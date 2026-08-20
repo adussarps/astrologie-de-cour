@@ -1,0 +1,20 @@
+{
+  "name": "astrologie-de-cour",
+  "version": "1.0.0",
+  "description": "Dresser une figure du ciel comme on la dressait en 1380 — maisons d'Alcabitius, carré médiéval, doctrine sourcée, et les cinq nativités royales du manuscrit de Charles V.",
+  "type": "module",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "servir": "python3 -m http.server 8765",
+    "test": "node verifier.mjs",
+    "fumee": "node fumee.mjs"
+  },
+  "devDependencies": {
+    "astronomy-engine": "^2.1.19"
+  },
+  "keywords": [
+    "astrologie", "histoire", "moyen-age", "alcabitius", "tables-alphonsines",
+    "charles-v", "horoscope", "manuscrits", "digital-humanities"
+  ]
+}

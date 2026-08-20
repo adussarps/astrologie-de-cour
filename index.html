@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L’Officine — astrologie de cour au XIVᵉ siècle</title>
+<meta name="description" content="Dresser une figure du ciel à la manière de 1380 : maisons d’Alcabitius, carré médiéval, dignités sourcées. Avec les cinq nativités royales du manuscrit de Charles V.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="bandeau">
+  <div class="dedans">
+    <h1>L’Officine</h1>
+    <p class="devise">Dresser une figure du ciel comme on la dressait en 1380 —
+      et montrer chaque règle avec le livre qui la porte.</p>
+    <nav>
+      <button class="onglet actif" data-vue="officine">L’officine</button>
+      <button class="onglet" data-vue="nativites">Les nativités</button>
+      <button class="onglet" data-vue="methode">La méthode</button>
+      <button class="onglet" data-vue="sources">Les sources</button>
+    </nav>
+  </div>
+</header>
+
+<main class="dedans">
+
+<!-- ══════════════════════════════ L'OFFICINE ══════════════════════════════ -->
+<section id="vue-officine" class="vue">
+
+  <div class="avertissement">
+    <p><strong>Ce que vous n’aurez pas ici :</strong> votre signe solaire, votre caractère,
+    votre avenir. Rien de cela n’existe au XIVᵉ siècle. Personne, en 1380, n’est
+    <em>un Bélier</em> — la notion est une invention du XXᵉ siècle. Ce que vous aurez est
+    ce qu’un prince achetait : un ascendant, son seigneur, douze maisons portant chacune
+    une question, des parts, et le nom du livre qui autorise chaque phrase.</p>
+  </div>
+
+  <form id="formulaire" class="officine">
+    <div class="champ">
+      <label for="jour">Jour</label>
+      <input type="number" id="jour" min="1" max="31" value="19" required>
+    </div>
+    <div class="champ">
+      <label for="mois">Mois</label>
+      <input type="number" id="mois" min="1" max="12" value="2" required>
+    </div>
+    <div class="champ">
+      <label for="annee">Année</label>
+      <input type="number" id="annee" min="-500" max="2400" value="1991" required>
+    </div>
+    <div class="champ champ-heure">
+      <label for="heure">Heure <span class="obligatoire">— sans elle, pas de figure</span></label>
+      <div class="paire">
+        <input type="number" id="heure" min="0" max="23" placeholder="h">
+        <span>h</span>
+        <input type="number" id="minute" min="0" max="59" placeholder="min" value="0">
+      </div>
+    </div>
+    <div class="champ">
+      <label for="lieu">Lieu</label>
+      <input list="lieux" id="lieu" value="Paris" autocomplete="off">
+      <datalist id="lieux"></datalist>
+    </div>
+    <div class="champ petit">
+      <label for="latitude">Latitude</label>
+      <input type="number" id="latitude" step="0.0001" value="48.8566" required>
+    </div>
+    <div class="champ petit">
+      <label for="longitude">Longitude</label>
+      <input type="number" id="longitude" step="0.0001" value="2.3522" required>
+    </div>
+    <div class="champ">
+      <label for="fuseau">L’heure est donnée en</label>
+      <select id="fuseau">
+        <option value="local">heure locale du lieu (avant les fuseaux)</option>
+        <option value="-1">UTC−1</option>
+        <option value="0">UTC (heure de Greenwich)</option>
+        <option value="1" selected>UTC+1</option>
+        <option value="2">UTC+2</option>
+        <option value="3">UTC+3</option>
+      </select>
+    </div>
+    <div class="boutons">
+      <button type="submit" class="principal">Dresser la figure</button>
+      <button type="button" id="sans-heure" class="secondaire">Je ne sais pas l’heure</button>
+    </div>
+    <p class="note-calendrier" id="note-calendrier"></p>
+  </form>
+
+  <div id="resultat"></div>
+</section>
+
+<!-- ═════════════════════════════ LES NATIVITÉS ════════════════════════════ -->
+<section id="vue-nativites" class="vue cachee">
+  <div class="intro">
+    <h2>Cinq carrés dans un seul cahier</h2>
+    <p>Charles V possédait un livre où il avait fait relier le traité de la sphère de Nicole
+    Oresme, deux traités écrits pour lui par Pèlerin de Prusse quand il était dauphin, et
+    l’<i>Introductorius</i> d’Alcabitius en français. On y a joint un cahier de trois
+    feuillets : sa nativité, et celles de ses quatre enfants. Le manuscrit est aujourd’hui à
+    Oxford, <b>St John’s College, MS 164</b>.</p>
+    <blockquote>
+      <p>« Une sorte de <i>livret familial</i>, constitué par un père de famille soucieux de
+      conserver, facilement accessibles, les données astronomiques qui permettront au médecin,
+      en cas de maladie, de pronostiquer son évolution, d’apprécier les risques d’une issue
+      fatale ou simplement de décider de l’opportunité d’une médication. »</p>
+      <cite>Emmanuel Poulle, <i>Horoscopes princiers des XIVᵉ et XVᵉ siècles</i>, 1969</cite>
+    </blockquote>
+    <p class="appuye">Ce n’est pas un recueil de bonne aventure. C’est un carnet de santé.
+    Des quatre enfants du cahier, deux mourront en bas âge dans les cinq ans, un sera
+    assassiné, un deviendra fou.</p>
+  </div>
+
+  <div id="galerie" class="galerie"></div>
+  <div id="nativite-detail"></div>
+
+  <div id="autres-pieces" class="intro"></div>
+</section>
+
+<!-- ══════════════════════════════ LA MÉTHODE ══════════════════════════════ -->
+<section id="vue-methode" class="vue cachee">
+  <div class="intro">
+    <h2>Comment on dresse une figure</h2>
+    <p>Six opérations, dans cet ordre. Aucune n’est de la divination : ce sont des calculs,
+    et c’est précisément pourquoi cela coûtait cher. Il fallait des tables, un astrolabe, et
+    un homme capable de s’en servir.</p>
+  </div>
+
+  <ol class="etapes">
+    <li>
+      <h3>Réduire la date</h3>
+      <p>Toute date antérieure à octobre 1582 est julienne. Les astronomes comptaient de plus
+      les jours <i>de midi à midi</i> : c’est pourquoi le carré de Charles V dit « dix-sept
+      heures trente-six minutes après le midi du 20 janvier » là où l’état civil dirait
+      « le 21 janvier à 5 h 36 ». Quand l’heure dépasse la douzième, il faut avancer le
+      quantième d’un jour.</p>
+    </li>
+    <li>
+      <h3>Trouver l’heure inégale</h3>
+      <p>Le jour <i>artificiel</i> va du lever au coucher du soleil et se coupe toujours en
+      douze, quelle que soit sa longueur. À Paris fin janvier, l’heure de nuit vaut
+      soixante-treize minutes et celle de jour quarante-sept. Une naissance n’est pas notée
+      « à cinq heures » : elle est notée « à la dixième heure de nuit ».</p>
+    </li>
+    <li>
+      <h3>Calculer les positions</h3>
+      <p>Sept planètes et les deux nœuds de la Lune. <b>Ce site calcule le ciel réel</b>, au
+      sens moderne. Un astrologien de 1380 calculait avec les <b>Tables alphonsines</b>, et
+      les deux ne donnent pas la même chose — voir plus bas.</p>
+    </li>
+    <li>
+      <h3>Dresser les maisons</h3>
+      <p>Le système est celui d’<b>Alcabitius</b>, en usage dans l’Occident latin au XIVᵉ
+      siècle. On prend le degré qui monte à l’horizon — l’<i>horoscopus</i>, l’ascendant — et
+      l’on coupe en trois son demi-arc diurne pour obtenir les maisons XI et XII, puis en
+      trois son demi-arc nocturne pour les maisons II et III. Les maisons sont donc
+      <b>inégales</b>, et c’est sa signature.</p>
+      <p class="controle">Notre calcul a été confronté à Swiss Ephemeris sur trois époques :
+      écart nul à la seconde d’arc.</p>
+    </li>
+    <li>
+      <h3>Peser les dignités</h3>
+      <p>Chaque degré du zodiaque est tenu par cinq seigneurs différents : le maître du
+      <b>domicile</b>, celui de l’<b>exaltation</b>, celui de la <b>triplicité</b> — qui
+      change entre le jour et la nuit —, celui du <b>terme</b> et celui de la <b>face</b>.
+      La planète qui en cumule le plus est l’<b>almuten</b>, de l’arabe <i>al-mubtazz</i>,
+      « celui qui l’emporte ». C’est elle qui gouverne la figure, non le signe.</p>
+    </li>
+    <li>
+      <h3>Juger</h3>
+      <p>Douze maisons, douze questions : la vie, l’avoir, les frères, le père, les enfants,
+      la maladie, le mariage, la mort, les voyages, la dignité, les amis, les ennemis cachés.
+      On juge chacune par son seigneur, par les planètes qui s’y tiennent, et par les regards
+      qu’elles reçoivent.</p>
+    </li>
+  </ol>
+
+  <div id="tables-doctrine"></div>
+
+  <div class="intro">
+    <h2>Ce que ce site ne fait pas, et pourquoi</h2>
+    <div id="reserves"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ LES SOURCES ═════════════════════════════ -->
+<section id="vue-sources" class="vue cachee">
+  <div class="intro">
+    <h2>Les sources</h2>
+    <p>Tout ce qui est affirmé sur ce site se trouve dans l’un de ces dépôts, et
+    la plupart sont en accès libre.</p>
+  </div>
+
+  <div class="cartes-sources">
+    <article>
+      <h3>DISHAS — projet ALFA</h3>
+      <p class="lieu">Observatoire de Paris, ERC 723085, dir. Matthieu Husson</p>
+      <p>Les <b>Tables alphonsines elles-mêmes</b>, numérisées chiffre par chiffre, avec une
+      API JSON. Plus de mille manuscrits dépouillés, 334 œuvres, 114 auteurs. C’est d’ici que
+      sortira un jour la seconde colonne de ce site : non pas le ciel, mais ce que les tables
+      faisaient trouver.</p>
+      <a href="https://dishas.obspm.fr/" target="_blank" rel="noopener">dishas.obspm.fr</a>
+    </article>
+    <article>
+      <h3>Ptolemaeus Arabus et Latinus</h3>
+      <p class="lieu">Académie bavaroise des sciences et université de Wurtzbourg</p>
+      <p>695 manuscrits latins ptoléméens catalogués, 193 œuvres, transcriptions, images en
+      haute définition, et un glossaire grec-arabe-latin des termes techniques. Les notices
+      décrivent jusqu’aux horoscopes dessinés dans les marges, et les datent en recalculant
+      les positions.</p>
+      <a href="https://ptolemaeus.badw.de/start" target="_blank" rel="noopener">ptolemaeus.badw.de</a>
+    </article>
+    <article>
+      <h3>AstroBibl</h3>
+      <p class="lieu">David Juste — plus de 5 500 titres</p>
+      <p>La bibliographie de l’histoire de l’astrologie occidentale, de la Mésopotamie à 1800,
+      classée par période. Publiée par le Warburg Institute de 2001 à 2017, reprise depuis
+      2019 par le projet PAL.</p>
+      <a href="https://ptolemaeus.badw.de/astrobibl/start" target="_blank" rel="noopener">ptolemaeus.badw.de/astrobibl</a>
+    </article>
+    <article>
+      <h3>Emmanuel Poulle, <i>Horoscopes princiers</i></h3>
+      <p class="lieu">Bulletin de la Société nationale des Antiquaires de France, 1969, p. 63-77</p>
+      <p>L’article qui publie les légendes latines des cinq carrés de Charles V et décrit les
+      recueils de la BnF, lat. 7443 et nouv. acq. lat. 398. C’est la source directe de la
+      section « Les nativités ». En accès libre sur Persée.</p>
+      <a href="https://www.persee.fr/doc/bsnaf_0081-1181_1971_num_1969_1_2163" target="_blank" rel="noopener">persee.fr</a>
+    </article>
+    <article>
+      <h3>Alcabitius, <i>Introductorius</i></h3>
+      <p class="lieu">éd. Ch. Burnett, K. Yamamoto, M. Yano, Warburg Institute, 2004</p>
+      <p>Le manuel universitaire du XIVᵉ siècle : plus de deux cents manuscrits, traduit de
+      l’arabe par Jean de Séville vers 1130, commenté à Paris et à Bologne dans les années
+      1320-1330. Toutes les tables de doctrine de ce site en viennent.</p>
+      <a href="https://ptolemaeus.badw.de/works" target="_blank" rel="noopener">notice PAL</a>
+    </article>
+    <article>
+      <h3>Jean-Patrice Boudet, <i>Entre science et nigromance</i></h3>
+      <p class="lieu">Publications de la Sorbonne, 2006, 624 p.</p>
+      <p>La synthèse de référence en français sur l’astrologie, la divination et la magie dans
+      l’Occident médiéval. À lire pour savoir où chercher — mais une synthèse n’est pas un
+      document, et rien ici ne repose sur elle seule.</p>
+      <a href="https://www.editionsdelasorbonne.fr/produit/33/9782859445447/entre-science-et-nigromance" target="_blank" rel="noopener">Éditions de la Sorbonne</a>
+    </article>
+  </div>
+
+  <div class="intro">
+    <h2>Le logiciel</h2>
+    <p>Le code est libre, sous licence MIT, et le site n’a pas de serveur : tout est calculé
+    dans votre navigateur, et rien de ce que vous entrez ne quitte votre machine. Les
+    positions viennent d’<a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noopener">astronomy-engine</a>
+    (MIT), validé ici contre Swiss Ephemeris à moins d’une minute d’arc sur 1331, 1345 et 1991.
+    Les corrections, les ajouts de nativités documentées et les reproches sont bienvenus.</p>
+    <p><a href="https://github.com/adussarps/astrologie-de-cour" target="_blank" rel="noopener">Le
+    dépôt, sur GitHub</a> — la contribution la plus utile serait de reconstruire le calcul
+    alphonsin depuis les données de DISHAS, pour afficher côte à côte le ciel réel et le ciel
+    des tables.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="dedans">
+    <p>« Il ne vous couste riens. » — Gaston Fébus, à qui l’on venait de raconter qu’un
+    chevalier disposait d’un esprit familier capable de rapporter en une nuit les nouvelles
+    de toute l’Europe. Devant le prodige, il évalue un coût d’exploitation.</p>
+  </div>
+</footer>
+
+<script src="vendor/astronomy.browser.min.js"></script>
+<script type="module" src="src/app.js"></script>
+</body>
+</html>

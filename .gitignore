@@ -1,0 +1,4 @@
+node_modules/
+.chrome-astro/
+.DS_Store
+*.log
