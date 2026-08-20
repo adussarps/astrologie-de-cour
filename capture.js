@@ -2,7 +2,7 @@
 // Sert aussi de contrôle : toute erreur de console est rapportée.
 //   node capture.js  (le site doit être servi sur :8765)
 
-const BASE = 'http://localhost:8765';
+const BASE = process.env.BASE ?? 'http://localhost:8765';
 const CIBLE = process.argv[2] ?? 'officine';
 
 const point = await (await fetch('http://127.0.0.1:9222/json/new?' + BASE,
