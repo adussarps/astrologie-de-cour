@@ -1,7 +1,13 @@
-# L’Officine
+# Gaudia planetarum
 
 **Dresser une figure du ciel comme on la dressait en 1380 — et montrer chaque règle avec le
 livre qui la porte.**
+
+*Les joies des planètes.* Le nom vient de la doctrine : chaque planète a une maison où les
+livres disent qu’elle se réjouit — *gaudet* —, et c’est le mot technique, sans métaphore.
+C’est aussi la seule condition favorable de tout le système qui ne pèse rien dans un calcul.
+Le site est à son image : il donne ce qui se démontre, il nomme ce qui se plaît, et il refuse
+ce qui ne se sait pas.
 
 Un site statique, sans serveur, qui calcule des nativités à la manière des astrologiens de
 cour du XIVᵉ siècle : maisons d’Alcabitius, calendrier julien, heures inégales, carré
