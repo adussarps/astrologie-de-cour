@@ -115,6 +115,20 @@ blockquote cite::before { content: '— '; }
   margin-bottom: 34px;
 }
 .rangee { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; margin-bottom: 16px; }
+/* Une rangée aligne le bas de ses cases. Quand l'une porte une note sous son
+   champ et l'autre non, ce sont les champs eux-mêmes qui se décalent — l'heure
+   descendait de vingt pixels sous le lieu. On réserve donc la place de la note
+   à toutes les cases de la rangée, y compris celles qui n'en ont pas. */
+.rangee:has(.etat-lieu) > .champ:not(:has(.etat-lieu))::after {
+  content: '';
+  display: block;
+  /* Les mêmes mesures que .etat-lieu, taille de police comprise : sans elle,
+     le em se résoudrait sur le corps et l'espace serait trop haut. */
+  font-size: .76rem;
+  line-height: 1.5;
+  min-height: 1.5em;
+  margin-top: 3px;
+}
 .rangee-date .champ { flex: 1 1 90px; max-width: 130px; }
 .champ { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .champ.petit { flex: 0 1 150px; }
@@ -159,6 +173,13 @@ label {
 input, select {
   font: inherit;
   font-size: 1.02rem;
+  /* Le sélecteur refuse la hauteur de ligne — Chrome la lui impose en
+     « normal » — et se retrouvait trois pixels plus court que les champs
+     voisins. On fixe donc la hauteur par le bas, en em pour qu'elle suive la
+     police : 1,6 de texte, plus les 22 px de marge intérieure et les 2 px de
+     filet, que la boîte compte ici puisqu'elle est en border-box. */
+  line-height: 1.6;
+  min-height: calc(1.6em + 24px);
   padding: 11px 12px;
   border: 1px solid var(--trait);
   background: #fffdf8;
@@ -562,7 +583,12 @@ button.lien:hover { color: #7a2718; }
   font-size: .76rem;
   color: var(--encre-pale);
   font-style: italic;
-  min-height: 1.1em;
+  /* Une ligne pleine et une ligne vide doivent occuper la même place, sans
+     quoi la case dont la note est remplie dépasse sa voisine et les deux
+     champs cessent de s'aligner. Voir l'espaceur de .rangee, qui copie ces
+     mesures pour les cases qui n'ont pas de note du tout. */
+  line-height: 1.5;
+  min-height: 1.5em;
   margin-top: 3px;
 }
 
@@ -807,6 +833,9 @@ footer p { max-width: 72ch; margin: 0; }
   .officine { padding: 18px 16px; }
   .rangee-date .champ { flex: 1 1 70px; max-width: none; }
   .champ-heure, .champ-lieu, .champ.petit { flex: 1 1 100%; }
+  /* Chaque case occupe désormais sa propre ligne : la place réservée pour
+     aligner les notes n'alignerait plus rien, et ne serait que du vide. */
+  .rangee:has(.etat-lieu) > .champ:not(:has(.etat-lieu))::after { content: none; }
   .boutons { flex-direction: column; align-items: stretch; }
   .boutons .principal { width: 100%; }
   .ligne-action { flex-direction: column; align-items: stretch; }
