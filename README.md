@@ -140,6 +140,14 @@ la méthode du seigneur, le ton, et la liste explicite de ce qu’il n’a pas l
 pas de portrait de caractère fondé sur le signe solaire, pas de durée de vie chiffrée, pas
 d’événement daté, aucune règle inventée. Il n’apporte que la prose.
 
+**Le jugement est rendu par rubriques.** Une section titrée par matière, et le titre donne la
+conclusion plutôt que le sujet : non pas « Le métier », mais « Le métier — un officier, jamais
+un seigneur terrien ». Qui ne lit que les cinq titres tient le jugement entier. Ce n’est pas
+une concession à la lecture en diagonale : *rubrique* désigne le titre que le copiste passe à
+l’encre rouge en tête de chaque matière, et les traités sont bâtis ainsi — Sahl donne un
+chapitre par maison, Ptolémée un livre par genre de question. Mille quatre cents mots d’un
+seul tenant, personne ne les lit, et l’on n’en retient que la dernière phrase.
+
 **Trois consignes, pas une.** Les trois genres ne se jugent pas de la même façon, et les
 confondre est l’erreur que les traités reprochent le plus. Le socle est commun — le ton, la
 règle de traduction, la dureté permise, les interdits — mais le plan du *judicium* change :
