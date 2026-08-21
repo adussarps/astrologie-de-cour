@@ -7,7 +7,7 @@
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, POIDS,
   MAISONS, ASPECTS, ORBES, PARTS, NATURES_SIGNES, FORCE_DES_LIEUX,
-  ETATS_SOLAIRES, LUMIERE, MATIERES, MELOTHESIE, SIGNIFICATIONS, laGrandeDignite,
+  ETATS_SOLAIRES, LUMIERE, MATIERES, MELOTHESIE, SIGNIFICATIONS, laGrandeDignite, CONDITIONS,
 } from './doctrine.js';
 import {
   PLANETES, SIGNES, GENRES, maisonDe, signeDe, mod360, enSigne, ecartAngulaire,
@@ -100,35 +100,61 @@ export function etatDe(clef, longitude, deJour) {
 /** L'écart angulaire absolu entre deux longitudes, de 0 à 180. */
 const ecartDe = ecartAngulaire;
 
-/** Les regards que les planètes se portent, avec l'orbe propre à chacune.
+/** Le regard entre deux astres, s'il y en a un dans les orbes — et, ce qui
+ *  importe davantage, s'il se fait ou s'il se défait.
  *
  *  Un regard ne dit rien tant qu'on ignore son sens. Si la plus rapide des
  *  deux marche vers l'aspect, il s'applique et la chose est à venir ; si elle
  *  s'en éloigne, il se sépare et la chose est déjà faite. Alcabitius traite
  *  l'application et la séparation à la dist. III, et c'est la distinction qui
- *  sépare un pronostic d'un constat. */
+ *  sépare un pronostic d'un constat. Dans une interrogation elle décide de la
+ *  réponse même : appliquer c'est oui, se séparer c'est non.
+ *
+ *  Le sens se lit sur un pas de temps court, et il faut qu'il le soit. La Lune
+ *  parcourt treize degrés en un jour : mesurée à un jour d'intervalle, une Lune
+ *  à deux degrés de l'aspect exact et marchant vers lui se retrouve onze degrés
+ *  au-delà, et l'on conclut qu'elle s'en sépare. C'est le contraire de la
+ *  vérité, et cela renverse la réponse. Le pas est donc d'une heure environ,
+ *  soit la dérivée à ce que le calcul peut lire. */
+const PAS = 0.04;
+
+export function regardEntre(a, b) {
+  const ecartMaintenant = ecartDe(a.longitude, b.longitude);
+  const orbe = ((ORBES.table[a.clef] ?? 6) + (ORBES.table[b.clef] ?? 6)) / 2;
+  for (const aspect of ASPECTS.table) {
+    const ecart = Math.abs(ecartMaintenant - aspect.angle);
+    if (ecart > orbe) continue;
+
+    const apres = Math.abs(ecartDe(
+      a.longitude + (a.vitesse ?? 0) * PAS,
+      b.longitude + (b.vitesse ?? 0) * PAS,
+    ) - aspect.angle);
+    const applique = apres < ecart;
+    const relative = Math.abs((a.vitesse ?? 0) - (b.vitesse ?? 0));
+
+    return {
+      aspect,
+      ...aspect, // nom, angle, glyphe, nature — dépliés pour la lecture
+      ecart,
+      partil: ecart < 1,
+      applique,
+      mouvement: applique ? 'application' : 'séparation',
+      jours: relative > 1e-6 ? ecart / relative : null,
+      glose: applique ? CONDITIONS.application : CONDITIONS.separation,
+    };
+  }
+  return null;
+}
+
+/** Tous les regards d'une figure, du plus serré au plus lâche. */
 export function regards(positions) {
   const clefs = PLANETES.map((p) => p.clef);
   const trouves = [];
-  const pas = 0.05; // en jours : de quoi voir dans quel sens l'écart bouge
   for (let i = 0; i < clefs.length; i++) {
     for (let j = i + 1; j < clefs.length; j++) {
       const a = clefs[i], b = clefs[j];
-      const ecart = ecartDe(positions[a].longitude, positions[b].longitude);
-      const orbe = (ORBES.table[a] + ORBES.table[b]) / 2;
-      for (const asp of ASPECTS.table) {
-        const distance = Math.abs(ecart - asp.angle);
-        if (distance > orbe) continue;
-        const apres = Math.abs(ecartDe(
-          positions[a].longitude + (positions[a].vitesse ?? 0) * pas,
-          positions[b].longitude + (positions[b].vitesse ?? 0) * pas,
-        ) - asp.angle);
-        trouves.push({
-          de: a, a: b, aspect: asp, ecart: distance, exact: distance < 1,
-          applique: apres < distance,
-        });
-        break;
-      }
+      const vu = regardEntre({ ...positions[a], clef: a }, { ...positions[b], clef: b });
+      if (vu) trouves.push({ de: a, a: b, ...vu });
     }
   }
   return trouves.sort((x, y) => x.ecart - y.ecart);
@@ -687,7 +713,7 @@ export function enPhrases(figure) {
     p.push({
       titre: 'Les regards serrés',
       texte: serres.map((r) => `${nom(r.de)} ${r.aspect.glyphe} ${nom(r.a)} `
-        + `(${r.aspect.nom}, ${r.ecart.toFixed(1)}°${r.exact ? ', par degré partil' : ''})`).join(' ; ') + '.',
+        + `(${r.aspect.nom}, ${r.ecart.toFixed(1)}°${r.partil ? ', par degré partil' : ''})`).join(' ; ') + '.',
       source: 'Alcabitius, dist. III — les aspects ; orbes d’après al-Bīrūnī',
     });
   }

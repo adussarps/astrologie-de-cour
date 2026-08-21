@@ -11,7 +11,8 @@ globalThis.tzlookup = tzlookup;
 
 const { jourJulien, positions, maisons, heuresInegales, heuresPlanetaires, enSigne, ecartAngulaire } =
   await import('./src/ciel.js');
-const { juger, proximiteExaltation, enDegresMinutes } = await import('./src/jugement.js');
+const { juger, proximiteExaltation, enDegresMinutes, regardEntre } =
+  await import('./src/jugement.js');
 const { EXALTATIONS } = await import('./src/doctrine.js');
 const { jugerInterrogation } = await import('./src/interrogation.js');
 const { NATIVITES, CONJONCTION_1345 } = await import('./src/corpus.js');
@@ -220,6 +221,47 @@ console.log('\n── L’écart angulaire : une distance, donc symétrique et b
   if (!accord) echecs++;
   console.log(`   ${accord ? '✓' : '✗'} l’état solaire s’accorde à la table des regards  `
     + `(Vénus ${venus.solaire.ecart.toFixed(1)}° du Soleil, ${venus.solaire.classe})`);
+}
+
+console.log('\n── Le regard : un seul moteur, et il voit la Lune venir');
+{
+  // Il y avait deux moteurs d'aspect, l'un mesurant le sens du mouvement sur un
+  // pas de 0,05 jour et l'autre sur un jour entier. La Lune parcourt treize
+  // degrés par jour : à un jour d'intervalle, une Lune qui s'applique est vue
+  // s'éloigner. Dans une interrogation, cela retourne la réponse.
+  const lune = { clef: 'lune', longitude: 98, vitesse: 13.2 };
+  const saturne = { clef: 'saturne', longitude: 100, vitesse: 0.03 };
+  const vers = regardEntre(lune, saturne);
+  const depuis = regardEntre({ ...lune, longitude: 102 }, saturne);
+
+  const controles = [
+    ['une Lune à 2° avant l’exactitude s’applique', true, vers?.applique === true],
+    ['une Lune à 2° après se sépare', true, depuis?.applique === false],
+    ['le regard est symétrique dans son constat', true,
+      regardEntre(saturne, lune)?.nom === vers?.nom],
+    ['l’écart est un nombre de degrés, non un booléen', true, typeof vers?.ecart === 'number'],
+    ['« partil » est bien le booléen', true, typeof vers?.partil === 'boolean'],
+  ];
+
+  // Et surtout : la table des regards d'une figure doit dire exactement ce que
+  // dit le moteur pris couple par couple. C'est la même fonction, donc c'est
+  // vrai par construction — ce contrôle est là pour qu'on ne la redouble pas.
+  const louis = NATIVITES.find((n) => n.clef === 'louis-orleans');
+  const { jj } = versTempsUniversel({ ...louis, convention: 'vraie' });
+  const pos = positions(jj);
+  const f = juger({ positions: pos, maisons: maisons(jj, louis.latitude, louis.longitude) });
+  const accordent = f.regards.every((r) => {
+    const seul = regardEntre({ ...pos[r.de], clef: r.de }, { ...pos[r.a], clef: r.a });
+    return seul && seul.nom === r.nom && Math.abs(seul.ecart - r.ecart) < 1e-9
+      && seul.applique === r.applique;
+  });
+  controles.push(['la table et le couple à couple s’accordent', true, accordent]);
+
+  for (const [quoi, attendu, obtenu] of controles) {
+    const ok = attendu === obtenu;
+    if (!ok) echecs++;
+    console.log(`   ${ok ? '✓' : '✗'} ${quoi.padEnd(46)} ${ok ? '' : `attendu ${attendu}, obtenu ${obtenu}`}`);
+  }
 }
 
 console.log('\n── Le compte de force : trois témoignages, il en faut deux');

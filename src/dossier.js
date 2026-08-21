@@ -521,7 +521,7 @@ function figureEnClair(figure) {
 
   const regards = (figure.regards ?? []).map((r) =>
     `  ${nomDe(r.de)} ${r.aspect.nom} ${nomDe(r.a)} `
-    + `(${r.aspect.angle}°, à ${r.ecart.toFixed(1)}° près${r.exact ? ', EXACT — par degré partil' : ''}`
+    + `(${r.aspect.angle}°, à ${r.ecart.toFixed(1)}° près${r.partil ? ', EXACT — par degré partil' : ''}`
     + `, ${r.applique ? 's’APPLIQUE — la chose est à venir' : 'se SÉPARE — la chose est faite'})`)
     .join('\n');
 
@@ -838,7 +838,7 @@ export function dossierInterrogation({ saisie, resultat, question, jugement }) {
       + `  ${nu(j.verdict.texte)}\n\n`
       + (j.jonction
         ? `  Aspect entre les deux seigneurs : ${j.jonction.nom} (${j.jonction.angle}°), à `
-          + `${j.jonction.exact.toFixed(2)}° de l'exactitude, en ${j.jonction.mouvement}.\n`
+          + `${j.jonction.ecart.toFixed(2)}° de l'exactitude, en ${j.jonction.mouvement}.\n`
           + `  ${j.jonction.glose}\n`
         : `  Aucun aspect entre les deux seigneurs.\n`)
       + (j.translation

@@ -21,7 +21,7 @@
 // divinacions.
 
 import { mod360, enSigne, signeDe, ecartAngulaire, GENRES } from './ciel.js';
-import { nomDe, rangHtml, peregrinDe, avecArticle } from './jugement.js';
+import { nomDe, rangHtml, peregrinDe, avecArticle, regardEntre } from './jugement.js';
 import {
   MAISONS, ASPECTS, ASPECTS_DURS, ORBES, CONDITIONS, NATURES_SIGNES, ETATS_SOLAIRES,
   FORCE_DES_LIEUX,
@@ -107,41 +107,6 @@ export function considerations(figure) {
     }
   }
   return avis;
-}
-
-const separation = ecartAngulaire;
-
-/** Le regard entre deux astres, s'il y en a un dans les orbes — et, ce qui
- *  importe davantage, s'il se fait ou s'il se défait.
- *
- *  C'est la distinction qui commande tout le genre. Un aspect qui s'applique
- *  annonce une chose à venir ; le même aspect en séparation dit qu'elle est
- *  déjà faite, ou déjà manquée. Les juger pareillement est l'erreur que Sahl
- *  reproche aux ignorants, et elle renverse la réponse du tout au tout. */
-function regardEntre(a, b) {
-  const distance = separation(a.longitude, b.longitude);
-  for (const asp of ASPECTS.table) {
-    const orbe = (ORBES.table[a.clef] ?? 6) / 2 + (ORBES.table[b.clef] ?? 6) / 2;
-    const exact = Math.abs(distance - asp.angle);
-    if (exact > orbe) continue;
-
-    // Un jour plus tard : l'écart à l'aspect exact se resserre-t-il ?
-    const apres = Math.abs(
-      separation(a.longitude + (a.vitesse ?? 0), b.longitude + (b.vitesse ?? 0)) - asp.angle,
-    );
-    const applique = apres < exact;
-    // La vitesse relative donne le nombre de jours jusqu'à l'exactitude.
-    const relative = Math.abs((a.vitesse ?? 0) - (b.vitesse ?? 0));
-    return {
-      ...asp,
-      exact,
-      applique,
-      mouvement: applique ? 'application' : 'séparation',
-      jours: relative > 1e-6 ? exact / relative : null,
-      glose: applique ? CONDITIONS.application : CONDITIONS.separation,
-    };
-  }
-  return null;
 }
 
 /** La plus rapide de deux planètes — celle qui porte le mouvement. */
@@ -233,11 +198,11 @@ function quand(jonction, seigneurChose) {
   if (!jonction?.applique) return null;
   const mode = NATURES_SIGNES.modes.find((m) => m.signes.includes(signeDe(seigneurChose.longitude)));
   const unite = UNITES[seigneurChose.force]?.[mode.nom] ?? MOIS;
-  const nombre = Math.max(1, Math.round(jonction.exact));
+  const nombre = Math.max(1, Math.round(jonction.ecart));
   return {
     nombre, unite: unite.pluriel, mode: mode.nom, lieu: seigneurChose.force,
-    degres: jonction.exact,
-    texte: `Il reste ${jonction.exact.toFixed(1)}° jusqu’à l’aspect exact, et l’on compte une `
+    degres: jonction.ecart,
+    texte: `Il reste ${jonction.ecart.toFixed(1)}° jusqu’à l’aspect exact, et l’on compte une `
       + `unité de temps par degré. Le seigneur de la chose est en signe ${mode.nom} et en `
       + `maison ${seigneurChose.force} : l’unité est ${unite.article}. La règle donne donc `
       + `<b>environ ${nombre} ${unite.pluriel}</b> — c’est ce que dit la table, non ce que je `
@@ -265,7 +230,7 @@ function videDeCourse(astres, lune) {
   const aVenir = astres.some((a) => {
     if (a.noeud || a.clef === 'lune') return false;
     const r = regardEntre(lune, a);
-    return r?.applique && r.exact < reste;
+    return r?.applique && r.ecart < reste;
   });
   return aVenir ? null : { reste };
 }
@@ -316,7 +281,7 @@ export function jugerInterrogation(figure, rangMaison) {
       titre: `La chose se fait — les deux seigneurs s’appliquent par ${jonction.nom}`,
       texte: `<b>${nomC}</b>, seigneur du consultant, marche vers <b>${nomS}</b>, seigneur de `
         + `la chose, et les joint par <b>${jonction.nom}</b> (${jonction.angle}°, à `
-        + `${jonction.exact.toFixed(1)}° de l’exactitude). L’aspect s’applique : la chose est `
+        + `${jonction.ecart.toFixed(1)}° de l’exactitude). L’aspect s’applique : la chose est `
         + `à venir, et elle se fera d’elle-même, sans entremise. `
         + (dur
           ? jonction.nom === 'opposition'
