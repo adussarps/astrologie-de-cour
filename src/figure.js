@@ -113,6 +113,10 @@ export function carre(figure, cartouche = {}, { cote = 620, partsVisibles = true
   }
   if (partsVisibles) {
     for (const part of figure.parts) {
+      // Une part sans longitude est une part qu'on n'a pas su trancher — le
+      // mariage, faute de connaître le sexe. On ne la place pas plutôt que de
+      // la placer au hasard.
+      if (!Number.isFinite(part.longitude)) continue;
       const m = figure.maisonsHabitees.find((h) => {
         const debut = figure.pointes[h.rang];
         const fin = figure.pointes[h.rang % 12 + 1];

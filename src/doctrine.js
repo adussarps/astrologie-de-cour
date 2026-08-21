@@ -247,7 +247,22 @@ export const PARTS = {
     {
       clef: 'mariage', nom: 'Part du Mariage', latin: 'pars conjugii',
       detail: 'pour un homme, la femme ; pour une femme, le mari',
-      dejour: ['venus', 'saturne'], denuit: ['venus', 'saturne'],
+      // Pas de dejour / denuit ici, et c'est voulu : les porter identiques
+      // laisserait croire que la part ne se renverse pas, alors qu'elle se
+      // renverse sur autre chose que la secte. Le champ absent oblige tout
+      // lecteur du code — et la table de la notice — à traiter le cas.
+      //
+      // La seule part de la table qui ne se renverse pas sur la secte, mais
+      // sur le sexe du natif : de Saturne à Vénus pour un homme, de Vénus à
+      // Saturne pour une femme. Les trois autres s'inversent entre le jour et
+      // la nuit, celle-ci non — et c'est pourquoi la connaître demande une
+      // donnée que le ciel ne fournit pas. La calculer sans la savoir
+      // reviendrait à traiter tout le monde en homme, en silence.
+      selonLeSexe: {
+        source: 'Al-Bīrūnī, Tafhīm (les parts du mariage) ; Alcabitius, dist. V',
+        homme: ['venus', 'saturne'],
+        femme: ['saturne', 'venus'],
+      },
     },
   ],
 };

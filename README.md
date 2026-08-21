@@ -91,6 +91,32 @@ chiffre qui fait autorité, pas le ciel.**
   colonnes côte à côte avec l’écart en degrés : c’est le vrai travail, et il reste à faire.
   **C’est la contribution la plus utile que quelqu’un puisse apporter à ce dépôt.**
 
+## La seule donnée que le ciel ne porte pas : le sexe
+
+Le formulaire demande la date, l’heure, le lieu — et une quatrième chose, facultative, qui
+n’est pas astronomique : si le natif est un homme ou une femme. Elle ne sert qu’à **une seule
+ligne de toute la doctrine**, et il vaut la peine de dire laquelle, parce qu’un champ pareil
+mérite d’être justifié ou retiré.
+
+Les parts se prennent dans un sens ou dans l’autre selon le cas, et le cas est d’ordinaire lisible
+dans le ciel : la Fortune se prend du Soleil à la Lune de jour, de la Lune au Soleil de nuit, et
+l’on sait toujours s’il fait jour. La **part du Mariage** se renverse sur autre chose — de Saturne à Vénus pour un homme, de Vénus
+à Saturne pour une femme (Al-Bīrūnī, *Tafhīm* ; Alcabitius, dist. V). Aucune observation ne
+tranche entre les deux, et l’écart n’est pas cosmétique : pour le 20 mai 1996 à 14 h 30 à Paris,
+la part tombe en **3ᵉ maison** si le natif est un homme et en **10ᵉ** si c’est une femme —
+la parenté et les lettres d’un côté, le règne et le métier de l’autre.
+
+Laisser le champ vide était la situation d’avant, mais en silence : la part se calculait dans
+la forme masculine sans que rien ne le signale. Désormais, si on ne le dit pas, **la part n’est
+pas placée sur le carré** et les deux degrés sont rendus côte à côte, dans le tableau comme
+dans le dossier. Une part qu’on n’a pas su trancher n’a pas non plus de seigneur, et l’on n’en
+calcule pas.
+
+Deux lois tiennent ce calcul, et sont vérifiées dans `verifier.mjs` : les deux formes sont
+**symétriques autour de l’ascendant** (leur somme fait deux ascendants), et les trois autres
+parts **ne bougent pas** quand le sexe change. La seconde est la plus utile : sans elle, on
+pourrait brancher le sexe sur le mauvais renversement sans que rien ne proteste.
+
 ## L’écart assumé : les traits d’aspect
 
 Le carré des manuscrits ne porte **pas** de traits entre les planètes. Les regards y sont

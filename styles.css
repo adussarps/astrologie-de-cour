@@ -122,6 +122,10 @@ blockquote cite::before { content: '— '; }
 .champ-lieu { flex: 1 1 260px; }
 .champ.large { flex: 1 1 280px; }
 .champ-convention { flex: 1 1 220px; }
+.champ-sexe { flex: 0 1 170px; }
+
+/* Une part qu'on n'a pas su trancher : les deux points, et aucun sur la figure. */
+tr.indecise td { background: rgba(139, 106, 58, .045); }
 label {
   font-size: .78rem;
   letter-spacing: .1em;

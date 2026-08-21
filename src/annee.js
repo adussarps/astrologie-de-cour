@@ -183,17 +183,19 @@ export function lEcartDuMaitre(natal, annuel) {
 }
 
 /** La figure de l'année, entière : la révolution, la profection, le maître. */
-export function figureDeLAnnee({ jjNatal, age, latitude, longitude }) {
+export function figureDeLAnnee({ jjNatal, age, latitude, longitude, sexe = null }) {
   const retour = revolutionSolaire(jjNatal, age);
   if (!retour) return null;
 
   const natale = juger({
     positions: positions(jjNatal),
     maisons: maisons(jjNatal, latitude, longitude),
+    sexe,
   });
   const annuelle = juger({
     positions: positions(retour.jj),
     maisons: maisons(retour.jj, latitude, longitude),
+    sexe,
   });
   const maitre = maitreDeLAnnee(natale, age);
 

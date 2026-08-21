@@ -43,7 +43,7 @@ function instant(saisie) {
 function dresser(saisie) {
   const { jj, julien, convention, decalage, equation, zone } = instant(saisie);
   const mai = maisons(jj, saisie.latitude, saisie.longitude);
-  const figure = juger({ positions: positions(jj), maisons: mai });
+  const figure = juger({ positions: positions(jj), maisons: mai, sexe: saisie.sexe ?? null });
   const hi = heuresInegales(jj, saisie.latitude, saisie.longitude);
   return {
     jj, julien, figure, heures: hi, planetaires: heuresPlanetaires(hi),
@@ -69,11 +69,14 @@ function tableauDesAstres(figure) {
     </tr>`;
   }).join('');
 
-  const parts = figure.parts.map((p) => `<tr>
+  const parts = figure.parts.map((p) => `<tr${p.indecise ? ' class="indecise"' : ''}>
       <td class="glyphe">·</td><td>${html(p.nom)}</td>
-      <td class="deg">${html(enSigne(p.longitude))}</td>
+      <td class="deg">${p.indecise
+    ? p.variantes.map((v) => `${html(enSigne(v.longitude))} <span class="cote">si ${v.sexe}</span>`).join('<br>')
+    : html(enSigne(p.longitude))}</td>
       <td class="deg">—</td><td>—</td>
-      <td><i>${html(p.latin)}</i> — ${html(p.detail)}</td>
+      <td><i>${html(p.latin)}</i> — ${html(p.detail)}${p.indecise
+  ? ` <span class="cote">— non placée : ${html(p.indecise)}</span>` : ''}</td>
     </tr>`).join('');
 
   return `<table class="releve">
@@ -359,6 +362,7 @@ function lireFormulaire() {
     heure: +$('#heure').value, minute: +$('#minute').value || 0,
     latitude: +$('#latitude').value, longitude: +$('#longitude').value,
     convention: $('#convention').value,
+    sexe: $('#sexe').value || null,
   };
 }
 
@@ -496,6 +500,7 @@ function rendreAnnee(saisie, age) {
   const resultat = dresser(saisie);
   const f = figureDeLAnnee({
     jjNatal: resultat.jj, age, latitude: saisie.latitude, longitude: saisie.longitude,
+    sexe: saisie.sexe ?? null,
   });
   if (!f) return '<p>Le retour solaire n’a pas été trouvé pour cet âge.</p>';
 
@@ -955,11 +960,16 @@ function initMethode() {
     <td class="deg">${i + 1}</td><td><i>${html(m.latin)}</i></td>
     <td><b>${html(m.titre)}</b></td><td>${html(m.detail)}</td></tr>`).join('');
 
-  const partsTable = PARTS.table.map((p) => `<tr>
+  const formule = (paire) => `asc + ${nomDe(paire[0])} − ${nomDe(paire[1])}`;
+  const partsTable = PARTS.table.map((p) => `<tr${p.selonLeSexe ? ' class="indecise"' : ''}>
     <td><b>${html(p.nom)}</b> <i class="cote">${html(p.latin)}</i></td>
-    <td>asc + ${nomDe(p.dejour[0])} − ${nomDe(p.dejour[1])}</td>
-    <td>asc + ${nomDe(p.denuit[0])} − ${nomDe(p.denuit[1])}</td>
-    <td>${html(p.detail)}</td></tr>`).join('');
+    ${p.selonLeSexe
+    ? `<td>${formule(p.selonLeSexe.homme)} <span class="cote">si le natif est un homme</span></td>
+       <td>${formule(p.selonLeSexe.femme)} <span class="cote">si c’est une femme</span></td>`
+    : `<td>${formule(p.dejour)} <span class="cote">de jour</span></td>
+       <td>${formule(p.denuit)} <span class="cote">de nuit</span></td>`}
+    <td>${html(p.detail)}</td>
+    </tr>`).join('');
 
   $('#tables-doctrine').innerHTML = `
     <div class="table-doctrine">
@@ -981,9 +991,13 @@ function initMethode() {
     <div class="table-doctrine">
       <h3>Les parts</h3>
       <p class="source-table">${html(PARTS.source)} — une part n’est pas un astre : c’est une
-      distance reportée depuis l’ascendant, et la plupart se renversent entre le jour et la nuit.</p>
+      distance reportée depuis l’ascendant. La Fortune et l’Esprit se renversent entre le jour et
+      la nuit, et le ciel dit lui-même dans quel cas on se trouve ; le Règne se prend toujours du
+      même côté. Le Mariage, lui, se renverse sur le sexe du natif — une donnée que le ciel ne
+      porte pas, et la seule que ce site demande sans pouvoir la calculer.</p>
       <table class="releve">
-        <thead><tr><th>Part</th><th>De jour</th><th>De nuit</th><th>Ce qu’elle regarde</th></tr></thead>
+        <thead><tr><th>Part</th><th>Un sens…</th><th>…ou l’autre</th>
+          <th>Ce qu’elle regarde</th></tr></thead>
         <tbody>${partsTable}</tbody></table>
     </div>`;
 

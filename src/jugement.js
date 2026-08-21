@@ -274,20 +274,39 @@ export function significateurDuMetier(figure) {
 }
 
 /** Les parts. Une part est une distance reportée depuis l'ascendant, et
- *  la plupart se renversent entre le jour et la nuit. */
-export function parts(positions, ascendant, deJour) {
+ *  la plupart se renversent entre le jour et la nuit.
+ *
+ *  Le mariage fait exception : il se renverse sur le sexe du natif, qui n'est
+ *  pas dans le ciel. Faute de le savoir, on ne tranche pas — on rend les deux
+ *  points, et la part n'est pas placée sur la figure. C'est le seul endroit du
+ *  site où une donnée manque sans qu'on puisse la calculer. */
+export function parts(positions, ascendant, deJour, sexe = null) {
+  const reporter = (de, a) => ({
+    longitude: mod360(ascendant + positions[de].longitude - positions[a].longitude),
+    formule: `ascendant + ${nomDe(de)} − ${nomDe(a)}`,
+  });
+
   return PARTS.table.map((p) => {
-    const [de, a] = deJour ? p.dejour : p.denuit;
+    if (!p.selonLeSexe) {
+      const [de, a] = deJour ? p.dejour : p.denuit;
+      return { ...p, ...reporter(de, a) };
+    }
+    const paire = p.selonLeSexe[sexe];
+    if (paire) return { ...p, ...reporter(...paire), sexe };
     return {
       ...p,
-      longitude: mod360(ascendant + positions[de].longitude - positions[a].longitude),
-      formule: `ascendant + ${nomDe(de)} − ${nomDe(a)}`,
+      longitude: null,
+      formule: null,
+      indecise: 'le sexe du natif n’a pas été donné',
+      variantes: ['homme', 'femme'].map((s) => ({
+        sexe: s, ...reporter(...p.selonLeSexe[s]),
+      })),
     };
   });
 }
 
 /** La figure complète : positions, maisons, dignités, parts, regards. */
-export function juger({ positions: pos, maisons: mai }) {
+export function juger({ positions: pos, maisons: mai, sexe = null }) {
   const soleilEnMaison = maisonDe(pos.soleil.longitude, mai.pointes);
   const deJour = soleilEnMaison >= 7;
 
@@ -324,7 +343,8 @@ export function juger({ positions: pos, maisons: mai }) {
     seigneurAscendant,
     seigneurAscendantPlace: astres.find((a) => a.clef === seigneurAscendant),
     almuten,
-    parts: parts(pos, mai.ascendant, deJour),
+    sexe,
+    parts: parts(pos, mai.ascendant, deJour, sexe),
     regards: lesRegards,
     lumiere: lumiereDeLaLune(pos.lune.longitude, pos.soleil.longitude),
     receptions: receptions(astres, lesRegards),

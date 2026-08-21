@@ -566,8 +566,12 @@ function figureEnClair(figure) {
     + ` seigneur ${nomDe(m.seigneur).padEnd(9)}`
     + ` ${m.hotes.length ? `y sont : ${m.hotes.map((h) => h.nom).join(', ')}` : '(vide)'}`).join('\n');
 
-  const parts = figure.parts.map((p) =>
-    `  ${p.nom.padEnd(20)} ${enSigne(p.longitude).padEnd(22)} (${p.formule})`).join('\n');
+  const parts = figure.parts.map((p) => (p.indecise
+    ? `  ${p.nom.padEnd(20)} INDÉCISE — ${p.indecise}. Les deux points possibles :\n`
+      + p.variantes.map((v) => `${' '.repeat(24)}si ${v.sexe} : `
+        + `${enSigne(v.longitude).padEnd(22)} (${v.formule})`).join('\n')
+    : `  ${p.nom.padEnd(20)} ${enSigne(p.longitude).padEnd(22)} (${p.formule})`
+      + (p.sexe ? ` — prise dans le sens qui vaut pour ${p.sexe === 'homme' ? 'un homme' : 'une femme'}` : ''))).join('\n');
 
   const regards = (figure.regards ?? []).map((r) =>
     `  ${nomDe(r.de)} ${r.aspect.nom} ${nomDe(r.a)} `
@@ -627,17 +631,27 @@ function figureEnClair(figure) {
           + `commun), son lieu (angle, succédente, cadente), sa dignité, et s’il est brûlé.`)
     : '';
 
-  const lieuxParts = (figure.parts ?? []).map((p) => {
+  const ouTombe = (longitude) => {
     const maison = figure.maisonsHabitees.find((h) => {
       const debut = figure.pointes[h.rang];
       const fin = figure.pointes[h.rang % 12 + 1];
-      return mod360(p.longitude - debut) < mod360(fin - debut);
+      return mod360(longitude - debut) < mod360(fin - debut);
     });
-    const seigneur = figure.astres.find((a) => a.clef === seigneurDuSigne(p.longitude));
-    return `  ${p.nom.padEnd(20)} tombe en la ${maison ? `${rang(maison.rang)} maison — ${maison.titre} `
-      + `(${maison.detail})` : '?'}\n`
-      + `    son seigneur est ${seigneur.nom}, en la ${rang(seigneur.maison)} maison, `
+    const seigneur = figure.astres.find((a) => a.clef === seigneurDuSigne(longitude));
+    return `la ${maison ? `${rang(maison.rang)} maison — ${maison.titre} (${maison.detail})`
+      : '?'}\n    son seigneur est ${seigneur.nom}, en la ${rang(seigneur.maison)} maison, `
       + `${etatEnClair(seigneur)}`;
+  };
+
+  const lieuxParts = (figure.parts ?? []).map((p) => {
+    // Une part indécise n'a pas de seigneur : lui en calculer un reviendrait à
+    // trancher en sous-main. On rend les deux lectures, et l'écart entre elles
+    // est précisément ce que le modèle doit rapporter.
+    if (p.indecise) {
+      return `  ${p.nom.padEnd(20)} INDÉCISE — ${p.indecise}. Les deux lectures :\n`
+        + p.variantes.map((v) => `    si ${v.sexe}, elle tombe en ${ouTombe(v.longitude)}`).join('\n');
+    }
+    return `  ${p.nom.padEnd(20)} tombe en ${ouTombe(p.longitude)}`;
   }).join('\n');
 
   return `L'ASCENDANT ET LES ANGLES
@@ -692,11 +706,17 @@ function contexte({ saisie, temps, heures, planetaires, julien }) {
     + `${julien ? ' (calendrier JULIEN, comme l\'aurait lu un calculateur du temps)' : ' (calendrier grégorien)'}`,
     `Heure annoncée : ${saisie.heure} h ${String(saisie.minute).padStart(2, '0')}`,
     `Lieu : latitude ${saisie.latitude}°, longitude ${saisie.longitude}°`,
-    'Sexe du natif : NON DEMANDÉ, donc inconnu. Le site ne le demande pas, et tu ne dois pas '
-    + 'le deviner. Cela a une conséquence précise : la Part du Mariage se prend dans un sens '
-    + 'pour un homme et dans l’autre pour une femme, si bien que le degré calculé ci-dessous '
-    + 'vaut pour l’une des deux lectures seulement. Dis-le, et ne tranche pas. Partout '
-    + 'ailleurs, écris sans supposer ni le sexe ni l’état matrimonial.',
+    saisie.sexe
+      ? `Sexe du natif : ${saisie.sexe}, donné par le consultant. Il ne sert qu’à une chose, `
+        + 'et à une seule : la Part du Mariage se prend de Saturne à Vénus pour un homme et de '
+        + 'Vénus à Saturne pour une femme, si bien qu’elle est ci-dessous calculée dans le bon '
+        + 'sens. N’en tire rien d’autre — pas de rôle, pas d’état matrimonial, pas de caractère.'
+      : 'Sexe du natif : NON DONNÉ. Le champ existe et le consultant l’a laissé vide ; ne le '
+        + 'devine pas. Cela a une conséquence précise et une seule : la Part du Mariage se prend '
+        + 'de Saturne à Vénus pour un homme et de Vénus à Saturne pour une femme, si bien qu’elle '
+        + 'reste indécise entre deux degrés. Les deux te sont donnés plus bas. Rends-les tous les '
+        + 'deux, dis à quelle condition chacun vaut, et ne choisis pas. Partout ailleurs, écris '
+        + 'sans supposer ni le sexe ni l’état matrimonial.',
   ];
   if (temps) {
     lignes.push(`Convention de temps appliquée : ${c?.nom ?? temps.convention}`

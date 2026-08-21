@@ -180,6 +180,47 @@ console.log('\n── Les degrés de perfection');
   console.log('       calculé de tête, et annoncé 0° 18′. C’est pour cela qu’on le calcule ici.');
 }
 
+console.log('\n── La part du Mariage se renverse sur le sexe, et non sur la secte');
+{
+  // Les trois autres parts s'inversent entre le jour et la nuit ; celle-ci
+  // s'inverse sur une donnée que le ciel ne porte pas. Deux lois la tiennent :
+  // la forme féminine est le miroir de la masculine autour de l'ascendant
+  // (Asc + V − S et Asc + S − V font ensemble deux ascendants), et le jour
+  // n'y change rien. Sans ce contrôle, on peut brancher le sexe sur dejour /
+  // denuit sans que rien ne proteste.
+  const { jj } = versTempsUniversel({
+    annee: 1996, mois: 5, jour: 20, heure: 14, minute: 30,
+    latitude: 48.8566, longitude: 2.3522, julien: false, convention: 'legale',
+  });
+  const mai = maisons(jj, 48.8566, 2.3522);
+  const laPart = (sexe) => juger({ positions: positions(jj), maisons: mai, sexe })
+    .parts.find((p) => p.clef === 'mariage');
+
+  const ok = (quoi, vrai, obtenu) => console.log(
+    `   ${vrai ? '✓' : '✗'} ${quoi.padEnd(58)} ${vrai ? '' : `obtenu ${obtenu}`}`);
+
+  const h = laPart('homme'); const f = laPart('femme'); const rien = laPart(null);
+  const miroir = ((h.longitude + f.longitude) % 360 + 360) % 360;
+  const deuxAsc = (2 * mai.ascendant % 360 + 360) % 360;
+
+  ok('la forme masculine et la féminine sont symétriques autour de l’ascendant',
+    Math.abs(((miroir - deuxAsc + 540) % 360) - 180) < 1e-9,
+    `${miroir.toFixed(4)}° contre ${deuxAsc.toFixed(4)}°`);
+  ok('sans le sexe, la part n’est pas placée mais les deux points sont rendus',
+    rien.longitude === null && rien.variantes?.length === 2
+      && Math.abs(rien.variantes.find((v) => v.sexe === 'homme').longitude - h.longitude) < 1e-9,
+    JSON.stringify(rien.variantes?.map((v) => v.sexe)));
+  ok('les trois autres parts ne dépendent pas du sexe',
+    ['fortune', 'ame', 'dignite'].every((clef) => {
+      const a = juger({ positions: positions(jj), maisons: mai, sexe: 'homme' })
+        .parts.find((p) => p.clef === clef);
+      const b = juger({ positions: positions(jj), maisons: mai, sexe: 'femme' })
+        .parts.find((p) => p.clef === clef);
+      return !a || !b || Math.abs(a.longitude - b.longitude) < 1e-9;
+    }), 'aucune ne bouge');
+  console.log(`     Mariage : ${enSigne(h.longitude)} si homme, ${enSigne(f.longitude)} si femme.`);
+}
+
 console.log('\n── L’écart angulaire : une distance, donc symétrique et bornée');
 {
   // Ce contrôle manquait, et son absence a laissé passer une formule qui rendait
