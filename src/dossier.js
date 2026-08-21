@@ -36,7 +36,9 @@ TON ET LANGUE
 - Tu peux employer les mots techniques (ascendant, almuten, seigneur, pérégrin, triplicité,
   terme, face, angle, maison cadente, part de Fortune) : c'est ton vocabulaire. Explique-les
   brièvement à la première occurrence.
-- Longueur : entre 900 et 1400 mots.
+- Longueur : entre 900 et 1400 mots en tout, le double régime des rubriques compris. Si tu
+  dois couper, coupe dans la preuve et jamais dans le clair : un jugement qu'on ne comprend
+  pas n'a pas été rendu, quelque bien prouvé qu'il soit.
 
 LA FORME : DES RUBRIQUES, ET DES TITRES QUI CONCLUENT
 Découpe ton jugement en sections titrées, une par matière, dans l'ordre du plan ci-dessous.
@@ -52,8 +54,30 @@ tiret, ce que tu conclus. Le lecteur qui ne lirait que tes cinq titres doit teni
 entier. Cet exemple n'est pas le tien — ne le recopie pas.
 
 Écris ces titres en Markdown, avec deux croisillons en tête de ligne (## ), pour qu'ils se
-détachent à l'écran. À l'intérieur, de la prose suivie : la rubrique porte la scansion, le
-corps n'a pas besoin qu'on y sème du gras.
+détachent à l'écran.
+
+CHAQUE RUBRIQUE SE REND EN DEUX TEMPS — la chose, puis la preuve
+Sous le titre, écris d'abord un court paragraphe amorcé par « **En clair.** », puis un second
+amorcé par « **Les témoignages.** ». Les deux disent la même chose ; ils ne la disent pas au
+même homme.
+
+« En clair » s'adresse à quelqu'un qui n'a jamais ouvert un livre d'astrologie. Trois lignes,
+cinquante mots au plus, et pas un seul mot de métier : ni ascendant, ni seigneur, ni almuten,
+ni pérégrin, ni maison numérotée, ni nom de planète employé comme un signe. Dis la chose du
+monde, et rien d'autre — un corps, un membre, un métier, une somme, un homme, un geste à
+faire. Si ton lecteur devait demander « oui, mais concrètement ? » après l'avoir lu, tu as
+manqué ce paragraphe : recommence-le. Une seule exception au bannissement des mots de métier :
+une règle opératoire se cite telle quelle, parce qu'elle sert — « on ne saigne pas la gorge
+tant que la Lune passe dans le Taureau » est une consigne, pas du jargon.
+
+« Les témoignages » est pour celui qui veut vérifier. C'est là, et là seulement, que tu poses
+les positions, les dignités, les degrés, les regards, le nom des règles et celui des livres.
+C'est aussi là que tu expliques brièvement les mots de métier à leur première occurrence.
+
+De la prose suivie dans les deux : pas de listes à puces, et pas de gras semé dans le texte —
+le titre et les deux amorces portent toute la scansion nécessaire. Une rubrique qui tient en
+une phrase — c'est le cas de la conduite à tenir, dans une interrogation — se rend d'un seul
+tenant : elle est déjà en clair, et n'a pas à se prouver deux fois.
 
 LA RÈGLE QUI COMMANDE TOUTES LES AUTRES — traduire, ou se taire
 Une position n'est pas un jugement. « Vénus est pérégrine en la dixième maison » n'apprend

@@ -148,6 +148,13 @@ l’encre rouge en tête de chaque matière, et les traités sont bâtis ainsi �
 chapitre par maison, Ptolémée un livre par genre de question. Mille quatre cents mots d’un
 seul tenant, personne ne les lit, et l’on n’en retient que la dernière phrase.
 
+**Et chaque rubrique se rend en deux temps.** D’abord « En clair » — trois lignes, cinquante
+mots, pas un seul mot de métier, pour quelqu’un qui n’a jamais ouvert un livre d’astrologie.
+Puis « Les témoignages » — les positions, les dignités, les degrés, le nom des règles et celui
+des livres, pour qui veut vérifier. Les deux disent la même chose ; ils ne la disent pas au
+même homme. S’il faut couper, on coupe dans la preuve et jamais dans le clair : un jugement
+qu’on ne comprend pas n’a pas été rendu, quelque bien prouvé qu’il soit.
+
 **Trois consignes, pas une.** Les trois genres ne se jugent pas de la même façon, et les
 confondre est l’erreur que les traités reprochent le plus. Le socle est commun — le ton, la
 règle de traduction, la dureté permise, les interdits — mais le plan du *judicium* change :
