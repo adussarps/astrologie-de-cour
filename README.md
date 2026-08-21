@@ -91,6 +91,19 @@ chiffre qui fait autorité, pas le ciel.**
   colonnes côte à côte avec l’écart en degrés : c’est le vrai travail, et il reste à faire.
   **C’est la contribution la plus utile que quelqu’un puisse apporter à ce dépôt.**
 
+## L’écart assumé : les traits d’aspect
+
+Le carré des manuscrits ne porte **pas** de traits entre les planètes. Les regards y sont
+écrits en toutes lettres dans la légende, et le carré ne sert qu’à loger les corps dans les
+maisons. Les traits tracés ici sont donc un ajout, et le seul de tout le site.
+
+Ils sont assumés parce qu’ils disent en un coup d’œil ce qu’un paragraphe met à dire, et
+surtout parce qu’ils rendent visible la distinction que Sahl ibn Bishr reproche aux ignorants
+de manquer : un regard qui **s’applique** est en train de se faire, un regard qui **se sépare**
+est déjà passé. Le premier est plein, le second à peine visible. Le vert est d’amitié — sextil
+et trin —, le rouge d’inimitié — quartil et opposition. Toucher une planète n’allume que ses
+regards, et les nomme sous la figure avec leur écart exact.
+
 ## Exactitude
 
 | Ce qui est vérifié | Comment | Résultat |
@@ -107,9 +120,14 @@ trois derniers tournent à chaque `npm test`.
 
 ## Le dossier pour un modèle de langue
 
-Chaque figure — nativité, révolution d’année, interrogation — s’accompagne d’un bouton qui
-copie un dossier de six à huit mille mots, à coller dans ChatGPT ou tout autre modèle, pour
-qu’il rédige le *judicium*.
+C’est le chemin principal du site, et il est délibéré : le jugement déterministe est exact
+mais dur à lire, et un modèle de langue le rend en prose sans avoir rien à inventer.
+
+Chaque figure — nativité, révolution d’année, interrogation — porte donc un bouton
+**Faire lire ma figure par ChatGPT**, qui copie un dossier de six à huit mille mots et ouvre
+l’onglet ; il ne reste qu’à coller. Un second bouton copie sans ouvrir, pour un autre modèle.
+Le dossier ne tiendrait dans aucune URL, et il n’existe pas de paramètre qui l’accepterait :
+copier puis ouvrir est le seul geste honnête.
 
 Aucune clé, aucun serveur : le site est statique, et le dossier est construit dans le
 navigateur — il n’est envoyé nulle part, c’est vous qui le collez où vous voulez. Le seul
@@ -232,7 +250,7 @@ src/lieux.js       la recherche de lieu : liste du corpus hors ligne, puis Photo
 src/annee.js       la révolution de l'année, la profection, le maître de l'année
 src/interrogation.js  les questions, les considérations de Bonatti, la perfection
 src/dossier.js     le dossier à coller dans un modèle de langue
-src/app.js         l'interface
+src/app.js         l'interface : la figure, les trois lignes, le repli du détail
 vendor/            astronomy-engine (MIT) et tz-lookup (CC0), figés
 ```
 

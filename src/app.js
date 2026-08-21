@@ -241,6 +241,38 @@ function blocHeures(heures, planetaires) {
   </section>`;
 }
 
+/** Le carré, et sous lui la ligne qui commente les regards au survol. */
+function hoteDuCarre(figure, cartouche, repos) {
+  return `<div class="carre-hote">
+    ${carre(figure, cartouche)}
+    <p class="glose-aspect" data-repos="${html(repos)}">${html(repos)}</p>
+  </div>`;
+}
+
+const AU_REPOS = 'Touchez ou survolez une planète pour voir ses regards.';
+
+/** Ce qu'un astrologien aurait dit debout, avant de s'asseoir : trois lignes.
+ *  Tout le reste est du détail, et le détail se replie. */
+function troisLignes(figure) {
+  const s = figure.seigneurAscendantPlace;
+  const etat = s.etat?.tenues.length ? s.etat.tenues.join(' et ')
+    : s.etat?.perdues.length ? s.etat.perdues.join(' et ')
+      : peregrinDe(figure.seigneurAscendant);
+  const soleil = figure.astres.find((a) => a.clef === 'soleil');
+
+  return `<dl class="verdict-court">
+    <dt>Ascendant</dt>
+    <dd>${html(enSigne(figure.ascendant))} — son seigneur <b>${html(nomDe(figure.seigneurAscendant))}</b>
+      en ${rangHtml(s.maison)} maison, ${html(etat)}</dd>
+    <dt>Almuten</dt>
+    <dd><b>${html(nomDe(figure.almuten.vainqueur.planete))}</b> — c’est lui qui gouverne la
+      figure entière, et non le signe du Soleil</dd>
+    <dt>Soleil</dt>
+    <dd>${html(enSigne(soleil.longitude))}, en ${rangHtml(soleil.maison)} maison —
+      ${figure.deJour ? 'nativité de jour' : 'nativité de nuit'}</dd>
+  </dl>`;
+}
+
 function rendreFigure(saisie, cartouche, { titreCarre = '', dossier = null } = {}) {
   const resultat = dresser(saisie);
   const { figure, heures, planetaires, julien, temps } = resultat;
@@ -249,37 +281,38 @@ function rendreFigure(saisie, cartouche, { titreCarre = '', dossier = null } = {
       <span class="renvoi">${html(p.source)}</span>
     </section>`).join('');
 
-  const bloc = dossier
-    ? boutonDossier(dossier, dossierNativite({ saisie, resultat }))
-    : '';
-
   return {
     figure, heures, planetaires, resultat,
-    markup: bloc + `
-      <div class="plan">
-        <div>
-          ${carre(figure, cartouche)}
+    markup: `
+      <div class="issue">
+        ${hoteDuCarre(figure, cartouche, AU_REPOS)}
+        <div class="issue-texte">
+          ${titreCarre}
+          ${troisLignes(figure)}
+          ${dossier ? actions(dossier, dossierNativite({ saisie, resultat })) : ''}
+        </div>
+      </div>
+      <details class="detail">
+        <summary>Le détail : les douze matières, le relevé, l’heure vraie</summary>
+        <div class="detail-corps">
           <p class="legende-carre">Carré astrologique — la construction des manuscrits :
           un carré, le losange de ses milieux de côtés, les deux diagonales. On lit dans le
           sens contraire des aiguilles d’une montre à partir de l’ascendant, à gauche. La roue
           n’existe pas au Moyen Âge ; c’est une invention du XIX<sup>e</sup> siècle.
           ${julien ? 'Date julienne.' : ''}</p>
-        </div>
-        <div class="jugement">
-          ${titreCarre}
           ${phrases}
+          ${blocSommaire(figure)}
+          ${blocPerfection(figure)}
+          ${blocCorps(figure)}
+          ${blocLecture(figure)}
           ${blocHeures(heures, planetaires)}
           ${blocTemps(temps)}
+          <h3>Le relevé</h3>
+          ${tableauDesAstres(figure)}
+          <h3>Les douze maisons</h3>
+          ${tableauDesMaisons(figure)}
         </div>
-      </div>
-      ${blocSommaire(figure)}
-      ${blocPerfection(figure)}
-      ${blocCorps(figure)}
-      ${blocLecture(figure)}
-      <h3 style="margin-top:34px">Le relevé</h3>
-      ${tableauDesAstres(figure)}
-      <h3>Les douze maisons</h3>
-      ${tableauDesMaisons(figure)}`,
+      </details>`,
   };
 }
 
@@ -357,38 +390,110 @@ function noterConvention() {
 
 const DOSSIERS = new Map();
 
-function boutonDossier(clef, texte) {
+/** Le chemin principal. Le dossier fait plusieurs milliers de mots : aucune URL
+ *  ne le porterait, et il n'existe pas de paramètre ChatGPT qui l'accepte. Le
+ *  seul geste honnête est donc celui-ci — on copie, et on ouvre l'onglet. */
+function actions(clef, texte) {
   DOSSIERS.set(clef, texte);
   const mots = texte.split(/\s+/).length;
-  return `<div class="dossier-llm">
-    <button type="button" class="copier" data-dossier="${clef}">Copier le dossier pour ChatGPT</button>
-    <span class="dossier-note">≈ ${mots.toLocaleString('fr-FR')} mots — la figure, les tables
-    de doctrine avec leurs sources, la méthode du seigneur, le ton, et ce que le modèle n’a
-    pas le droit de dire. Collez-le tel quel : il n’a rien à inventer.</span>
+  return `<div class="actions" data-dossier="${clef}">
+    <button type="button" class="principal vers-chatgpt">Faire lire ma figure par ChatGPT</button>
+    <button type="button" class="lien copier">Copier seulement</button>
+    <p class="actions-note" aria-live="polite">≈ ${mots.toLocaleString('fr-FR')} mots : la figure,
+      les tables de doctrine avec leurs sources, la méthode, le ton, et ce que le modèle n’a pas
+      le droit de dire. Il n’a rien à inventer.</p>
     <details class="dossier-voir">
-      <summary>Voir ce qu’il contient</summary>
+      <summary>Voir le dossier</summary>
       <pre>${html(texte)}</pre>
     </details>
   </div>`;
 }
 
+const CHATGPT = 'https://chatgpt.com/';
+
 function initCopie() {
-  document.addEventListener('click', async (e) => {
-    const b = e.target.closest?.('button.copier');
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest?.('.vers-chatgpt, .copier');
     if (!b) return;
-    const texte = DOSSIERS.get(b.dataset.dossier);
+    const zone = b.closest('.actions');
+    const texte = DOSSIERS.get(zone?.dataset.dossier);
     if (!texte) return;
-    try {
-      await navigator.clipboard.writeText(texte);
-      b.textContent = 'Copié — collez-le dans ChatGPT';
-    } catch {
-      // Sans presse-papier (page non sécurisée, permission refusée), on
-      // déplie le texte : le lecteur le sélectionne à la main.
-      b.closest('.dossier-llm').querySelector('details').open = true;
-      b.textContent = 'Copie refusée — sélectionnez le texte ci-dessous';
-    }
-    setTimeout(() => { b.textContent = 'Copier le dossier pour ChatGPT'; }, 4000);
+    const versChatgpt = b.classList.contains('vers-chatgpt');
+
+    // Les deux appels doivent partir dans le même tour de boucle que le clic :
+    // le presse-papier et l'ouverture d'onglet exigent l'un et l'autre une
+    // activation de l'utilisateur, qu'un await consommerait.
+    const copie = navigator.clipboard?.writeText(texte);
+    if (versChatgpt) window.open(CHATGPT, '_blank', 'noopener');
+
+    const note = zone.querySelector('.actions-note');
+    const dire = (m) => { note.textContent = m; note.classList.add('dit'); };
+    const fait = () => dire(versChatgpt
+      ? 'Dossier copié. Collez-le (⌘V, ou Ctrl+V) dans l’onglet ChatGPT qui vient de s’ouvrir.'
+      : 'Dossier copié. Collez-le où vous voulez.');
+
+    Promise.resolve(copie).then(fait).catch(() => {
+      // L'API moderne exige un contexte sécurisé et une permission ; ni l'un
+      // ni l'autre n'est garanti. Le vieux execCommand n'en demande aucun, et
+      // c'est la seule raison de le garder.
+      if (copierALAncienne(texte)) return fait();
+      zone.querySelector('details').open = true;
+      return dire('La copie a été refusée par le navigateur. Le dossier est déplié ci-dessous : '
+        + 'sélectionnez-le et copiez-le à la main.');
+    });
   });
+}
+
+function copierALAncienne(texte) {
+  const zone = document.createElement('textarea');
+  zone.value = texte;
+  zone.setAttribute('readonly', '');
+  zone.style.cssText = 'position:fixed;top:0;left:-9999px;opacity:0';
+  document.body.appendChild(zone);
+  zone.select();
+  let fait = false;
+  try { fait = document.execCommand('copy'); } catch { fait = false; }
+  zone.remove();
+  return fait;
+}
+
+/** Le carré s'anime tout seul à l'insertion — c'est du CSS. Ne reste ici que
+ *  ce qui demande un pointeur : allumer les regards d'une planète. */
+function initCarre() {
+  const eteindre = (svg) => {
+    svg.classList.remove('survol');
+    svg.querySelectorAll('.aspect.vif').forEach((l) => l.classList.remove('vif'));
+    const p = svg.parentElement?.querySelector('.glose-aspect');
+    if (p) p.textContent = p.dataset.repos ?? '';
+  };
+
+  const allumer = (groupe) => {
+    const svg = groupe.closest('svg.carre');
+    const clef = groupe.dataset.astre;
+    const gloses = [];
+    svg.querySelectorAll('.aspect').forEach((l) => {
+      const vif = l.dataset.de === clef || l.dataset.a === clef;
+      l.classList.toggle('vif', vif);
+      if (vif) gloses.push(l.dataset.glose);
+    });
+    svg.classList.add('survol');
+    const p = svg.parentElement?.querySelector('.glose-aspect');
+    if (p) {
+      p.textContent = gloses.length ? gloses.join(' · ')
+        : 'Cette planète ne regarde aucune autre : elle est seule dans la figure.';
+    }
+  };
+
+  const suivre = (e) => {
+    const groupe = e.target.closest?.('.astre-groupe[data-astre]');
+    document.querySelectorAll('svg.carre.survol').forEach((svg) => {
+      if (!groupe || !svg.contains(groupe)) eteindre(svg);
+    });
+    if (groupe) allumer(groupe);
+  };
+
+  document.addEventListener('mouseover', suivre);
+  document.addEventListener('click', suivre);
 }
 
 // ─── Les questions : la révolution de l'année, et l'interrogation ────────────
@@ -410,19 +515,32 @@ function rendreAnnee(saisie, age) {
     : etat?.perdues.length ? etat.perdues.join(' et ')
       : `${peregrinDe(m.clef)} — sans dignité aucune en ce lieu`;
 
-  const carreAnnuel = carre(f.annuelle, {
+  const peut = f.maitre.ecart.annuel?.fort;
+
+  return `<div class="issue">
+    ${hoteDuCarre(f.annuelle, {
     titre: 'Revolutio anni',
     lignes: [`${age} ans`, `${d.jour}/${d.mois}/${d.annee}`, $('#lieu').value || '—'],
-  });
-
-  return boutonDossier('annee', dossierAnnee({ saisie, resultat, annee: f })) + `<div class="plan">
-    <div>
-      ${carreAnnuel}
-      <p class="legende-carre">La figure de la révolution — le ciel à l’instant où le Soleil
-      a retrouvé son degré de naissance. Elle vaut du ${d.jour}/${d.mois}/${d.annee} au
-      ${fin.jour}/${fin.mois}/${fin.annee}.</p>
+  }, AU_REPOS)}
+    <div class="issue-texte">
+      <dl class="verdict-court">
+        <dt>La matière</dt>
+        <dd>${rangHtml(m.profection.rang)} maison — ${html(m.profection.titre.toLowerCase())}</dd>
+        <dt>Le maître de l’année</dt>
+        <dd><b>${html(m.nom)}</b>, en ${rangHtml(m.annuel.maison)} maison, ${html(force)}</dd>
+        <dt>Peut-il donner ?</dt>
+        <dd class="${peut ? 'oui' : 'non'}">${peut
+    ? 'Oui — il réunit les témoignages qu’il faut'
+    : 'Non — il lui manque de quoi tenir sa promesse'}</dd>
+      </dl>
+      <p class="cadre-dates">Vaut du ${d.jour}/${d.mois}/${d.annee} au
+        ${fin.jour}/${fin.mois}/${fin.annee}.</p>
+      ${actions('annee', dossierAnnee({ saisie, resultat, annee: f }))}
     </div>
-    <div class="jugement">
+  </div>
+  <details class="detail">
+    <summary>Le détail : la profection, le compte des témoignages, les douze mois</summary>
+    <div class="detail-corps">
       <section>
         <h3>La maison de l’année</h3>
         <p>À <b>${age} ans</b>, la profection porte sur la
@@ -465,7 +583,7 @@ function rendreAnnee(saisie, age) {
         bougent plus.</p>
       </section>
     </div>
-  </div>`;
+  </details>`;
 }
 
 /** Le compte des trois témoignages, montré pièce à pièce. Dire « faible » sans
@@ -519,7 +637,7 @@ function rendreQuestion(rangMaison, texteQuestion) {
   const resultat = dresser(saisie);
   const { figure } = resultat;
   const j = jugerInterrogation(figure, rangMaison);
-  const dossier = boutonDossier('question', dossierInterrogation({
+  const dossier = actions('question', dossierInterrogation({
     saisie, resultat, question: texteQuestion, jugement: j,
   }));
 
@@ -537,17 +655,31 @@ function rendreQuestion(rangMaison, texteQuestion) {
         <span class="renvoi">${html(SOURCES_QUESTION.considerations)}</span>
       </section>`;
 
-  return dossier + `<div class="plan">
-    <div>
-      ${carre(figure, { titre: 'Interrogatio', lignes: [
-    `${saisie.jour}/${saisie.mois}/${saisie.annee}`,
-    `${String(saisie.heure).padStart(2, '0')} h ${String(saisie.minute).padStart(2, '0')}`,
-    'Paris'] })}
-      <p class="legende-carre">Le ciel à l’instant où la question a été posée. Rechargez la
-      page et reposez-la : ce ne sera plus la même figure. C’est le principe même du genre —
-      et c’est ce qu’on lui a le plus reproché.</p>
+  return `<div class="issue">
+    ${hoteDuCarre(figure, {
+    titre: 'Interrogatio',
+    lignes: [`${saisie.jour}/${saisie.mois}/${saisie.annee}`,
+      `${String(saisie.heure).padStart(2, '0')} h ${String(saisie.minute).padStart(2, '0')}`,
+      'Paris'],
+  }, AU_REPOS)}
+    <div class="issue-texte">
+      <div class="verdict-net ${j.verdict.clef}">
+        <span class="reponse ${j.verdict.reponse}">${j.verdict.reponse}</span>
+        <p>${html(j.verdict.titre)}</p>
+      </div>
+      ${j.echeance ? `<p class="cadre-dates">${j.echeance.texte}</p>` : ''}
+      ${j.considerations.some((c) => c.grave)
+    ? '<p class="cadre-dates alerte">Une considération de Bonatti s’oppose au jugement — '
+      + 'voyez le détail avant de vous y fier.</p>' : ''}
+      ${dossier}
     </div>
-    <div class="jugement">
+  </div>
+  <details class="detail">
+    <summary>Le détail : les considérations, la voie de la question, l’échéance</summary>
+    <div class="detail-corps">
+      <p class="legende-carre">Le ciel à l’instant où la question a été posée. Reposez-la dans
+      une heure : ce ne sera plus la même figure. C’est le principe même du genre — et c’est ce
+      qu’on lui a le plus reproché.</p>
       ${gardes}
       <section>
         <h3>Le consultant, et la chose</h3>
@@ -579,7 +711,7 @@ function rendreQuestion(rangMaison, texteQuestion) {
         <span class="renvoi">${html(j.echeance.source)}</span>
       </section>` : ''}
     </div>
-  </div>`;
+  </details>`;
 }
 
 function initQuestions() {
@@ -597,12 +729,14 @@ function initQuestions() {
       return;
     }
     $('#resultat-annee').innerHTML = rendreAnnee(saisie, +$('#age').value);
+    montrer('#resultat-annee');
   });
 
   $('#formulaire-question').addEventListener('submit', (e) => {
     e.preventDefault();
     const d = DEMANDES[+$('#demande').value];
     $('#resultat-question').innerHTML = rendreQuestion(d.maison, d.texte);
+    montrer('#resultat-question');
   });
 
   $('#avertissement-oresme').innerHTML = `
@@ -626,6 +760,26 @@ function noterCalendrier() {
   $('#note-calendrier').textContent = estJulien(s)
     ? 'Date antérieure à octobre 1582 : elle est lue dans le calendrier julien, comme l’aurait fait un calculateur du temps.'
     : 'Date lue dans le calendrier grégorien.';
+}
+
+/** Sur un téléphone, le formulaire occupe l'écran entier : sans cela le lecteur
+ *  reste devant ses champs et croit qu'il ne s'est rien passé. */
+function montrer(selecteur) {
+  $(selecteur).scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/** Les deux autres genres ne servent à rien sans naissance saisie : la page ne
+ *  les montre qu'une fois la figure dressée, et propose d'emblée l'âge qu'a le
+ *  natif aujourd'hui — c'est celui qu'on veut neuf fois sur dix. */
+function ouvrirLaSuite(saisie) {
+  const suite = $('#suite');
+  if (!suite.hidden) return;
+  suite.hidden = false;
+  const maintenant = new Date();
+  const age = maintenant.getFullYear() - saisie.annee
+    - (maintenant.getMonth() + 1 < saisie.mois
+      || (maintenant.getMonth() + 1 === saisie.mois && maintenant.getDate() < saisie.jour) ? 1 : 0);
+  if (age >= 0 && age <= 110) $('#age').value = age;
 }
 
 function initOfficine() {
@@ -672,11 +826,14 @@ function initOfficine() {
       ],
     }, { dossier: 'nativite' });
     $('#resultat').innerHTML = markup;
+    ouvrirLaSuite(saisie);
+    montrer('#resultat');
   });
 
   $('#sans-heure').addEventListener('click', () => {
     $('#heure').value = '';
     $('#resultat').innerHTML = rendreSansHeure(lireFormulaire());
+    $('#suite').hidden = true;
   });
 }
 
@@ -854,6 +1011,7 @@ function initNavigation() {
 }
 
 initCopie();
+initCarre();
 initNavigation();
 initOfficine();
 initQuestions();

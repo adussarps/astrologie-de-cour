@@ -99,33 +99,29 @@ blockquote {
 blockquote cite { display: block; font-size: .88em; font-style: normal; color: var(--encre-pale); margin-top: .5em; }
 blockquote cite::before { content: '— '; }
 
-.invitation {
-  border: 1px solid var(--trait);
-  border-left: 4px solid var(--or);
-  background: var(--parchemin-clair);
-  padding: 22px 28px;
-  margin-bottom: 34px;
-  max-width: 76ch;
+.accroche {
+  font-size: 1.28rem;
+  line-height: 1.45;
+  color: #453d31;
+  max-width: 54ch;
+  margin: 0 0 22px;
 }
-.invitation h2 { color: var(--rubrique); font-size: 1.5rem; margin-bottom: .35em; }
-.invitation p { margin: 0 0 .7em; }
-.invitation p:last-child { margin-bottom: 0; }
-.promesse { font-style: italic; color: var(--encre-pale); }
 
 /* ── Le formulaire ───────────────────────────────────────────────────────── */
 .officine {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px 20px;
-  align-items: end;
-  padding: 26px;
+  padding: 22px 24px;
   border: 1px solid var(--trait);
   background: var(--parchemin-clair);
   margin-bottom: 34px;
 }
-.champ { display: flex; flex-direction: column; gap: 5px; }
-.champ.petit { max-width: 160px; }
-.champ-heure { grid-column: span 2; }
+.rangee { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; margin-bottom: 16px; }
+.rangee-date .champ { flex: 1 1 90px; max-width: 130px; }
+.champ { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.champ.petit { flex: 0 1 150px; }
+.champ-heure { flex: 0 1 190px; }
+.champ-lieu { flex: 1 1 260px; }
+.champ.large { flex: 1 1 280px; }
+.champ-convention { flex: 1 1 220px; }
 label {
   font-size: .78rem;
   letter-spacing: .1em;
@@ -135,8 +131,8 @@ label {
 .obligatoire { color: var(--rubrique); text-transform: none; letter-spacing: 0; font-style: italic; }
 input, select {
   font: inherit;
-  font-size: 1rem;
-  padding: 8px 10px;
+  font-size: 1.02rem;
+  padding: 11px 12px;
   border: 1px solid var(--trait);
   background: #fffdf8;
   color: var(--encre);
@@ -146,33 +142,168 @@ input, select {
 input:focus, select:focus { outline: 2px solid var(--rubrique-pale); outline-offset: -1px; }
 .paire { display: flex; align-items: center; gap: 6px; }
 .paire span { color: var(--encre-pale); }
-.boutons { display: flex; gap: 10px; flex-wrap: wrap; grid-column: 1 / -1; }
-button.principal, button.secondaire {
+
+.boutons { display: flex; gap: 8px 18px; flex-wrap: wrap; align-items: center; }
+button.principal {
   font: inherit;
-  font-size: .95rem;
-  letter-spacing: .04em;
-  padding: 10px 22px;
+  font-size: 1.05rem;
+  letter-spacing: .03em;
+  padding: 14px 30px;
   border-radius: 2px;
   cursor: pointer;
   border: 1px solid var(--rubrique);
+  background: var(--rubrique);
+  color: var(--parchemin-clair);
+  transition: background .15s;
 }
-button.principal { background: var(--rubrique); color: var(--parchemin-clair); }
 button.principal:hover { background: #7a2718; }
-button.secondaire { background: none; color: var(--rubrique); }
-button.secondaire:hover { background: rgba(143, 47, 33, .07); }
+button.lien {
+  font: inherit;
+  font-size: .95rem;
+  background: none;
+  border: none;
+  color: var(--rubrique);
+  cursor: pointer;
+  padding: 6px 2px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+button.lien:hover { color: #7a2718; }
+
+/* Les coordonnées et la convention d'heure : justes par défaut, et repliées.
+   Qui a besoin d'y toucher sait qu'elles existent. */
+.reglages { margin-top: 16px; border-top: 1px dotted var(--trait); padding-top: 12px; }
+.reglages > summary {
+  cursor: pointer;
+  font-size: .84rem;
+  color: var(--encre-pale);
+  font-style: italic;
+}
+.reglages > summary:hover { color: var(--rubrique); }
+.reglages .rangee { margin-top: 14px; margin-bottom: 0; }
 .note-calendrier {
-  grid-column: 1 / -1;
-  margin: 0;
-  font-size: .88rem;
+  margin: 10px 0 0;
+  font-size: .86rem;
   font-style: italic;
   color: var(--encre-pale);
-  min-height: 1.4em;
 }
 
-/* ── Le carré ────────────────────────────────────────────────────────────── */
-.plan { display: grid; grid-template-columns: minmax(330px, 620px) 1fr; gap: 40px; align-items: start; }
-@media (max-width: 900px) { .plan { grid-template-columns: 1fr; } }
+/* ── L'issue : ce qu'on voit d'abord ─────────────────────────────────────── */
+.issue {
+  display: grid;
+  grid-template-columns: minmax(300px, 1.15fr) minmax(310px, 1fr);
+  gap: 34px;
+  align-items: start;
+  margin-bottom: 26px;
+}
+@media (max-width: 860px) { .issue { grid-template-columns: 1fr; gap: 22px; } }
 
+.glose-aspect {
+  margin: 8px 0 0;
+  font-size: .84rem;
+  color: var(--encre-pale);
+  font-style: italic;
+  min-height: 2.6em;
+  line-height: 1.4;
+}
+
+/* Trois lignes, pas trente. Le reste est dans le repli. */
+.verdict-court { margin: 0 0 22px; }
+.verdict-court dt {
+  font-size: .74rem;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+  color: var(--encre-pale);
+  margin-top: 14px;
+}
+.verdict-court dt:first-child { margin-top: 0; }
+.verdict-court dd { margin: 2px 0 0; font-size: 1.06rem; line-height: 1.45; }
+.verdict-court dd b { color: var(--rubrique); font-weight: 600; }
+.verdict-court dd.oui { color: #4f7343; }
+.verdict-court dd.non { color: var(--rubrique); }
+
+/* Une interrogation se conclut : le oui ou le non passe avant tout le reste. */
+.verdict-net {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  border-left: 3px solid var(--trait);
+  padding: 4px 0 4px 16px;
+  margin-bottom: 16px;
+}
+.verdict-net p { margin: 0; font-size: 1.1rem; }
+.verdict-net.doux, .verdict-net.translation, .verdict-net.collection { border-left-color: #6b8f5e; }
+.verdict-net.dur { border-left-color: var(--rubrique); }
+.verdict-net.rien, .verdict-net.vide, .verdict-net.passe { border-left-color: var(--encre-pale); }
+.verdict-net.lune, .verdict-net.meme { border-left-color: var(--or); }
+
+.cadre-dates {
+  margin: 0 0 18px;
+  font-size: .92rem;
+  color: var(--encre-pale);
+}
+.cadre-dates.alerte { color: var(--rubrique); font-style: italic; }
+
+/* ── Le chemin principal ─────────────────────────────────────────────────── */
+.actions { margin-top: 4px; }
+.actions .principal { width: 100%; font-size: 1.12rem; padding: 16px 24px; }
+.actions .copier { margin-top: 6px; }
+.actions-note {
+  margin: 10px 0 0;
+  font-size: .85rem;
+  color: var(--encre-pale);
+  line-height: 1.5;
+}
+.actions-note.dit {
+  color: var(--rubrique);
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* ── Le détail : pour qui le demande ─────────────────────────────────────── */
+.detail {
+  border-top: 1px solid var(--trait);
+  border-bottom: 1px solid var(--trait);
+  margin: 30px 0;
+}
+.detail > summary {
+  cursor: pointer;
+  padding: 16px 4px;
+  font-size: 1rem;
+  color: var(--rubrique);
+  letter-spacing: .02em;
+  list-style: none;
+}
+.detail > summary::-webkit-details-marker { display: none; }
+.detail > summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 10px;
+  color: var(--or);
+  transition: transform .2s;
+}
+.detail[open] > summary::before { transform: rotate(90deg); }
+.detail > summary:hover { background: var(--parchemin-clair); }
+.detail-corps { padding: 6px 0 30px; }
+.detail-corps > section { border-top: 1px solid var(--trait); padding: 16px 0; }
+.detail-corps > section > h3 { color: var(--rubrique); font-size: 1.02rem; letter-spacing: .03em; }
+.detail-corps > section p { margin: 0 0 .4em; }
+
+/* ── Les deux autres genres ──────────────────────────────────────────────── */
+#suite { border-top: 2px solid var(--or); padding-top: 26px; margin-top: 10px; }
+.accroche-suite { color: var(--encre-pale); font-style: italic; max-width: 60ch; margin: 0 0 22px; }
+.deux-genres { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.genre {
+  border: 1px solid var(--trait);
+  background: var(--parchemin-clair);
+  padding: 20px 22px;
+}
+.genre h3 { color: var(--rubrique); font-size: 1.15rem; }
+.genre > p { margin: 0 0 16px; font-size: .92rem; color: var(--encre-pale); }
+.ligne-action { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+.ligne-action .principal { font-size: .98rem; padding: 12px 24px; flex: 0 0 auto; }
+
+/* ── Le carré ────────────────────────────────────────────────────────────── */
 .carre { width: 100%; height: auto; display: block; }
 .carre .champ { fill: rgba(255, 253, 246, .55); stroke: none; }
 .carre .cadre, .carre .losange { fill: none; stroke: var(--encre); stroke-width: 1.6; }
@@ -188,6 +319,58 @@ button.secondaire:hover { background: rgba(143, 47, 33, .07); }
 .carre .cartouche-titre { font-size: 14px; fill: var(--rubrique); font-weight: 600; }
 .carre .cartouche-ligne { font-size: 11.5px; fill: var(--encre-pale); }
 
+/* Les regards. Le carré des manuscrits n'en porte pas — ils sont écrits en
+   toutes lettres dans la légende. On les trace parce qu'un trait montre d'un
+   coup ce qu'un paragraphe met à dire, et parce que l'amitié et l'inimitié
+   n'ont pas à se ressembler. */
+/* Un regard qui s'applique est en train de se faire ; un regard qui se sépare
+   est déjà passé. Le premier est plein, le second à peine visible — c'est la
+   distinction que Sahl reproche aux ignorants de manquer. On ne peut pas la
+   marquer en pointillé : le tracé animé occupe déjà le stroke-dasharray. */
+.carre .aspect { pointer-events: none; transition: opacity .18s, stroke-width .18s; }
+.carre .aspect.applique { stroke-width: 1.4; opacity: .34; }
+.carre .aspect:not(.applique) { stroke-width: 1; opacity: .15; }
+.carre .aspect.doux { stroke: #4f7343; }
+.carre .aspect.dur { stroke: var(--rubrique); }
+.carre.survol .aspect { opacity: .06; }
+.carre.survol .aspect.vif { opacity: .95; stroke-width: 2; }
+
+/* Le fondu du survol passe par fill-opacity : l'animation d'entrée tient déjà
+   la propriété opacity, et une animation l'emporte sur une déclaration. */
+.carre .astre-groupe { cursor: pointer; }
+.carre .astre-groupe tspan { transition: fill-opacity .18s; }
+.carre.survol .astre-groupe:not(:hover) tspan { fill-opacity: .3; }
+
+/* ── Le carré se dresse ──────────────────────────────────────────────────── */
+@keyframes tracer { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes paraitre { from { opacity: 0; } to { opacity: 1; } }
+@keyframes poser { from { opacity: 0; transform: translateY(-9px); } to { opacity: 1; transform: none; } }
+
+.carre .couche-fond .cadre,
+.carre .couche-fond .losange,
+.carre .couche-fond .trait {
+  stroke-dasharray: 1;
+  animation: tracer .85s ease-out both;
+}
+.carre .couche-fond .losange { animation-delay: .2s; }
+.carre .couche-fond .trait { animation-delay: .35s; }
+.carre .couche-reperes { animation: paraitre .6s ease-out .55s both; }
+.carre .couche-cartouche { animation: paraitre .6s ease-out .5s both; }
+.carre .couche-astres text {
+  animation: poser .55s cubic-bezier(.2, .85, .3, 1) both;
+  animation-delay: calc(.8s + var(--i, 0) * .055s);
+}
+.carre .couche-aspects line {
+  stroke-dasharray: 1;
+  animation: tracer .7s ease-out both;
+  animation-delay: calc(1.35s + var(--i, 0) * .07s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carre *, .carre { animation: none !important; stroke-dashoffset: 0 !important; }
+  html { scroll-behavior: auto; }
+}
+
 .legende-carre {
   font-size: .84rem;
   color: var(--encre-pale);
@@ -196,14 +379,6 @@ button.secondaire:hover { background: rgba(143, 47, 33, .07); }
   max-width: 60ch;
 }
 
-/* ── Le jugement ─────────────────────────────────────────────────────────── */
-.jugement > section {
-  border-top: 1px solid var(--trait);
-  padding: 16px 0;
-}
-.jugement > section:first-child { border-top: none; }
-.jugement h3 { color: var(--rubrique); font-size: 1.02rem; letter-spacing: .03em; }
-.jugement p { margin: 0 0 .4em; }
 .renvoi {
   display: block;
   font-size: .8rem;
@@ -213,32 +388,7 @@ button.secondaire:hover { background: rgba(143, 47, 33, .07); }
 .renvoi::before { content: '▸ '; color: var(--or); font-style: normal; }
 
 /* ── Le dossier pour un modèle de langue ─────────────────────────────────── */
-.dossier-llm {
-  border: 1px solid var(--trait);
-  border-left: 4px solid var(--or);
-  background: var(--parchemin-clair);
-  padding: 16px 20px;
-  margin: 0 0 30px;
-}
-button.copier {
-  background: var(--encre);
-  color: var(--parchemin);
-  border: none;
-  padding: 9px 18px;
-  font-family: var(--serif);
-  font-size: .95rem;
-  cursor: pointer;
-  letter-spacing: .02em;
-}
-button.copier:hover { background: var(--rubrique); }
-.dossier-note {
-  display: block;
-  margin-top: 9px;
-  font-size: .84rem;
-  color: var(--encre-pale);
-  max-width: 76ch;
-}
-.dossier-voir { margin-top: 8px; }
+.dossier-voir { margin-top: 12px; }
 .dossier-voir summary {
   cursor: pointer;
   font-size: .82rem;
@@ -259,17 +409,7 @@ button.copier:hover { background: var(--rubrique); }
 }
 
 /* ── Les questions ───────────────────────────────────────────────────────── */
-.titre-genre {
-  color: var(--rubrique);
-  border-bottom: 2px solid var(--or);
-  padding-bottom: 7px;
-  margin: 48px 0 14px;
-  font-size: 1.6rem;
-}
 .preambule { max-width: 78ch; }
-.officine.compacte { margin: 18px 0 26px; }
-.champ.large { grid-column: span 3; }
-.champ.large select { width: 100%; }
 
 .considerations { border-left: 3px solid var(--or); padding-left: 14px !important; }
 .considerations p.grave { color: var(--rubrique); font-weight: 500; }
@@ -588,8 +728,55 @@ footer {
 }
 footer p { max-width: 72ch; margin: 0; }
 
+/* ── La notice : tout y est, rien n'y est ouvert ─────────────────────────── */
+.pan { border-bottom: 1px solid var(--trait); }
+.pan:first-of-type { border-top: 1px solid var(--trait); }
+.pan > summary {
+  cursor: pointer;
+  padding: 18px 4px;
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.pan > summary::-webkit-details-marker { display: none; }
+.pan > summary::before {
+  content: '▸';
+  color: var(--or);
+  transition: transform .2s;
+}
+.pan[open] > summary::before { transform: rotate(90deg); }
+.pan > summary:hover { background: var(--parchemin-clair); }
+.pan > summary h3 {
+  display: inline;
+  margin: 0;
+  font-size: 1.22rem;
+  font-weight: 500;
+  color: var(--rubrique);
+}
+.pan > *:not(summary) { max-width: 78ch; }
+.pan > *:last-child { margin-bottom: 26px; }
+.pan .cartes-sources, .pan #tables-doctrine { max-width: none; }
+.etapes h4 { font-size: 1.05rem; font-weight: 600; margin: 0 0 .3em; color: var(--rubrique); }
+.cartes-sources h4 { color: var(--rubrique); font-size: 1.1rem; margin: 0 0 .2em; }
+
 @media (max-width: 640px) {
   body { font-size: 17px; }
-  .officine { grid-template-columns: 1fr 1fr; }
-  .champ-heure { grid-column: span 2; }
+  main { padding: 28px 18px 60px; }
+  .dedans { padding: 0 18px; }
+  .bandeau { padding-top: 26px; }
+  .onglet { padding: 9px 9px; font-size: .78rem; letter-spacing: .04em; }
+  .accroche { font-size: 1.15rem; }
+  .officine { padding: 18px 16px; }
+  .rangee-date .champ { flex: 1 1 70px; max-width: none; }
+  .champ-heure, .champ-lieu, .champ.petit { flex: 1 1 100%; }
+  .boutons { flex-direction: column; align-items: stretch; }
+  .boutons .principal { width: 100%; }
+  .ligne-action { flex-direction: column; align-items: stretch; }
+  .ligne-action .principal { width: 100%; }
+  .verdict-court dd { font-size: 1rem; }
+  .maison-lue > summary { grid-template-columns: 1.8em 1fr; }
+  .maison-lue .seigneur-court { grid-column: 2; }
+  .maison-lue .corps { padding-left: calc(1.8em + 14px); }
+  table.releve { font-size: .84rem; }
 }

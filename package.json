@@ -7,7 +7,8 @@
   "private": false,
   "scripts": {
     "servir": "python3 -m http.server 8765",
-    "test": "node verifier.mjs",
+    "syntaxe": "for f in src/*.js *.mjs; do node --check \"$f\" || exit 1; done && echo 'Syntaxe : tous les fichiers passent.'",
+    "test": "npm run --silent syntaxe && node verifier.mjs",
     "fumee": "node fumee.mjs"
   },
   "devDependencies": {

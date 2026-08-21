@@ -37,11 +37,17 @@ await envoyer('Network.enable');
 await envoyer('Network.setCacheDisabled', { cacheDisabled: true });
 await envoyer('Page.reload', { ignoreCache: true });
 await envoyer('Emulation.setDeviceMetricsOverride',
-  { width: 1280, height: 900, deviceScaleFactor: 2, mobile: false });
+  {
+    width: +(process.env.LARGEUR ?? 1280),
+    height: +(process.env.HAUTEUR ?? 900),
+    deviceScaleFactor: 2,
+    mobile: !!process.env.LARGEUR && +process.env.LARGEUR < 600,
+  });
 
 await new Promise((r) => setTimeout(r, 2500));
 
 const script = {
+  vierge: `'ok'`,
   officine: `document.querySelector('#heure').value = 14;
              document.querySelector('#minute').value = 30;
              document.querySelector('#formulaire').requestSubmit(); 'ok'`,
@@ -51,7 +57,8 @@ const script = {
          c.dispatchEvent(new Event('input', { bubbles: true })); 'ok'`,
   nativites: `document.querySelector('[data-vue=nativites]').click();
               document.querySelector('#galerie button').click(); 'ok'`,
-  methode: `document.querySelector('[data-vue=methode]').click(); 'ok'`,
+  notice: `document.querySelector('[data-vue=notice]').click();
+           document.querySelectorAll('#vue-notice .pan')[0].open = true; 'ok'`,
   annee: `document.querySelector('#heure').value = 14;
           document.querySelector('#minute').value = 30;
           document.querySelector('[data-vue=questions]').click();
@@ -81,7 +88,7 @@ if (selecteur) {
   // Un sélecteur préfixé de « ~ » cadre une bande pleine largeur à partir de
   // l'élément, ce qui est plus lisible qu'un élément isolé.
   clip = selecteur.startsWith('~')
-    ? { x: 0, y: Math.max(0, b.y - 30), width: 1280, height: 760, scale: 1.6 }
+    ? { x: 0, y: Math.max(0, b.y - 30), width: +(process.env.LARGEUR ?? 1280), height: 760, scale: 1.6 }
     : { ...b, scale: 2 };
   h = Math.ceil(clip.y + clip.height) + 40;
 } else {
@@ -90,9 +97,10 @@ if (selecteur) {
 }
 // Au-delà d'une certaine surface, Chrome renonce sans rien dire : on baisse
 // l'échelle à mesure que la page s'allonge.
+const largeur = +(process.env.LARGEUR ?? 1280);
 const echelle = clip ? 1 : Math.max(0.6, Math.min(1.5, 4200 / h));
 await envoyer('Emulation.setDeviceMetricsOverride',
-  { width: 1280, height: h, deviceScaleFactor: echelle, mobile: false });
+  { width: largeur, height: h, deviceScaleFactor: echelle, mobile: largeur < 600 });
 await new Promise((res) => setTimeout(res, 700));
 
 const shot = await envoyer('Page.captureScreenshot', clip ? { format: 'png', clip } : { format: 'png' });

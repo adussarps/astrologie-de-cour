@@ -15,6 +15,8 @@
 // contraire des aiguilles d'une montre, en partant de l'ascendant à gauche.
 
 import { SIGNES, enSigne, signeDe, mod360, PLANETES } from './ciel.js';
+import { ASPECTS_DURS } from './doctrine.js';
+import { enDegresMinutes } from './jugement.js';
 import { html } from './texte.js';
 
 // U+FE0E force la présentation « texte » : sans lui, les navigateurs rendent
@@ -74,24 +76,35 @@ export function carre(figure, cartouche = {}, { cote = 620, partsVisibles = true
   const W = cote;
   const marge = 26;
   const regs = regions(W);
-  const e = [];
 
-  const poly = (pts, classe) => `<polygon class="${classe}" points="${pts.map((p) => p.join(',')).join(' ')}"/>`;
+  // Le SVG se peint dans l'ordre du document : il faut donc tenir les couches
+  // séparées et les assembler à la fin, sans quoi les traits d'aspect passent
+  // par-dessus les glyphes qu'ils relient.
+  const fond = [];
+  const reperes = [];
+  const corps = [];
+
+  const poly = (pts, classe) => `<polygon class="${classe}" pathLength="1" `
+    + `points="${pts.map((p) => p.join(',')).join(' ')}"/>`;
   const txt = (x, y, s, classe, extra = '') =>
     `<text class="${classe}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" ${extra}>${html(s)}</text>`;
 
   // Les douze champs, puis le trait.
-  for (let i = 0; i < 12; i++) e.push(poly(regs[i], 'champ'));
-  e.push(poly([[0, 0], [W, 0], [W, W], [0, W]], 'cadre'));
-  e.push(poly([[W / 2, 0], [W, W / 2], [W / 2, W], [0, W / 2]], 'losange'));
-  e.push(`<line class="trait" x1="0" y1="0" x2="${W}" y2="${W}"/>`);
-  e.push(`<line class="trait" x1="${W}" y1="0" x2="0" y2="${W}"/>`);
+  for (let i = 0; i < 12; i++) {
+    fond.push(`<polygon class="champ" points="${regs[i].map((p) => p.join(',')).join(' ')}"/>`);
+  }
+  fond.push(poly([[0, 0], [W, 0], [W, W], [0, W]], 'cadre'));
+  fond.push(poly([[W / 2, 0], [W, W / 2], [W / 2, W], [0, W / 2]], 'losange'));
+  fond.push(`<line class="trait" pathLength="1" x1="0" y1="0" x2="${W}" y2="${W}"/>`);
+  fond.push(`<line class="trait" pathLength="1" x1="${W}" y1="0" x2="0" y2="${W}"/>`);
 
   // Les astres, répartis par maison.
   const parMaison = new Map();
   for (const astre of figure.astres) {
     if (!parMaison.has(astre.maison)) parMaison.set(astre.maison, []);
     parMaison.get(astre.maison).push({
+      clef: astre.clef,
+      nom: astre.nom,
       glyphe: GLYPHES[astre.clef] ?? '·',
       texte: enSigne(astre.longitude, true),
       retrograde: astre.retrograde && !astre.noeud,
@@ -115,15 +128,18 @@ export function carre(figure, cartouche = {}, { cote = 620, partsVisibles = true
     }
   }
 
+  // Où chaque astre a fini par se poser : c'est de là que partiront les traits.
+  const ancres = new Map();
+
   for (let i = 0; i < 12; i++) {
     const rang = i + 1;
     const pts = regs[i];
     const [ax, ay] = ancrePointe(pts, W);
     const pointe = figure.pointes[rang];
 
-    e.push(txt(ax, ay, `${Math.floor(mod360(pointe) % 30)} ${GLYPHES_SIGNES[signeDe(pointe)]}`,
+    reperes.push(txt(ax, ay, `${Math.floor(mod360(pointe) % 30)} ${GLYPHES_SIGNES[signeDe(pointe)]}`,
       'pointe', 'text-anchor="middle"'));
-    e.push(txt(ax, ay + 13, ROMAINS[i], 'rang', 'text-anchor="middle"'));
+    reperes.push(txt(ax, ay + 13, ROMAINS[i], 'rang', 'text-anchor="middle"'));
 
     // Les hôtes se posent au barycentre du champ, poussés vers l'extérieur pour
     // ne pas heurter la pointe, puis ramenés dans le cadre : les champs des
@@ -139,26 +155,60 @@ export function carre(figure, cartouche = {}, { cote = 620, partsVisibles = true
     hotes.forEach((h, k) => {
       const y = by + (k - (hotes.length - 1) / 2) * 17;
       const classe = `astre${h.part ? ' part' : ''}${h.fort ? ' fort' : ''}`;
-      e.push(`<text x="${bx.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">`
+      if (h.clef) ancres.set(h.clef, [bx, y]);
+      corps.push(`<text class="astre-groupe"${h.clef ? ` data-astre="${h.clef}"` : ''}`
+        + ` style="--i:${corps.length}"`
+        + ` x="${bx.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">`
         + `<tspan class="${classe}">${h.glyphe}${h.retrograde ? '℞' : ''}</tspan>`
         + `<tspan class="astre-degre" dx="4">${html(h.texte)}</tspan></text>`);
     });
   }
 
+  // Les traits d'aspect. Le carré médiéval n'en porte pas : les manuscrits
+  // notent les regards dans la légende, en toutes lettres. On les trace ici
+  // parce qu'ils montrent d'un coup d'œil ce qu'une liste d'aspects met un
+  // paragraphe à dire — et parce qu'un trait qui se sépare et un trait qui
+  // s'applique ne se ressemblent pas, ce qui est tout le sujet.
+  const aspects = [];
+  for (const r of figure.regards ?? []) {
+    const de = ancres.get(r.de);
+    const a = ancres.get(r.a);
+    if (!de || !a) continue;
+    const dur = ASPECTS_DURS.has(r.nom);
+    const glose = `${nomCourt(figure, r.de)} ${r.glyphe} ${nomCourt(figure, r.a)}`
+      + ` — ${r.nom}, ${r.mouvement}, ${enDegresMinutes(r.ecart)}`;
+    aspects.push(`<line class="aspect ${dur ? 'dur' : 'doux'}${r.applique ? ' applique' : ''}"`
+      + ` pathLength="1" style="--i:${aspects.length}"`
+      + ` data-de="${r.de}" data-a="${r.a}" data-glose="${html(glose)}"`
+      + ` x1="${de[0].toFixed(1)}" y1="${(de[1] - 4).toFixed(1)}"`
+      + ` x2="${a[0].toFixed(1)}" y2="${(a[1] - 4).toFixed(1)}"/>`);
+  }
+
   // Le cartouche central : c'est là que le manuscrit inscrit la date.
+  const cartouches = [];
   const cw = W * 0.30, ch = W * 0.17;
-  e.push(`<rect class="cartouche" x="${(W - cw) / 2}" y="${(W - ch) / 2}" width="${cw}" height="${ch}" rx="2"/>`);
+  cartouches.push(`<rect class="cartouche" x="${(W - cw) / 2}" y="${(W - ch) / 2}" width="${cw}" height="${ch}" rx="2"/>`);
   const lignes = [cartouche.titre, ...(cartouche.lignes ?? [])].filter(Boolean);
   lignes.forEach((ligne, k) => {
     const y = W / 2 - (lignes.length - 1) * 8 + k * 16 + 4;
-    e.push(txt(W / 2, y, ligne, k === 0 ? 'cartouche-titre' : 'cartouche-ligne', 'text-anchor="middle"'));
+    cartouches.push(txt(W / 2, y, ligne, k === 0 ? 'cartouche-titre' : 'cartouche-ligne', 'text-anchor="middle"'));
   });
 
   return `<svg class="carre" viewBox="${-marge} ${-marge} ${W + marge * 2} ${W + marge * 2}"
     xmlns="http://www.w3.org/2000/svg" role="img"
     aria-label="Carré astrologique : ${html(cartouche.titre ?? 'figure du ciel')}">
-    <g>${e.join('\n')}</g>
+    <g class="couche-fond">${fond.join('\n')}</g>
+    <g class="couche-reperes">${reperes.join('\n')}</g>
+    <g class="couche-aspects">${aspects.join('\n')}</g>
+    <g class="couche-astres">${corps.join('\n')}</g>
+    <g class="couche-cartouche">${cartouches.join('\n')}</g>
   </svg>`;
+}
+
+/** Le nom d'un astre tel qu'il figure déjà dans la figure — on ne le réinvente
+ *  pas ici, sous peine d'en avoir deux orthographes dans la même page. */
+function nomCourt(figure, clef) {
+  return figure.astres.find((a) => a.clef === clef)?.nom ?? clef;
 }
 
 export { GLYPHES, GLYPHES_SIGNES, SIGNES };
