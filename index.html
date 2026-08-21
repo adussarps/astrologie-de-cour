@@ -19,6 +19,7 @@
       et montrer chaque règle avec le livre qui la porte.</p>
     <nav>
       <button class="onglet actif" data-vue="officine">L’officine</button>
+      <button class="onglet" data-vue="questions">Les questions</button>
       <button class="onglet" data-vue="nativites">Les nativités</button>
       <button class="onglet" data-vue="methode">La méthode</button>
       <button class="onglet" data-vue="sources">Les sources</button>
@@ -97,6 +98,63 @@
 </section>
 
 <!-- ═════════════════════════════ LES NATIVITÉS ════════════════════════════ -->
+<section id="vue-questions" class="vue cachee">
+  <h1>Les questions</h1>
+  <p class="devise">Ce qu’un prince demandait vraiment — et par quelle figure on lui répondait.</p>
+
+  <div class="invitation">
+    <h2>On ne relit pas une nativité tous les ans</h2>
+    <p>Un roi de vingt ans qui demande de quoi se méfier ne fait pas relire son thème de
+    naissance. Il fait dresser <b>une autre figure</b>, et laquelle dépend de la question.
+    Il y a trois genres, distincts dans la doctrine comme dans les manuscrits : la
+    <b>nativité</b>, qu’on dresse une fois pour la vie entière ; la <b>révolution de
+    l’année</b>, qu’on recalcule à chaque anniversaire ; et l’<b>interrogation</b>, qu’on
+    dresse à l’instant même où la question est posée.</p>
+    <p class="promesse">Les deux dernières sont ici. La première est dans l’officine.</p>
+  </div>
+
+  <h2 class="titre-genre">La révolution de l’année</h2>
+  <p class="preambule">On recalcule le ciel à l’instant exact où le Soleil revient au degré
+  qu’il occupait à la naissance. Cette figure gouverne les douze mois qui suivent. Avec elle
+  va la <b>profection</b> : on avance d’un signe par année de vie depuis l’ascendant natal,
+  et le seigneur du lieu où l’on tombe devient le <b>maître de l’année</b> — une planète
+  unique, désignée par une division, à quoi pend tout le jugement annuel.</p>
+
+  <form id="formulaire-annee" class="officine compacte">
+    <div class="champ petit">
+      <label for="age">Âge</label>
+      <input type="number" id="age" min="0" max="110" value="20" required>
+    </div>
+    <div class="boutons">
+      <button type="submit" class="principal">Dresser la figure de l’année</button>
+    </div>
+    <p class="note-calendrier">Reprend la naissance saisie dans l’officine.</p>
+  </form>
+  <div id="resultat-annee"></div>
+
+  <h2 class="titre-genre">L’interrogation</h2>
+  <p class="preambule">Le genre qui répond à « de quoi dois-je me méfier ». On dresse le ciel
+  à l’instant où la question est posée — pas à la naissance. Le consultant est l’ascendant et
+  son seigneur ; la chose demandée est la maison qui la gouverne. La question <i>aboutit</i>
+  si les deux seigneurs se regardent, ou si la Lune porte la lumière de l’un à l’autre. Le
+  <i>De interrogationibus</i> de Sahl ibn Bishr est bâti ainsi : un chapitre par maison, donc
+  par espèce de question.</p>
+
+  <form id="formulaire-question" class="officine compacte">
+    <div class="champ large">
+      <label for="demande">Votre question</label>
+      <select id="demande"></select>
+    </div>
+    <div class="boutons">
+      <button type="submit" class="principal">Poser la question au ciel</button>
+    </div>
+    <p class="note-calendrier">La figure est celle de cet instant, à Paris.</p>
+  </form>
+  <div id="resultat-question"></div>
+
+  <div class="avertissement-genre" id="avertissement-oresme"></div>
+</section>
+
 <section id="vue-nativites" class="vue cachee">
   <div class="intro">
     <h2>Cinq carrés dans un seul cahier</h2>

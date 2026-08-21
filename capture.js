@@ -52,6 +52,13 @@ const script = {
   nativites: `document.querySelector('[data-vue=nativites]').click();
               document.querySelector('#galerie button').click(); 'ok'`,
   methode: `document.querySelector('[data-vue=methode]').click(); 'ok'`,
+  annee: `document.querySelector('#heure').value = 14;
+          document.querySelector('#minute').value = 30;
+          document.querySelector('[data-vue=questions]').click();
+          document.querySelector('#formulaire-annee').requestSubmit(); 'ok'`,
+  question: `document.querySelector('[data-vue=questions]').click();
+             document.querySelector('#demande').value = '0';
+             document.querySelector('#formulaire-question').requestSubmit(); 'ok'`,
   sources: `document.querySelector('[data-vue=sources]').click(); 'ok'`,
 }[CIBLE];
 

@@ -15,6 +15,7 @@ const { juger } = await import('./src/jugement.js');
 const { NATIVITES, CONJONCTION_1345 } = await import('./src/corpus.js');
 const { versTempsUniversel, equationDuTemps, fuseauDe, decalageLegal, conventionParDefaut } =
   await import('./src/temps.js');
+const { figureDeLAnnee, profection, dansLAnnee } = await import('./src/annee.js');
 
 let echecs = 0;
 
@@ -100,6 +101,40 @@ for (const n of NATIVITES) {
   }
   console.log(`     jour de la semaine calculé : ${hp.jourSemaine}`);
   if (n.ecart) console.log(`     (~) écart documenté : ${n.ecart.titre}`);
+}
+
+// ─── La révolution de l'année, contrôlée sur le carré annoté ─────────────────
+// Le meurtre de Louis d'Orléans est écrit dans la marge de son carré de
+// trente-cinquième anniversaire. Cette figure doit donc contenir le 23
+// novembre 1407 — et la profection de la trente-cinquième année doit tomber
+// où elle tombe.
+console.log('\n── La révolution de la 35e année de Louis d’Orléans');
+{
+  const louis = NATIVITES.find((n) => n.clef === 'louis-orleans');
+  const { jj: jjNatal } = versTempsUniversel({ ...louis, convention: 'vraie' });
+  const f = figureDeLAnnee({
+    jjNatal, age: 35, latitude: louis.latitude, longitude: louis.longitude,
+  });
+  const { jj: jjMeurtre } = versTempsUniversel({
+    annee: 1407, mois: 11, jour: 23, heure: 20, minute: 0, julien: true,
+    latitude: louis.latitude, longitude: louis.longitude, convention: 'vraie',
+  });
+
+  const controles = [
+    ['la profection tombe en 12e maison', 12, f.maitre.profection.rang],
+    ['le maître de l’année est Mars', 'mars', f.maitre.clef],
+    ['le meurtre tombe dans l’année révolue', true, dansLAnnee(f, jjMeurtre)],
+    // Le contrôle qui compte : la même profection revient tous les douze ans.
+    ['la même maison revient à 11 ans', 12, profection(11).rang],
+    ['la même maison revient à 23 ans', 12, profection(23).rang],
+  ];
+  for (const [quoi, attendu, obtenu] of controles) {
+    const ok = attendu === obtenu;
+    if (!ok) echecs++;
+    console.log(`   ${ok ? '✓' : '✗'} ${quoi.padEnd(42)} ${ok ? '' : `attendu ${attendu}, obtenu ${obtenu}`}`);
+  }
+  console.log('     ⚠ Louis avait déjà eu cette profection à 11 et 23 ans, sans dommage.');
+  console.log('       La technique ne prédit pas : elle fournit un casier où loger l’événement.');
 }
 
 // La conjonction de 1345, aux deux dates.

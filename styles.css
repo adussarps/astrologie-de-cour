@@ -212,6 +212,45 @@ button.secondaire:hover { background: rgba(143, 47, 33, .07); }
 }
 .renvoi::before { content: '▸ '; color: var(--or); font-style: normal; }
 
+/* ── Les questions ───────────────────────────────────────────────────────── */
+.titre-genre {
+  color: var(--rubrique);
+  border-bottom: 2px solid var(--or);
+  padding-bottom: 7px;
+  margin: 48px 0 14px;
+  font-size: 1.6rem;
+}
+.preambule { max-width: 78ch; }
+.officine.compacte { margin: 18px 0 26px; }
+.champ.large { grid-column: span 3; }
+.champ.large select { width: 100%; }
+
+.considerations { border-left: 3px solid var(--or); padding-left: 14px !important; }
+.considerations p.grave { color: var(--rubrique); font-weight: 500; }
+
+.verdict { border-left: 3px solid var(--trait); padding-left: 14px !important; }
+.verdict.doux { border-left-color: #6b8f5e; }
+.verdict.dur { border-left-color: var(--rubrique); }
+.verdict.rien { border-left-color: var(--encre-pale); }
+.verdict.lune, .verdict.meme { border-left-color: var(--or); }
+.verdict h3 { font-size: 1.15rem !important; }
+
+.mise-en-garde {
+  font-style: italic;
+  color: var(--encre-pale);
+  border-top: 1px dotted var(--trait);
+  padding-top: 8px;
+}
+.avertissement-genre {
+  border: 1px solid var(--trait);
+  border-left: 4px solid var(--rubrique);
+  background: var(--parchemin-clair);
+  padding: 20px 26px;
+  margin-top: 48px;
+  max-width: 78ch;
+}
+.avertissement-genre h3 { color: var(--rubrique); margin-bottom: .4em; }
+
 /* ── La recherche de lieu ────────────────────────────────────────────────── */
 .champ-lieu { position: relative; }
 .suggestions {

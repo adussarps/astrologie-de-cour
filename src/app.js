@@ -2,7 +2,7 @@
 
 import {
   jourJulien, positions, maisons, heuresInegales, heuresPlanetaires,
-  enSigne, PLANETES, NOMS_JOURS,
+  enSigne, dateGregorienne, PLANETES, NOMS_JOURS,
 } from './ciel.js';
 import { juger, enPhrases, nomDe, sommaire, lectureDesMaisons } from './jugement.js';
 import { carre, GLYPHES } from './figure.js';
@@ -16,6 +16,10 @@ import {
   fuseauDe, enHeures, enDecalage,
 } from './temps.js';
 import { installerRechercheDeLieu } from './lieux.js';
+import { figureDeLAnnee, SOURCES as SOURCES_ANNEE } from './annee.js';
+import {
+  DEMANDES, jugerInterrogation, SOURCES as SOURCES_QUESTION,
+} from './interrogation.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
@@ -280,6 +284,153 @@ function noterConvention() {
   }
 }
 
+// ─── Les questions : la révolution de l'année, et l'interrogation ────────────
+
+function rendreAnnee(saisie, age) {
+  const { jj: jjNatal } = instant(saisie);
+  const f = figureDeLAnnee({ jjNatal, age, latitude: saisie.latitude, longitude: saisie.longitude });
+  if (!f) return '<p>Le retour solaire n’a pas été trouvé pour cet âge.</p>';
+
+  const d = dateGregorienne(f.jj);
+  const fin = dateGregorienne(f.finit);
+  const m = f.maitre;
+  const etat = m.annuel.etat;
+  const force = etat?.tenues.length ? `en ${etat.tenues.join(' et ')} — forte`
+    : etat?.perdues.length ? `en ${etat.perdues.join(' et ')} — mal logée`
+      : 'pérégrine — sans dignité ni appui';
+
+  const carreAnnuel = carre(f.annuelle, {
+    titre: 'Revolutio anni',
+    lignes: [`${age} ans`, `${d.jour}/${d.mois}/${d.annee}`, $('#lieu').value || '—'],
+  });
+
+  return `<div class="plan">
+    <div>
+      ${carreAnnuel}
+      <p class="legende-carre">La figure de la révolution — le ciel à l’instant où le Soleil
+      a retrouvé son degré de naissance. Elle vaut du ${d.jour}/${d.mois}/${d.annee} au
+      ${fin.jour}/${fin.mois}/${fin.annee}.</p>
+    </div>
+    <div class="jugement">
+      <section>
+        <h3>La maison de l’année</h3>
+        <p>À <b>${age} ans</b>, la profection porte sur la
+        <b>${m.profection.rang}<sup>e</sup> maison</b> — ${html(m.profection.titre.toLowerCase())} :
+        ${html(m.profection.detail)}. C’est la matière que l’année met en jeu.</p>
+        <p>Le signe profecté est ${html(enSigne(m.signeProfecte))}.</p>
+        <span class="renvoi">${html(SOURCES_ANNEE.profection)}</span>
+      </section>
+      <section>
+        <h3>Le maître de l’année</h3>
+        <p>Le seigneur de ce signe est <b>${html(m.nom)}</b> : c’est le <i>dominus anni</i>.
+        Tout le jugement de l’année pend à l’état de cette seule planète.</p>
+        <p>À la naissance il se tenait à ${html(enSigne(m.natal.longitude))}, en
+        ${m.natal.maison}<sup>e</sup> maison. Dans la figure de l’année il est à
+        ${html(enSigne(m.annuel.longitude))}, en <b>${m.annuel.maison}<sup>e</sup> maison</b>,
+        ${html(force)}.</p>
+        <span class="renvoi">${html(SOURCES_ANNEE.revolution)}</span>
+      </section>
+      <section>
+        <h3>L’ascendant de l’année</h3>
+        <p>${html(enSigne(f.annuelle.ascendant))} monte à l’instant du retour. L’almuten de la
+        révolution est <b>${html(nomDe(f.annuelle.almuten.vainqueur.planete))}</b>.</p>
+        <p class="mise-en-garde">La révolution ne remplace pas la nativité : elle se lit
+        <b>par-dessus</b>. Une année ne peut donner que ce que la nativité promet.</p>
+      </section>
+    </div>
+  </div>`;
+}
+
+function rendreQuestion(rangMaison) {
+  const maintenant = new Date();
+  const saisie = {
+    annee: maintenant.getFullYear(), mois: maintenant.getMonth() + 1, jour: maintenant.getDate(),
+    heure: maintenant.getHours(), minute: maintenant.getMinutes(),
+    latitude: 48.8566, longitude: 2.3522, convention: 'legale',
+  };
+  const { figure } = dresser(saisie);
+  const j = jugerInterrogation(figure, rangMaison);
+
+  const gardes = j.considerations.length
+    ? `<section class="considerations">
+        <h3>Avant de juger</h3>
+        ${j.considerations.map((c) => `<p class="${c.grave ? 'grave' : ''}">${c.texte}</p>`).join('')}
+        <span class="renvoi">${html(SOURCES_QUESTION.considerations)}</span>
+      </section>`
+    : `<section class="considerations">
+        <h3>Avant de juger</h3>
+        <p>Aucune des considérations de Bonatti ne s’oppose au jugement : l’ascendant n’est ni
+        au début ni à la fin de son signe, Saturne n’est pas en septième, et la Lune n’est pas
+        vide de course. On peut juger.</p>
+        <span class="renvoi">${html(SOURCES_QUESTION.considerations)}</span>
+      </section>`;
+
+  return `<div class="plan">
+    <div>
+      ${carre(figure, { titre: 'Interrogatio', lignes: [
+    `${saisie.jour}/${saisie.mois}/${saisie.annee}`,
+    `${String(saisie.heure).padStart(2, '0')} h ${String(saisie.minute).padStart(2, '0')}`,
+    'Paris'] })}
+      <p class="legende-carre">Le ciel à l’instant où la question a été posée. Rechargez la
+      page et reposez-la : ce ne sera plus la même figure. C’est le principe même du genre —
+      et c’est ce qu’on lui a le plus reproché.</p>
+    </div>
+    <div class="jugement">
+      ${gardes}
+      <section>
+        <h3>Le consultant, et la chose</h3>
+        <p>Vous êtes l’ascendant, ${html(enSigne(figure.ascendant))}, et son seigneur
+        <b>${html(nomDe(j.consultant.clef))}</b>, qui se tient en
+        ${j.consultant.maison}<sup>e</sup> maison.</p>
+        <p>La chose demandée est la <b>${j.matiere.rang}<sup>e</sup> maison</b> —
+        ${html(j.matiere.titre.toLowerCase())} : ${html(j.matiere.detail)}. Son seigneur est
+        <b>${html(nomDe(j.seigneurChose.clef))}</b>, en ${j.seigneurChose.maison}<sup>e</sup>
+        maison.</p>
+      </section>
+      <section class="verdict ${j.verdict.clef}">
+        <h3>${html(j.verdict.titre)}</h3>
+        <p>${j.verdict.texte}</p>
+        <span class="renvoi">${html(SOURCES_QUESTION.interrogation)}</span>
+      </section>
+    </div>
+  </div>`;
+}
+
+function initQuestions() {
+  $('#demande').innerHTML = DEMANDES
+    .map((d, i) => `<option value="${i}">${html(d.texte)}</option>`).join('');
+
+  $('#formulaire-annee').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const saisie = lireFormulaire();
+    if (!Number.isFinite(saisie.heure)) {
+      $('#resultat-annee').innerHTML = '<p class="mise-en-garde">Il faut d’abord une heure de '
+        + 'naissance dans l’officine : sans ascendant natal, il n’y a pas de profection.</p>';
+      return;
+    }
+    $('#resultat-annee').innerHTML = rendreAnnee(saisie, +$('#age').value);
+  });
+
+  $('#formulaire-question').addEventListener('submit', (e) => {
+    e.preventDefault();
+    $('#resultat-question').innerHTML = rendreQuestion(DEMANDES[+$('#demande').value].maison);
+  });
+
+  $('#avertissement-oresme').innerHTML = `
+    <h3>Ce que l’Église en pensait</h3>
+    <p>C’est ici que l’astrologie cesse d’être tolérée. Juger une nativité passait pour
+    naturel — on y lisait une complexion, comme un médecin lit un pouls. Mais <b>poser une
+    question au ciel revient à tenir la réponse pour déjà écrite</b>, donc à nier le libre
+    arbitre. C’est l’astrologie judiciaire au sens strict, et c’est elle que les
+    condamnations visent.</p>
+    <p>L’attaque française la plus dure, le <i>Livre de divinacions</i>, est de
+    <b>Nicole Oresme</b> — le traducteur de Charles V. Et son traité de la sphère ouvre le
+    manuscrit même où sont reliées les cinq nativités royales, Oxford, St John’s College,
+    MS 164. <b>Le roi gardait dans un seul volume son astrologue et son sceptique.</b></p>
+    <span class="renvoi">Nicole Oresme, Livre de divinacions, v. 1361-1365 ;
+    Jean-Patrice Boudet, Entre science et nigromance, Publications de la Sorbonne, 2006.</span>`;
+}
+
 function noterCalendrier() {
   const s = { annee: +$('#annee').value, mois: +$('#mois').value, jour: +$('#jour').value };
   if (!s.annee) return;
@@ -515,6 +666,7 @@ function initNavigation() {
 
 initNavigation();
 initOfficine();
+initQuestions();
 initNativites();
 initMethode();
 void NOMS_JOURS;
