@@ -124,6 +124,29 @@ blockquote cite::before { content: '— '; }
 .champ-convention { flex: 1 1 220px; }
 .champ-sexe { flex: 0 1 170px; }
 
+/* La durée de vie : deux colonnes qui ne concluent pas la même chose. C'est le
+   seul bloc du site dont la mise en page porte l'argument — si les deux marches
+   se lisaient l'une sous l'autre, on croirait à une suite et non à une fourche. */
+.vie .marches { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin: 16px 0; }
+.vie .marche { border: 1px solid var(--trait); padding: 14px 16px; background: rgba(255, 253, 246, .5); }
+.vie .marche h4 { margin: 0 0 2px; font-size: 1rem; }
+.vie .etapes { margin: 10px 0; padding-left: 18px; font-size: .9rem; }
+.vie .etapes li { margin-bottom: 5px; }
+.vie .etapes li.ecarte { color: var(--encre-pale); }
+.vie .etapes li.retenu { color: var(--encre-pale); }
+.vie .etapes li.elu::marker { color: var(--rubrique); font-weight: 700; }
+.vie .etapes li.elu { color: var(--encre); }
+.vie .issue-hyleg { margin: 10px 0 4px; padding-top: 8px; border-top: 1px solid var(--trait); }
+.vie .ecart-interne { font-size: .88rem; color: var(--rubrique); font-style: italic; }
+.vie .donneurs-titre { font-size: .85rem; color: var(--encre-pale); margin: 8px 0 4px; }
+.vie ul.donneurs { margin: 0; padding-left: 18px; font-size: .9rem; }
+.vie ul.donneurs li { margin-bottom: 4px; }
+.vie .verdict-vie { padding: 12px 14px; border-left: 3px solid var(--rubrique); background: rgba(139, 106, 58, .06); }
+.vie .verdict-vie.accord { border-left-color: var(--trait); }
+.vie .pas-de-nombre { font-size: .9rem; color: var(--encre-pale); margin-top: 12px; }
+.vie .syzygie { font-size: .92rem; }
+@media (max-width: 620px) { .vie .marches { grid-template-columns: 1fr; } }
+
 /* Une part qu'on n'a pas su trancher : les deux points, et aucun sur la figure. */
 tr.indecise td { background: rgba(139, 106, 58, .045); }
 label {

@@ -18,7 +18,7 @@ import {
   MAISONS, ASPECTS, ORBES, PARTS, RESERVES, NATURES_SIGNES, FORCE_DES_LIEUX,
   SIGNIFICATIONS, ETATS_SOLAIRES, CONDITIONS, LUMIERE, MATIERES, MELOTHESIE,
 } from './doctrine.js';
-import { nomDe, seigneurDuSigne, enDegresMinutes, peregrinDe } from './jugement.js';
+import { nomDe, seigneurDuSigne, enDegresMinutes, peregrinDe, rangTexte } from './jugement.js';
 import { CONVENTIONS, enHeures, enDecalage } from './temps.js';
 
 const NOMS = Object.fromEntries(PLANETES.map((p) => [p.clef, p.nom]));
@@ -305,9 +305,14 @@ CE QUE TU NE DOIS PAS FAIRE — c'est important, et c'est là que tout se joue
 - N'invente aucune règle, aucune table, aucun degré. Si une donnée ne figure pas ci-dessous,
   tu ne l'as pas, et tu le dis. Un jugement qui avoue un trou vaut mieux qu'un jugement qui
   le comble.
-- Ne donne aucun chiffre de durée de vie. La doctrine du hyleg et de l'alcocoden n'est pas
-  fixée — Ptolémée, Alcabitius et Bonatti ne désignent pas le hyleg de la même façon —, et
-  un nombre unique serait un faux.
+- Ne donne aucun chiffre de durée de vie, et n'en approche pas — pas de fourchette, pas de
+  décennie, pas de « longue vie » ni de « vie brève », qui sont des chiffres déguisés. Le
+  dossier te remet la marche complète de deux auteurs sur cette figure même, avec le point
+  d'où chacun part et la planète que chacun nomme pour donner les années. Rends cet écart,
+  qui est un fait, et arrête-toi là. Le nombre, lui, dépendrait encore de trois choses que
+  personne n'a fixées : l'état de l'alcocoden, qui décide entre ses années majeures, moyennes
+  et mineures ; puis les additions des bénéfiques ; puis les soustractions des maléfiques.
+  Un chiffre rendu ici ne dirait pas l'âge du natif, il dirait quel livre était ouvert.
 - Ne prédis aucun événement daté de ta propre autorité. Tu juges des dispositions, des
   matières fortes et faibles, ce dont il faut se garder. Une seule exception, et elle est
   étroite : si le dossier te remet une échéance ou un calendrier déjà calculés, tu peux les
@@ -750,7 +755,7 @@ function enDate(jj) {
 }
 
 /** Le rang d'une maison : la première est « 1re », les autres « ne ». */
-const rang = (n) => (n === 1 ? '1re' : `${n}e`);
+const rang = rangTexte;
 
 
 /** Le compte des trois témoignages, écrit de sorte qu'on voie lequel manque.
@@ -818,6 +823,55 @@ function lesChangements(annee) {
 }
 
 /** Le dossier d'une nativité. */
+/** La durée de vie, remise au modèle comme un désaccord et non comme un blanc.
+ *
+ *  L'ancienne consigne se contentait d'interdire le chiffre. Une interdiction
+ *  sans preuve invite à la contourner ; on remet donc la marche entière des deux
+ *  auteurs, pour que le refus soit lisible comme un résultat. */
+function dureeDeVieEnClair(vie) {
+  if (!vie?.marches?.length) return '';
+
+  const marche = (m) => {
+    // Trois états, et non deux : un candidat peut être en lieu convenable sans
+    // être celui qu'on retient. Ptolémée le dit en propres termes lorsque les
+    // deux luminaires conviennent.
+    const etat = (e) => (e.elu ? '→ ÉLU     ' : e.retenu ? '  éligible' : '  écarté  ');
+    const etapes = m.marches.map((e) =>
+      `    ${etat(e)} ${(e.nom ?? '').padEnd(30)} ${e.pourquoi}`
+      + (e.detail ? `\n${' '.repeat(15)}${e.detail}` : '')).join('\n');
+
+    const donneurs = m.alcocodens.map((a) =>
+      `    selon ${a.auteur.padEnd(36)} ${a.elu
+        ? `${a.elu.nom} (par ${a.elu.dignite}) — ${a.elu.atteinte.glose}`
+        : 'AUCUN : pas un des seigneurs du degré ne l’atteint, donc le hyleg est incomplet'}`)
+      .join('\n');
+
+    return `  ${m.auteur} — ${m.source}\n${etapes}\n`
+      + `    HYLEG : ${m.nom}${m.position ? ` à ${m.position}` : ''} — ${m.raison}\n`
+      + (m.ecartInterne ? `    (Ptolémée se contredit ici : ${m.ecartInterne})\n` : '')
+      + `    L'ALCOCODEN, selon l'ordre de commandement qu'on suit :\n${donneurs}`;
+  };
+
+  const verdict = vie.accord.memePoint && vie.accord.memeDonneur
+    ? 'Sur cette figure, les deux marches tombent d’accord. C’est le cas le moins fréquent, '
+      + 'et il ne rend pourtant pas le nombre calculable : il resterait à choisir entre les '
+      + 'années majeures, moyennes et mineures du donneur, puis à ajouter et retrancher selon '
+      + 'les regards. Dis l’accord, il vaut d’être dit — et n’en tire pas un âge.'
+    : 'Les deux marches divergent sur cette figure. C’est le fait à rapporter, et il se rapporte '
+      + 'tel quel : deux autorités qu’on enseignait ensemble ne partent pas du même point et ne '
+      + 'nomment pas le même donneur d’années. Nomme les deux points, nomme les donneurs, et '
+      + 'conclus que le nombre aurait dit quel livre était ouvert, non l’âge du natif.';
+
+  return `${SEPARATEUR('LA DURÉE DE VIE — un désaccord, pas un blanc')}Cette section ne te donne `
+    + 'aucun âge, et tu n’en dois produire aucun. Elle te donne mieux : la marche complète de deux '
+    + 'auteurs sur cette figure, pour que tu puisses montrer d’où vient le silence.\n\n'
+    + (vie.syzygie ? `  La syzygie qui a précédé la naissance : ${vie.syzygie.nom}, `
+      + `à ${enSigne(vie.syzygie.longitude)}. Elle entre dans les deux marches, différemment.\n\n` : '')
+    + `${vie.marches.map(marche).join('\n\n')}\n\n`
+    + `  CE QU'IL FAUT EN DIRE\n  ${verdict}\n\n`
+    + `  ET POURQUOI ON S'ARRÊTE LÀ\n  ${vie.pasDeNombre}\n`;
+}
+
 export function dossierNativite({ saisie, resultat }) {
   return [
     consigne(PLAN_NATIVITE),
@@ -825,6 +879,7 @@ export function dossierNativite({ saisie, resultat }) {
     SEPARATEUR('LES DONNÉES') + contexte({ ...resultat, saisie }),
     '',
     figureEnClair(resultat.figure),
+    dureeDeVieEnClair(resultat.vie),
     SEPARATEUR('LA DOCTRINE') + tablesDeDoctrine(),
     SEPARATEUR('LES RÉSERVES') + reserves(),
   ].join('\n');

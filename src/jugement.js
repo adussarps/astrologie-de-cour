@@ -1,8 +1,9 @@
 // Le jugement : appliquer la doctrine à une figure.
 //
 // Tout ce qui suit est mécanique et incontesté — les dignités, l'almuten, les
-// parts, les regards. Ce qui ne l'est pas (la durée de vie, le caractère)
-// n'est pas calculé : voir RESERVES dans doctrine.js.
+// parts, les regards. Ce qui ne l'est pas n'est pas calculé ici : le caractère
+// pas du tout, la durée de vie autrement — vie.js en calcule le désaccord des
+// auteurs, mais aucun nombre. Voir RESERVES dans doctrine.js.
 
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, POIDS,
@@ -484,6 +485,9 @@ export function pointsDePerfection(astres) {
 
 /** La première maison est « la 1re », les autres « la ne ». */
 export const rangHtml = (k) => (k === 1 ? '1<sup>re</sup>' : `${k}<sup>e</sup>`);
+/** Le même rang en texte nu, pour le dossier et les modules qui n'écrivent pas
+ *  de HTML. Le premier prend « re » et non « e » : on écrit 1re, pas 1e. */
+export const rangTexte = (k) => (k === 1 ? '1re' : `${k}e`);
 const rang = rangHtml;
 
 const modeDu = (longitude) =>

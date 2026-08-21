@@ -2,10 +2,12 @@
 
 import {
   positions, maisons, heuresInegales, heuresPlanetaires,
-  enSigne, dateGregorienne, PLANETES, SIGNES,
+  enSigne, dateGregorienne, syzygiePrecedente, PLANETES, SIGNES,
 } from './ciel.js';
+import { laDureeDeVie } from './vie.js';
 import {
   juger, enPhrases, nomDe, sommaire, lectureDesMaisons, enDegresMinutes, rangHtml, peregrinDe,
+  avecArticle,
 } from './jugement.js';
 import { html } from './texte.js';
 import { carre, GLYPHES } from './figure.js';
@@ -45,8 +47,9 @@ function dresser(saisie) {
   const mai = maisons(jj, saisie.latitude, saisie.longitude);
   const figure = juger({ positions: positions(jj), maisons: mai, sexe: saisie.sexe ?? null });
   const hi = heuresInegales(jj, saisie.latitude, saisie.longitude);
+  const vie = laDureeDeVie(figure, syzygiePrecedente(jj));
   return {
-    jj, julien, figure, heures: hi, planetaires: heuresPlanetaires(hi),
+    jj, julien, figure, vie, heures: hi, planetaires: heuresPlanetaires(hi),
     temps: { convention, decalage, equation, zone, ...lectureDuTemps(jj, saisie.longitude, zone) },
   };
 }
@@ -158,6 +161,94 @@ function blocCorps(figure) {
     <b>${html(s.nom)}</b>, en ${rangHtml(s.maison)} maison, ${html(s.force)}. Ce qu’il charge
     dans le corps : ${html(c.maladie.corps)}.</p>
     <span class="renvoi">${html(c.source)}</span>
+  </section>`;
+}
+
+/** La durée de vie — c'est-à-dire l'écart entre ceux qui prétendent la dire.
+ *
+ *  Ce bloc est le seul du site qui ne conclut rien, et c'est délibéré : il fait
+ *  marcher deux autorités sur la même figure et montre où elles se séparent.
+ *  Rendre un nombre reviendrait à choisir un livre sans le dire. */
+/** Ce que l'écart veut dire, dit en français et non en drapeaux booléens.
+ *
+ *  Trois cas se présentent réellement, et le troisième surprend : il arrive
+ *  qu'une des deux marches ne trouve aucun donneur d'années du tout. Écrire
+ *  « elles ne nomment pas le même » serait alors faux — l'une n'en nomme
+ *  aucun, ce qui est un jugement plus dur qu'un désaccord. */
+function leVerdict(vie) {
+  const noms = vie.donneurs.map(avecArticle);
+  const liste = noms.length > 1
+    ? `${noms.slice(0, -1).join(', ')} et ${noms.at(-1)}`
+    : noms[0] ?? null;
+
+  if (vie.accord.memePoint && vie.accord.memeDonneur) {
+    return `<p class="verdict-vie accord">Sur cette figure, les deux marches tombent d’accord :
+      même point de départ, et <b>${html(liste)}</b> pour donner les années. C’est le cas le moins
+      fréquent, et il ne rend pas le nombre calculable pour autant — il resterait à choisir entre
+      les années majeures, moyennes et mineures selon l’état de cette planète, puis à ajouter et
+      retrancher selon les regards.</p>`;
+  }
+
+  const surLePoint = vie.accord.memePoint
+    ? 'Les deux marches partent du même point'
+    : 'Les deux marches ne partent pas du même point';
+
+  const surLeDonneur = !liste
+    ? ', et ni l’une ni l’autre ne trouve de planète à qui donner les années'
+    : vie.sansDonneur
+      ? `, et l’une nomme <b>${html(liste)}</b> pour donner les années quand l’autre n’en trouve
+         aucune — un hyleg qu’aucun de ses seigneurs n’atteint est déclaré incomplet, et la règle
+         veut alors qu’on en cherche un autre`
+      : vie.accord.memeDonneur
+        ? `, mais nomment la même planète pour donner les années : <b>${html(liste)}</b>`
+        : `, et ne nomment pas la même planète pour donner les années : <b>${html(liste)}</b>`;
+
+  return `<p class="verdict-vie desaccord">${surLePoint}${surLeDonneur}. Un chiffre rendu ici
+    n’aurait pas dit l’âge du natif : il aurait dit quel livre était ouvert sur la table.</p>`;
+}
+
+function blocVie(vie) {
+  if (!vie?.marches?.length) return '';
+
+  const marche = (m) => {
+    const etapes = m.marches.map((e) => `<li class="${e.elu ? 'elu' : e.retenu ? 'retenu' : 'ecarte'}">
+      <b>${html(e.nom ?? '')}</b>${e.detail ? ` <span class="cote">${html(e.detail)}</span>` : ''}
+      — ${html(e.pourquoi)}${e.retenu && !e.elu
+  ? ' <span class="cote">(en lieu convenable, mais un autre l’emporte)</span>' : ''}</li>`).join('');
+
+    const donneurs = m.alcocodens.map((a) => `<li>
+      <span class="cote">${html(a.auteur)}</span>
+      ${a.elu ? `<b>${html(a.elu.nom)}</b>, par ${html(a.elu.dignite)} — ${html(a.elu.atteinte.glose)}`
+    : '<b>aucun</b> — pas un des seigneurs du degré ne l’atteint, et le hyleg est donc incomplet'}
+      </li>`).join('');
+
+    return `<div class="marche">
+      <h4>${html(m.auteur)}</h4>
+      <p class="renvoi">${html(m.source)}</p>
+      <ol class="etapes">${etapes}</ol>
+      <p class="issue-hyleg">Hyleg : <b>${html(m.nom)}</b>${m.position
+  ? ` à ${html(m.position)}` : ''} — ${html(m.raison)}.</p>
+      ${m.ecartInterne ? `<p class="ecart-interne">Ptolémée se contredit ici lui-même :
+        ${html(m.ecartInterne)}.</p>` : ''}
+      <p class="donneurs-titre">Le donneur d’années, selon l’ordre de commandement qu’on suit :</p>
+      <ul class="donneurs">${donneurs}</ul>
+    </div>`;
+  };
+
+  const verdict = leVerdict(vie);
+
+  return `<section class="vie">
+    <h3>La durée de vie : pourquoi il n’y a pas de nombre</h3>
+    <p class="preambule">C’est la pièce la plus chère d’une nativité princière, et la seule que
+    ce site refuse de chiffrer. Le refus n’est pas de la prudence : c’est le calcul lui-même qui
+    le rend. On fait marcher ici, sur votre figure, les deux autorités qu’on lisait ensemble dans
+    les universités latines — et l’on regarde où elles se séparent.</p>
+    ${vie.syzygie ? `<p class="syzygie">La syzygie qui a précédé la naissance —
+      ${html(vie.syzygie.nom)}, à ${html(enSigne(vie.syzygie.longitude))} — entre dans les deux
+      marches, et pas de la même façon.</p>` : ''}
+    <div class="marches">${vie.marches.map(marche).join('')}</div>
+    ${verdict}
+    <p class="pas-de-nombre">${html(vie.pasDeNombre)}</p>
   </section>`;
 }
 
@@ -278,7 +369,7 @@ function troisLignes(figure) {
 
 function rendreFigure(saisie, cartouche, { titreCarre = '', dossier = null } = {}) {
   const resultat = dresser(saisie);
-  const { figure, heures, planetaires, julien, temps } = resultat;
+  const { figure, heures, planetaires, julien, temps, vie } = resultat;
   const phrases = enPhrases(figure).map((p) => `<section>
       <h3>${html(p.titre)}</h3><p>${p.texte}</p>
       <span class="renvoi">${html(p.source)}</span>
@@ -307,6 +398,7 @@ function rendreFigure(saisie, cartouche, { titreCarre = '', dossier = null } = {
           ${blocSommaire(figure)}
           ${blocPerfection(figure)}
           ${blocCorps(figure)}
+          ${blocVie(vie)}
           ${blocLecture(figure)}
           ${blocHeures(heures, planetaires)}
           ${blocTemps(temps)}

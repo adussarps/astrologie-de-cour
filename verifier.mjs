@@ -9,8 +9,9 @@ globalThis.Astronomy = Astronomy;
 import tzlookup from 'tz-lookup';
 globalThis.tzlookup = tzlookup;
 
-const { jourJulien, positions, maisons, heuresInegales, heuresPlanetaires, enSigne, ecartAngulaire } =
-  await import('./src/ciel.js');
+const { jourJulien, positions, maisons, heuresInegales, heuresPlanetaires, enSigne, ecartAngulaire,
+  syzygiePrecedente } = await import('./src/ciel.js');
+const { laDureeDeVie } = await import('./src/vie.js');
 const { juger, proximiteExaltation, enDegresMinutes, regardEntre } =
   await import('./src/jugement.js');
 const { EXALTATIONS } = await import('./src/doctrine.js');
@@ -178,6 +179,93 @@ console.log('\n── Les degrés de perfection');
     + `${enDegresMinutes(v.perfection.exaltation)} de son degré d’exaltation (27° Poissons).`);
   console.log('       Un modèle de langage à qui l’on ne donnait pas ce nombre l’avait');
   console.log('       calculé de tête, et annoncé 0° 18′. C’est pour cela qu’on le calcule ici.');
+}
+
+console.log('\n── La syzygie qui précède la naissance');
+{
+  // Deux lois suffisent, et elles se vérifient sans éphéméride de contrôle :
+  // la syzygie tombe avant la naissance et pas plus de trente jours avant
+  // (le mois synodique en fait 29,53), et les deux luminaires y sont soit au
+  // même degré, soit dos à dos. Le piège que cela attrape est réel : chercher
+  // la phase dans une seule fenêtre de quarante jours rend parfois
+  // l'avant-dernière syzygie, ce qui décale le hyleg d'al-Qabīṣī d'un mois.
+  const ok = (quoi, vrai, obtenu) => console.log(
+    `   ${vrai ? '✓' : '✗'} ${quoi.padEnd(58)} ${vrai ? '' : `obtenu ${obtenu}`}`);
+
+  let avant = true; let recente = true; let alignee = true; let pire = 0;
+  for (let annee = 1300; annee <= 2000; annee += 37) {
+    for (const [mois, jour] of [[1, 8], [4, 19], [7, 3], [10, 27]]) {
+      const jj = jourJulien({ annee, mois, jour, heure: 9, julien: annee < 1582 });
+      const s = syzygiePrecedente(jj);
+      if (!s) { avant = false; continue; }
+      const age = jj - s.jj;
+      if (!(age > 0)) avant = false;
+      if (!(age < 29.6)) { recente = false; pire = Math.max(pire, age); }
+      const ecart = ecartAngulaire(s.soleil, s.lune);
+      const attendu = s.conjonction ? 0 : 180;
+      if (Math.abs(ecart - attendu) > 0.05) alignee = false;
+    }
+  }
+  ok('la syzygie tombe toujours avant la naissance', avant, 'une syzygie postérieure');
+  ok('et jamais plus d’un mois synodique avant', recente, `${pire.toFixed(1)} jours`);
+  ok('les luminaires y sont conjoints ou opposés à 3′ près', alignee, 'désalignement');
+
+  const s = syzygiePrecedente(jourJulien({ annee: 1996, mois: 5, jour: 20, heure: 12.5 }));
+  console.log(`     20/5/1996 : ${s.nom} trois jours plus tôt, à ${enSigne(s.longitude)}.`);
+}
+
+console.log('\n── Le hyleg : deux auteurs, deux marches, et l’écart qu’on ne chiffre pas');
+{
+  // Ce bloc ne contrôle aucune durée de vie — il n'y en a pas. Il contrôle que
+  // les deux marches sont bien deux, c'est-à-dire qu'on n'a pas écrit deux fois
+  // la même règle sous deux noms. Une divergence attestée vaut donc ici comme
+  // un résultat positif : c'est elle qu'on publie.
+  const ok = (quoi, vrai, obtenu) => console.log(
+    `   ${vrai ? '✓' : '✗'} ${quoi.padEnd(58)} ${vrai ? '' : `obtenu ${obtenu}`}`);
+
+  const louis = NATIVITES.find((n) => /Louis/.test(n.nom));
+  const { jj } = versTempsUniversel({
+    annee: louis.annee, mois: louis.mois, jour: louis.jour,
+    heure: louis.heure, minute: louis.minute, julien: true,
+    latitude: louis.latitude, longitude: louis.longitude, convention: 'vraie',
+  });
+  const f = juger({ positions: positions(jj), maisons: maisons(jj, louis.latitude, louis.longitude) });
+  const v = laDureeDeVie(f, syzygiePrecedente(jj));
+
+  const [ptol, alca] = v.marches;
+  // Aucun luminaire n'est en lieu prorogatif : Ptolémée passe donc à la planète
+  // qui domine le Soleil, la syzygie et l'ascendant, et c'est Mercure. Chez
+  // al-Qabīṣī rien ne convient — luminaires mal logés, syzygie et Fortune
+  // cadentes — et le hyleg échoit au degré de l'ascendant, en dernier recours.
+  ok('Ptolémée, faute de luminaire bien logé, prend le dominateur : Mercure',
+    ptol.clef === 'mercure', ptol.clef);
+  ok('al-Qabīṣī, faute de tout, échoit au degré de l’ascendant',
+    alca.clef === 'ascendant', alca.clef);
+  ok('les deux ne partent donc pas du même point', !v.accord.memePoint, 'accord');
+  ok('ni ne nomment le même donneur d’années', !v.accord.memeDonneur, 'accord');
+  ok('trois planètes différentes sont nommées pour donner les années',
+    v.donneurs.length === 3, `${v.donneurs.length} : ${v.donneurs.join(', ')}`);
+
+  // La loi qui compte : tout hyleg élu doit avoir un alcocoden nommé, ou être
+  // déclaré incomplet. Un hyleg dont l'alcocoden serait « undefined » passerait
+  // inaperçu à l'écran et ferait dire n'importe quoi au modèle.
+  let complet = true;
+  for (let annee = 1320; annee <= 2000; annee += 23) {
+    const q = jourJulien({ annee, mois: 6, jour: 11, heure: 15, julien: annee < 1582 });
+    const g = juger({ positions: positions(q), maisons: maisons(q, 48.8566, 2.3522) });
+    const w = laDureeDeVie(g, syzygiePrecedente(q));
+    for (const m of w.marches) {
+      if (!Number.isFinite(m.longitude)) { complet = false; break; }
+      for (const a of m.alcocodens) if (!a.elu && !a.incomplet) complet = false;
+    }
+  }
+  ok('tout hyleg a un alcocoden nommé, ou est déclaré incomplet', complet, 'un trou');
+
+  console.log(`     Louis d’Orléans : Ptolémée part de ${ptol.nom} ; al-Qabīṣī, ${alca.nom}.`);
+  console.log(`     Donneurs d’années nommés : ${v.donneurs.join(', ')} — `
+    + `${v.donneurs.length} planètes pour un seul ciel.`);
+  console.log('       Il a été assassiné à trente-cinq ans, et aucune de ces marches');
+  console.log('       ne l’annonçait. C’est pour cela qu’aucun nombre n’est rendu.');
 }
 
 console.log('\n── La part du Mariage se renverse sur le sexe, et non sur la secte');

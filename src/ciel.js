@@ -114,6 +114,54 @@ export function positions(jj) {
   return out;
 }
 
+/** La syzygie qui précède la naissance : la dernière nouvelle ou pleine lune.
+ *
+ *  Elle sert au hyleg. Ptolémée s'en sert pour désigner la planète qui domine
+ *  les lieux prorogatifs ; al-Qabīṣī en fait un candidat à part entière, ce que
+ *  Ptolémée refuse. C'est l'un des points où les deux se séparent, et il faut
+ *  donc la calculer pour montrer la séparation.
+ *
+ *  On la cherche par phases successives plutôt qu'en une passe : une fenêtre
+ *  de quarante jours contient parfois deux conjonctions, et prendre la première
+ *  venue donnerait l'avant-dernière syzygie au lieu de la dernière. */
+export function syzygiePrecedente(jj) {
+  const derniere = (cible) => {
+    let trouvee = null;
+    let depart = jj - 40;
+    for (let i = 0; i < 4; i++) {
+      const t = Astronomy.SearchMoonPhase(cible, tempsDe(depart), 40);
+      if (!t) break;
+      const quand = t.ut + J2000;
+      if (quand >= jj) break;
+      trouvee = quand;
+      depart = quand + 1;
+    }
+    return trouvee;
+  };
+
+  const nouvelle = derniere(0);
+  const pleine = derniere(180);
+  if (nouvelle === null && pleine === null) return null;
+
+  const conjonction = (pleine === null) || (nouvelle !== null && nouvelle > pleine);
+  const quand = conjonction ? nouvelle : pleine;
+
+  // Le degré de la syzygie est celui du Soleil à cet instant. Pour une pleine
+  // lune, la doctrine retient celui des deux luminaires qui est au-dessus de
+  // la terre ; ne connaissant pas encore l'horizon ici, on rend les deux et
+  // le choix se fait plus haut, où les maisons sont connues.
+  const p = positions(quand);
+  return {
+    jj: quand,
+    conjonction,
+    genre: conjonction ? 'conjonction' : 'opposition',
+    nom: conjonction ? 'la nouvelle lune' : 'la pleine lune',
+    soleil: p.soleil.longitude,
+    lune: p.lune.longitude,
+    longitude: conjonction ? p.soleil.longitude : p.lune.longitude,
+  };
+}
+
 /** Ascendant, milieu du ciel et les douze maisons d'Alcabitius.
  *
  *  Alcabitius trisège les demi-arcs diurne et nocturne du degré ascendant :

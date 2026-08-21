@@ -468,11 +468,118 @@ export const MATIERES = {
   },
 };
 
+// ─── Le genre des signes ─────────────────────────────────────────────────────
+// Masculins et féminins alternent depuis le Bélier. La table ne sert presque
+// à rien dans ce site — sauf au hyleg d'al-Qabīṣī, où elle décide si le Soleil
+// couché en septième maison peut donner la vie ou non.
+export const GENRES_SIGNES = {
+  source: 'Alcabitius, dist. I ; Tetrabiblos, I, 12',
+  regle: 'Le Bélier est masculin, le Taureau féminin, et ainsi de suite en alternant.',
+  genre: (signe) => (signe % 2 === 0 ? 'masculin' : 'féminin'),
+};
+
+// ─── La durée de vie : les lieux d'où l'on peut la lancer ────────────────────
+//
+// Ce bloc ne sert pas à prédire une durée. Il sert à montrer que deux auteurs
+// qu'on enseignait ensemble ne désignent pas le même point de départ, et donc
+// pas la même planète pour donner les années. C'est le seul endroit du site où
+// la doctrine est mise en contradiction avec elle-même, sur pièces.
+export const HYLEG = {
+  nom: 'Le hyleg',
+  glose: 'De l’arabo-persan haylāj, « ce qui lâche » — le point d’où l’on fait '
+    + 'partir la vie. Les Latins disent prorogator, celui qui proroge.',
+
+  ptolemee: {
+    auteur: 'Ptolémée',
+    source: 'Tetrabiblos, III, 10 et 11 (trad. Robbins)',
+    // « la douzième partie du zodiaque entourant l'horoscope, de 5° au-dessus
+    // de l'horizon jusqu'aux 25° qui restent ; le sextil dextre à ces trente
+    // degrés, dit maison du Bon Démon ; le quartil, le milieu du ciel ; le
+    // trigone, dit maison du Dieu ; et l'opposé, l'Occident. »
+    lieux: [10, 1, 11, 7, 9],
+    preference: 'Le milieu du ciel d’abord, puis l’orient, puis la onzième, '
+      + 'puis l’occident, puis la neuvième.',
+    marge: 5,
+    horsLieux: 'Rien sous la terre, hormis ce qui monte dans le signe ascendant '
+      + 'même ; et rien en douzième, qui est cadente et dont les rayons se troublent '
+      + 'dans les vapeurs de la terre.',
+    // Les cinq modes de domination de Ptolémée ne sont PAS les cinq dignités
+    // arabes : la face n'y figure pas, et le regard y figure. C'est une
+    // divergence de fond, et elle change qui l'emporte.
+    dominations: ['triplicité', 'domicile', 'exaltation', 'terme', 'regard'],
+    seuil: 3,
+  },
+
+  alcabitius: {
+    auteur: 'Al-Qabīṣī (Alcabitius)',
+    source: 'Introduction à l’astrologie, IV, 4 (trad. Burnett, Yamamoto et Yano)',
+    // Al-Qabīṣī n'a pas les cinq lieux de Ptolémée : il a des lieux propres à
+    // chaque luminaire, et le genre du signe y entre. Le Soleil peut donner la
+    // vie depuis la huitième maison, que Ptolémée exclut absolument.
+    soleilDeJour: {
+      partout: { maisons: [10, 11], avantAscendant: true },
+      siMasculin: { maisons: [7, 8, 9] },
+    },
+    soleilDeNuit: {
+      partout: { maisons: [4, 5], avantDescendant: true },
+      siMasculin: { maisons: [1, 2] },
+    },
+    lune: {
+      partout: { maisons: [1, 2, 3, 7, 8] },
+      siFeminin: { maisons: [10, 11, 4, 5], avantAscendant: true },
+    },
+    marge: 5,
+    souslesRayons: 'Quand la Lune est en ces lieux mais sous les rayons, elle ne '
+      + 'convient pas au hyleg.',
+    // La condition qui manque tout à fait chez Ptolémée, et qui peut faire
+    // qu'une figure n'ait aucun hyleg du tout.
+    regardExige: 'Chacun de ces lieux ne convient au hyleg que si l’un des seigneurs '
+      + 'des cinq parts le regarde — seigneur du domicile, de l’exaltation, du terme, '
+      + 'de la triplicité ou de la face. Si aucun ne le regarde, le lieu ne convient pas.',
+    apresLesLuminaires: 'Quand les deux luminaires ne conviennent pas, on regarde le '
+      + 'degré de la syzygie qui a précédé : s’il est en un angle ou en une succédente, '
+      + 'il convient. S’il est cadent, on regarde la part de Fortune, à la même condition. '
+      + 'Si elle est cadente aussi, on prend le degré de l’ascendant, et le hyleg lui revient.',
+  },
+};
+
+export const ALCOCODEN = {
+  nom: 'L’alcocoden',
+  glose: 'De l’arabe al-kadhkhudāh, « le maître de maison » — le donneur d’années. '
+    + 'Les auteurs le disent le mari, dont le hyleg est la femme : elle porte la vie, '
+    + 'il en fixe la mesure.',
+  source: 'Al-Qabīṣī, IV, 5 (74-78) ; Dorothée de Sidon, Carmen, III',
+  regle: 'On prend les seigneurs des cinq parts au degré du hyleg, et celui qui y a le '
+    + 'plus de commandement et qui regarde le hyleg est l’alcocoden. S’il ne le regarde '
+    + 'pas, on descend d’un rang, jusqu’au dernier. Si aucun ne le regarde, le hyleg est '
+    + 'incomplet, et il faut en chercher un autre.',
+  // Deux ordres, et c'est la deuxième fourche : le rang décide qui l'emporte.
+  ordres: [
+    {
+      auteur: 'Al-Qabīṣī (« certains astrologues »)',
+      rang: ['domicile', 'exaltation', 'terme', 'triplicité', 'face'],
+    },
+    {
+      auteur: 'Dorothée de Sidon',
+      rang: ['terme', 'domicile', 'exaltation', 'triplicité', 'face'],
+      note: 'Al-Qabīṣī le dit lui-même : « Dorothée a mis le seigneur du terme '
+        + 'avant le seigneur du domicile. »',
+    },
+  ],
+  // On s'arrête là, et le refus est doctrinal, non technique.
+  pasDeNombre: 'Les années majeures, moyennes et mineures de chaque planète sont dans '
+    + 'les livres, et l’on saurait les additionner. On ne le fait pas : le choix entre '
+    + 'majeures, moyennes et mineures dépend de l’état de l’alcocoden, puis l’on ajoute '
+    + 'et l’on retranche selon les regards des bénéfiques et des maléfiques — et c’est '
+    + 'là que la règle cesse d’être une règle pour devenir la main de l’astrologien. '
+    + 'Le désaccord sur le hyleg suffit à faire voir ce qu’il faut voir.',
+};
+
 // ─── Ce que ce site ne calcule pas, et pourquoi ──────────────────────────────
 export const RESERVES = [
   {
     titre: 'La durée de vie (hyleg et alcocoden)',
-    texte: 'C’est la pièce la plus chère d’une nativité princière, et la doctrine n’est pas fixée : Ptolémée, Alcabitius et Bonatti ne désignent pas le hyleg de la même façon, et l’alcocoden se compte en années majeures, moyennes ou mineures selon l’état de la planète. Un chiffre unique serait un faux. La règle est donnée dans la Méthode ; le nombre ne l’est pas.',
+    texte: 'C’est la pièce la plus chère d’une nativité princière, et le site en calcule tout — sauf le nombre. Ptolémée et al-Qabīṣī ne désignent pas le hyleg de la même façon : leurs deux marches sont conduites côte à côte sur votre figure, et l’on voit où elles se séparent. Elles nomment souvent deux planètes différentes pour donner les années. Le chiffre, lui, dépendrait encore de l’état de cette planète, puis des regards qui ajoutent et retranchent — et c’est là que la règle cesse d’être une règle. Le désaccord est rendu ; le nombre ne l’est pas, parce qu’il aurait dit quel livre était ouvert et non l’âge du natif.',
   },
   {
     titre: 'Le jugement de caractère',

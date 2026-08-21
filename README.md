@@ -82,14 +82,54 @@ chiffre qui fait autorité, pas le ciel.**
 - **Pas de signe solaire, pas de caractère.** Personne, en 1380, n’est *un Bélier* : la notion
   est une invention du XXᵉ siècle. L’astrologie savante travaille sur l’ascendant, les maisons
   et les seigneurs planétaires.
-- **Pas de durée de vie chiffrée.** Le *hyleg* et l’*alcocoden* sont la pièce la plus chère
-  d’une nativité princière, et la doctrine n’est pas fixée : Ptolémée, Alcabitius et Bonatti
-  ne s’accordent pas. Un chiffre unique serait un faux. La règle est donnée, le nombre non.
+- **Pas de durée de vie chiffrée** — mais le désaccord, lui, est calculé. Voir la section
+  ci-dessous : c’est le seul endroit du site où la doctrine est mise en contradiction avec
+  elle-même, sur pièces.
 - **Pas encore la seconde colonne.** Le site calcule le **ciel réel**. Un astrologien de 1380
   calculait avec les **Tables alphonsines**, et les deux divergent. Reconstruire le calcul
   alphonsin depuis les données de [DISHAS](https://dishas.obspm.fr/) et afficher les deux
   colonnes côte à côte avec l’écart en degrés : c’est le vrai travail, et il reste à faire.
   **C’est la contribution la plus utile que quelqu’un puisse apporter à ce dépôt.**
+
+## La durée de vie : un désaccord calculé, plutôt qu’un refus poli
+
+Le site ne rend aucun âge. Ce n’était longtemps qu’une réserve écrite dans un coin — « la
+doctrine n’est pas fixée » — et une réserve qu’on affirme sans la prouver vaut peu. Elle est
+maintenant démontrée sur chaque figure.
+
+Deux autorités qu’on lisait **ensemble** dans les universités latines du XIVᵉ siècle marchent
+côte à côte sur votre nativité :
+
+- **Ptolémée**, *Tetrabiblos*, III, 10-11 (trad. Robbins). Le prorogateur doit se tenir dans
+  l’un de **cinq lieux** seulement — la dixième, la première (de 5° au-dessus de l’horizon à
+  25° au-dessous), la onzième, la septième, la neuvième — et dans cet ordre d’autorité. On
+  prend le luminaire de la secte s’il y est ; sinon l’autre ; sinon la planète qui domine le
+  Soleil, la syzygie et l’ascendant par au moins trois des cinq modes ; sinon l’ascendant.
+- **Al-Qabīṣī** (Alcabitius), *Introduction à l’astrologie*, IV, 4-5 (trad. Burnett, Yamamoto
+  et Yano). Il **n’a pas** les cinq lieux. Il donne à chaque luminaire sa propre liste de
+  maisons, où le genre du signe entre : le Soleil de jour peut donner la vie depuis la huitième
+  — que Ptolémée exclut absolument — pourvu que le signe soit masculin. Et il ajoute une
+  condition que Ptolémée ignore : un candidat ne vaut que si l’un de ses cinq seigneurs
+  l’atteint. Faute de quoi une figure peut n’avoir aucun hyleg valable.
+
+Puis vient l’**alcocoden**, le donneur d’années : le seigneur du degré du hyleg qui l’atteigne,
+pris dans l’ordre de commandement. Et l’ordre est la seconde fourche — al-Qabīṣī rapporte que
+« certains astrologues » mettent le domicile en tête, puis note que **Dorothée a mis le terme
+avant le domicile**. Deux ordres, souvent deux planètes.
+
+**Le résultat, sur la nativité de Louis d’Orléans :** aucun luminaire n’est bien logé, Ptolémée
+passe donc au dominateur et tombe sur **Mercure** ; chez al-Qabīṣī rien ne convient — luminaires
+mal placés, syzygie et part de Fortune cadentes — et le hyleg échoit en dernier recours au
+**degré de l’ascendant**. Trois planètes différentes sont alors nommées pour donner les années.
+Il fut assassiné à trente-cinq ans, et aucune de ces marches ne l’annonçait.
+
+**On s’arrête avant le nombre, et le point d’arrêt est motivé.** Les années majeures, moyennes
+et mineures de chaque planète sont dans les livres, et l’on saurait les additionner. Mais le
+choix entre les trois dépend de l’état de l’alcocoden, puis l’on ajoute et l’on retranche selon
+les regards des bénéfiques et des maléfiques — et c’est là que la règle cesse d’être une règle
+pour devenir la main de l’astrologien. Le désaccord sur le point de départ suffit à faire voir
+ce qu’il faut voir : un chiffre n’aurait pas dit l’âge du natif, il aurait dit quel livre était
+ouvert sur la table.
 
 ## La seule donnée que le ciel ne porte pas : le sexe
 
@@ -139,10 +179,13 @@ regards, et les nomme sous la figure avec leur écart exact.
 | Heures inégales et planétaires | confrontées aux cinq légendes latines du manuscrit Oxford, St John’s College 164 | **4 sur 5 exacts**, le cinquième documenté |
 | Écart angulaire | symétrie et bornes vérifiées sur 22 000 couples | **exact** |
 | Ascendants | comparés aux éphémérides publiées pour trois naissances cotées AA (Trump, Cendrars, Macron) | **1′ ou moins** |
+| Syzygie précédente | sur 76 dates de 1300 à 2000 : antériorité, âge sous un mois synodique, alignement des luminaires | **exacte à 3′** |
+| Part du Mariage | symétrie des deux formes autour de l’ascendant ; invariance des trois autres parts | **exact** |
+| Hyleg | les deux marches conduites sur le corpus ; tout hyleg élu a un alcocoden nommé ou est déclaré incomplet | **aucun trou** |
 
 Les deux premiers contrôles ont été faits avec `pyswisseph` pendant le développement et ne se
-rejouent pas depuis ce dépôt : il faudrait installer Swiss Ephemeris pour les refaire. Les
-trois derniers tournent à chaque `npm test`.
+rejouent pas depuis ce dépôt : il faudrait installer Swiss Ephemeris pour les refaire. Tous les
+autres tournent à chaque `npm test`.
 
 ## Le dossier pour un modèle de langue
 
@@ -163,8 +206,11 @@ modèle de langue connaît mille fois mieux le Bélier caractériel du XXᵉ si�
 et laissé libre il produirait de l’horoscope de magazine sous un vernis ancien. On lui donne
 donc tout, et rien d’autre : la figure calculée ici, les tables de doctrine avec leur source,
 la méthode du seigneur, le ton, et la liste explicite de ce qu’il n’a pas le droit de dire —
-pas de portrait de caractère fondé sur le signe solaire, pas de durée de vie chiffrée, pas
-d’événement daté, aucune règle inventée. Il n’apporte que la prose.
+pas de portrait de caractère fondé sur le signe solaire, pas d’âge de la mort, pas d’événement
+daté, aucune règle inventée. Il n’apporte que la prose. Là où il devrait se taire faute de
+doctrine fixée, on ne se contente pas de le lui interdire : on lui remet la marche complète
+des deux auteurs sur la figure, pour qu’il rende l’écart au lieu d’un blanc — une interdiction
+sans preuve invite à la contourner.
 
 **Le jugement est rendu par rubriques.** Une section titrée par matière, et le titre donne la
 conclusion plutôt que le sujet : non pas « Le métier », mais « Le métier — un officier, jamais
@@ -187,7 +233,7 @@ règle de traduction, la dureté permise, les interdits — mais le plan du *jud
 
 | Genre | Plan | Ce qu’il refuse de juger |
 |---|---|---|
-| Nativité | les cinq matières du livre IV du *Tetrabiblos* : la complexion et le corps, le métier, l’avoir, la dignité, les parties adverses | la durée de vie, l’événement daté |
+| Nativité | les cinq matières du livre IV du *Tetrabiblos* : la complexion et le corps, le métier, l’avoir, la dignité, les parties adverses | l’âge de la mort — il reçoit à la place la marche des deux auteurs, et doit en rendre l’écart ; l’événement daté |
 | Révolution | la matière de l’année, le maître jugé deux fois, ce qui a changé depuis la nativité, le calendrier des douze mois | le métier, la complexion, le naturel — ils se décident à la naissance et n’en bougent plus |
 | Interrogation | peut-on juger, la voie d’aboutissement, l’échéance, la conduite à tenir | tout ce qui touche à la nativité, dont il ne doit pas parler |
 
