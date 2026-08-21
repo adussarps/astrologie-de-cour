@@ -20,6 +20,7 @@ import { figureDeLAnnee, SOURCES as SOURCES_ANNEE } from './annee.js';
 import {
   DEMANDES, jugerInterrogation, SOURCES as SOURCES_QUESTION,
 } from './interrogation.js';
+import { dossierNativite, dossierAnnee, dossierInterrogation } from './dossier.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
@@ -184,16 +185,21 @@ function blocHeures(heures, planetaires) {
   </section>`;
 }
 
-function rendreFigure(saisie, cartouche, { titreCarre = '' } = {}) {
-  const { figure, heures, planetaires, julien, temps } = dresser(saisie);
+function rendreFigure(saisie, cartouche, { titreCarre = '', dossier = null } = {}) {
+  const resultat = dresser(saisie);
+  const { figure, heures, planetaires, julien, temps } = resultat;
   const phrases = enPhrases(figure).map((p) => `<section>
       <h3>${html(p.titre)}</h3><p>${p.texte}</p>
       <span class="renvoi">${html(p.source)}</span>
     </section>`).join('');
 
+  const bloc = dossier
+    ? boutonDossier(dossier, dossierNativite({ saisie, resultat }))
+    : '';
+
   return {
-    figure, heures, planetaires,
-    markup: `
+    figure, heures, planetaires, resultat,
+    markup: bloc + `
       <div class="plan">
         <div>
           ${carre(figure, cartouche)}
@@ -284,11 +290,56 @@ function noterConvention() {
   }
 }
 
+// ─── Le dossier pour un modèle de langue ─────────────────────────────────────
+//
+// On ne branche pas d'API : le site reste statique, sans clé, sans serveur et
+// sans rien qui sorte de la machine. Le lecteur emporte le dossier et le colle
+// où il veut. Le modèle ne reçoit aucune latitude doctrinale — la figure, les
+// règles, la méthode et les interdits lui sont fournis d'un bloc.
+
+const DOSSIERS = new Map();
+
+function boutonDossier(clef, texte) {
+  DOSSIERS.set(clef, texte);
+  const mots = texte.split(/\s+/).length;
+  return `<div class="dossier-llm">
+    <button type="button" class="copier" data-dossier="${clef}">Copier le dossier pour ChatGPT</button>
+    <span class="dossier-note">≈ ${mots.toLocaleString('fr-FR')} mots — la figure, les tables
+    de doctrine avec leurs sources, la méthode du seigneur, le ton, et ce que le modèle n’a
+    pas le droit de dire. Collez-le tel quel : il n’a rien à inventer.</span>
+    <details class="dossier-voir">
+      <summary>Voir ce qu’il contient</summary>
+      <pre>${html(texte)}</pre>
+    </details>
+  </div>`;
+}
+
+function initCopie() {
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest?.('button.copier');
+    if (!b) return;
+    const texte = DOSSIERS.get(b.dataset.dossier);
+    if (!texte) return;
+    try {
+      await navigator.clipboard.writeText(texte);
+      b.textContent = 'Copié — collez-le dans ChatGPT';
+    } catch {
+      // Sans presse-papier (page non sécurisée, permission refusée), on
+      // déplie le texte : le lecteur le sélectionne à la main.
+      b.closest('.dossier-llm').querySelector('details').open = true;
+      b.textContent = 'Copie refusée — sélectionnez le texte ci-dessous';
+    }
+    setTimeout(() => { b.textContent = 'Copier le dossier pour ChatGPT'; }, 4000);
+  });
+}
+
 // ─── Les questions : la révolution de l'année, et l'interrogation ────────────
 
 function rendreAnnee(saisie, age) {
-  const { jj: jjNatal } = instant(saisie);
-  const f = figureDeLAnnee({ jjNatal, age, latitude: saisie.latitude, longitude: saisie.longitude });
+  const resultat = dresser(saisie);
+  const f = figureDeLAnnee({
+    jjNatal: resultat.jj, age, latitude: saisie.latitude, longitude: saisie.longitude,
+  });
   if (!f) return '<p>Le retour solaire n’a pas été trouvé pour cet âge.</p>';
 
   const d = dateGregorienne(f.jj);
@@ -304,7 +355,7 @@ function rendreAnnee(saisie, age) {
     lignes: [`${age} ans`, `${d.jour}/${d.mois}/${d.annee}`, $('#lieu').value || '—'],
   });
 
-  return `<div class="plan">
+  return boutonDossier('annee', dossierAnnee({ saisie, resultat, annee: f })) + `<div class="plan">
     <div>
       ${carreAnnuel}
       <p class="legende-carre">La figure de la révolution — le ciel à l’instant où le Soleil
@@ -341,15 +392,19 @@ function rendreAnnee(saisie, age) {
   </div>`;
 }
 
-function rendreQuestion(rangMaison) {
+function rendreQuestion(rangMaison, texteQuestion) {
   const maintenant = new Date();
   const saisie = {
     annee: maintenant.getFullYear(), mois: maintenant.getMonth() + 1, jour: maintenant.getDate(),
     heure: maintenant.getHours(), minute: maintenant.getMinutes(),
     latitude: 48.8566, longitude: 2.3522, convention: 'legale',
   };
-  const { figure } = dresser(saisie);
+  const resultat = dresser(saisie);
+  const { figure } = resultat;
   const j = jugerInterrogation(figure, rangMaison);
+  const dossier = boutonDossier('question', dossierInterrogation({
+    saisie, resultat, question: texteQuestion, jugement: j,
+  }));
 
   const gardes = j.considerations.length
     ? `<section class="considerations">
@@ -365,7 +420,7 @@ function rendreQuestion(rangMaison) {
         <span class="renvoi">${html(SOURCES_QUESTION.considerations)}</span>
       </section>`;
 
-  return `<div class="plan">
+  return dossier + `<div class="plan">
     <div>
       ${carre(figure, { titre: 'Interrogatio', lignes: [
     `${saisie.jour}/${saisie.mois}/${saisie.annee}`,
@@ -413,7 +468,8 @@ function initQuestions() {
 
   $('#formulaire-question').addEventListener('submit', (e) => {
     e.preventDefault();
-    $('#resultat-question').innerHTML = rendreQuestion(DEMANDES[+$('#demande').value].maison);
+    const d = DEMANDES[+$('#demande').value];
+    $('#resultat-question').innerHTML = rendreQuestion(d.maison, d.texte);
   });
 
   $('#avertissement-oresme').innerHTML = `
@@ -481,7 +537,7 @@ function initOfficine() {
         `${String(saisie.heure).padStart(2, '0')} h ${String(saisie.minute).padStart(2, '0')}`,
         $('#lieu').value || '—',
       ],
-    });
+    }, { dossier: 'nativite' });
     $('#resultat').innerHTML = markup;
   });
 
@@ -664,6 +720,7 @@ function initNavigation() {
   }));
 }
 
+initCopie();
 initNavigation();
 initOfficine();
 initQuestions();

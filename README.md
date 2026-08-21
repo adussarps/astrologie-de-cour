@@ -102,6 +102,24 @@ chiffre qui fait autorité, pas le ciel.**
 Les deux premiers contrôles ont été faits avec `pyswisseph` pendant le développement ; le
 troisième tourne à chaque `npm test`.
 
+## Le dossier pour un modèle de langue
+
+Chaque figure — nativité, révolution d’année, interrogation — s’accompagne d’un bouton qui
+copie un dossier d’environ deux mille mots, à coller dans ChatGPT ou tout autre modèle, pour
+qu’il rédige le *judicium*.
+
+Aucune clé, aucun serveur, aucun appel réseau : le site reste statique et rien ne sort de la
+machine. Surtout, **le modèle ne reçoit aucune latitude doctrinale**. C’est le point. Un
+modèle de langue connaît mille fois mieux le Bélier caractériel du XXᵉ siècle qu’Alcabitius,
+et laissé libre il produirait de l’horoscope de magazine sous un vernis ancien. On lui donne
+donc tout, et rien d’autre : la figure calculée ici, les tables de doctrine avec leur source,
+la méthode du seigneur, le ton, et la liste explicite de ce qu’il n’a pas le droit de dire —
+pas de portrait de caractère fondé sur le signe solaire, pas de durée de vie chiffrée, pas
+d’événement daté, aucune règle inventée. Il n’apporte que la prose.
+
+C’est aussi la bonne division du travail, historiquement : le calculateur dressait la figure,
+et le jugement était un texte rédigé.
+
 ## Le lieu, et quelle heure
 
 Une figure sans longitude n’est pas une figure, et une heure sans sa convention n’est pas une
@@ -154,6 +172,9 @@ src/figure.js      le carré médiéval en SVG
 src/corpus.js      les nativités documentées, avec latin, traduction et cote
 src/temps.js       les conventions de temps — heure légale, heure vraie, équation du temps
 src/lieux.js       la recherche de lieu : liste du corpus hors ligne, puis Photon
+src/annee.js       la révolution de l'année, la profection, le maître de l'année
+src/interrogation.js  les questions, les considérations de Bonatti, la perfection
+src/dossier.js     le dossier à coller dans un modèle de langue
 src/app.js         l'interface
 vendor/            astronomy-engine (MIT) et tz-lookup (CC0), figés
 ```

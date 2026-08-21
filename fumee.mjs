@@ -33,6 +33,7 @@ const elements = new Map();
 globalThis.document = {
   querySelector: (s) => elements.get(s) ?? (elements.set(s, faireElement(s)), elements.get(s)),
   querySelectorAll: () => [],
+  addEventListener: () => {},
 };
 globalThis.window = { scrollTo: () => {} };
 

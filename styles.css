@@ -212,6 +212,52 @@ button.secondaire:hover { background: rgba(143, 47, 33, .07); }
 }
 .renvoi::before { content: '▸ '; color: var(--or); font-style: normal; }
 
+/* ── Le dossier pour un modèle de langue ─────────────────────────────────── */
+.dossier-llm {
+  border: 1px solid var(--trait);
+  border-left: 4px solid var(--or);
+  background: var(--parchemin-clair);
+  padding: 16px 20px;
+  margin: 0 0 30px;
+}
+button.copier {
+  background: var(--encre);
+  color: var(--parchemin);
+  border: none;
+  padding: 9px 18px;
+  font-family: var(--serif);
+  font-size: .95rem;
+  cursor: pointer;
+  letter-spacing: .02em;
+}
+button.copier:hover { background: var(--rubrique); }
+.dossier-note {
+  display: block;
+  margin-top: 9px;
+  font-size: .84rem;
+  color: var(--encre-pale);
+  max-width: 76ch;
+}
+.dossier-voir { margin-top: 8px; }
+.dossier-voir summary {
+  cursor: pointer;
+  font-size: .82rem;
+  color: var(--rubrique);
+  font-style: italic;
+}
+.dossier-voir pre {
+  margin-top: 10px;
+  max-height: 26em;
+  overflow: auto;
+  background: var(--parchemin);
+  border: 1px solid var(--trait);
+  padding: 12px 14px;
+  font-size: .72rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /* ── Les questions ───────────────────────────────────────────────────────── */
 .titre-genre {
   color: var(--rubrique);
