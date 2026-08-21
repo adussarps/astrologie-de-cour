@@ -14,7 +14,7 @@ const { jourJulien, positions, maisons, heuresInegales, heuresPlanetaires, enSig
 const { laDureeDeVie } = await import('./src/vie.js');
 const { juger, proximiteExaltation, enDegresMinutes, regardEntre } =
   await import('./src/jugement.js');
-const { EXALTATIONS } = await import('./src/doctrine.js');
+const { EXALTATIONS, JOIES, enSaJoie } = await import('./src/doctrine.js');
 const { jugerInterrogation } = await import('./src/interrogation.js');
 const { NATIVITES, CONJONCTION_1345 } = await import('./src/corpus.js');
 const { versTempsUniversel, equationDuTemps, fuseauDe, decalageLegal, conventionParDefaut } =
@@ -307,6 +307,53 @@ console.log('\n── La part du Mariage se renverse sur le sexe, et non sur la 
       return !a || !b || Math.abs(a.longitude - b.longitude) < 1e-9;
     }), 'aucune ne bouge');
   console.log(`     Mariage : ${enSigne(h.longitude)} si homme, ${enSigne(f.longitude)} si femme.`);
+}
+
+console.log('\n── Les joies : sept planètes, sept maisons, et aucune dignité');
+{
+  // La joie est la seule condition favorable qui ne pèse rien dans le compte.
+  // Le risque, en l'ajoutant, est précisément qu'elle s'y glisse — que le
+  // tableau la range parmi les dignités tenues, et qu'elle finisse par gonfler
+  // l'almuten. Ces contrôles-là gardent la porte.
+  const ok = (quoi, vrai, obtenu) => console.log(
+    `   ${vrai ? '✓' : '✗'} ${quoi.padEnd(58)} ${vrai ? '' : `obtenu ${obtenu}`}`);
+
+  const maisonsJoie = Object.keys(JOIES.table).map(Number);
+  const planetesJoie = Object.values(JOIES.table);
+  ok('sept planètes, chacune en une maison, sans doublon',
+    planetesJoie.length === 7 && new Set(planetesJoie).size === 7
+      && new Set(maisonsJoie).size === 7,
+    `${planetesJoie.length} planètes, ${new Set(maisonsJoie).size} maisons`);
+  ok('chaque planète a sa glose',
+    planetesJoie.every((p) => typeof JOIES.gloses[p] === 'string' && JOIES.gloses[p].length > 20),
+    Object.keys(JOIES.gloses).join(', '));
+
+  const { jj } = versTempsUniversel({
+    annee: 1996, mois: 5, jour: 20, heure: 14, minute: 30,
+    latitude: 48.8566, longitude: 2.3522, julien: false, convention: 'legale',
+  });
+  const fig = juger({ positions: positions(jj), maisons: maisons(jj, 48.8566, 2.3522) });
+
+  ok('la figure marque la joie exactement là où la table la place',
+    fig.astres.every((a) => a.joie === (!a.noeud && enSaJoie(a.clef, a.maison))),
+    fig.astres.filter((a) => a.joie).map((a) => a.nom).join(', ') || 'aucune');
+  ok('la teste et la queue du dragon n’ont jamais de joie',
+    fig.astres.filter((a) => a.noeud).every((a) => a.joie === false), 'un nœud se réjouit');
+  ok('la joie n’entre dans aucune dignité tenue',
+    fig.astres.every((a) => !(a.etat?.tenues ?? []).some((t) => /joie/i.test(t))),
+    'une joie comptée comme dignité');
+
+  // Et la preuve par le lieu : on force chaque planète dans la maison de sa
+  // joie, puis dans une autre, sans rien changer d'autre.
+  ok('la joie tient au lieu seul, et bascule avec lui',
+    Object.entries(JOIES.table).every(([m, p]) =>
+      enSaJoie(p, Number(m)) && !enSaJoie(p, (Number(m) % 12) + 1)),
+    'une joie qui ne suit pas sa maison');
+
+  const enJoie = fig.astres.filter((a) => a.joie);
+  console.log(`     Le 20 mai 1996 : ${enJoie.length
+    ? enJoie.map((a) => `${a.nom} en ${a.maison}e`).join(', ')
+    : 'aucune planète en sa joie'}.`);
 }
 
 console.log('\n── L’écart angulaire : une distance, donc symétrique et bornée');

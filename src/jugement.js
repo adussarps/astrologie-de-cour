@@ -9,6 +9,7 @@ import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, POIDS,
   MAISONS, ASPECTS, ORBES, PARTS, NATURES_SIGNES, FORCE_DES_LIEUX,
   ETATS_SOLAIRES, LUMIERE, MATIERES, MELOTHESIE, SIGNIFICATIONS, laGrandeDignite, CONDITIONS,
+  enSaJoie,
 } from './doctrine.js';
 import {
   PLANETES, SIGNES, GENRES, maisonDe, signeDe, mod360, enSigne, ecartAngulaire,
@@ -323,6 +324,7 @@ export function juger({ positions: pos, maisons: mai, sexe = null }) {
       noeud: !!pos[clef].noeud,
       maison,
       force: FORCE_DES_LIEUX.table[maison],
+      joie: !pos[clef].noeud && enSaJoie(clef, maison),
       seigneur: seigneurDuSigne(longitude),
       etat: pos[clef].noeud ? null : etatDe(clef, longitude, deJour),
       solaire: pos[clef].noeud ? null : etatSolaire(clef, longitude, pos.soleil.longitude),

@@ -13,7 +13,7 @@ import { html } from './texte.js';
 import { carre, GLYPHES } from './figure.js';
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, MAISONS,
-  POIDS, PARTS, RESERVES, laGrandeDignite,
+  POIDS, PARTS, RESERVES, JOIES, laGrandeDignite,
 } from './doctrine.js';
 import { NATIVITES, CONJONCTION_1345, AUTRES_PIECES } from './corpus.js';
 import {
@@ -68,7 +68,8 @@ function tableauDesAstres(figure) {
       <td class="deg">${html(enSigne(a.longitude))}</td>
       <td class="deg">${a.maison}</td>
       <td>${html(nomDe(a.seigneur))}</td>
-      <td>${html(dignites)}</td>
+      <td>${html(dignites)}${a.joie
+  ? ` <span class="joie" title="${html(JOIES.gloses[a.clef])}">en sa joie</span>` : ''}</td>
     </tr>`;
   }).join('');
 

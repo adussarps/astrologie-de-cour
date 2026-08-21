@@ -658,6 +658,17 @@ table.releve td.deg { font-variant-numeric: tabular-nums; }
 table.releve tr.dignifie td { color: var(--or); }
 .retro { color: var(--rubrique); font-size: .85em; }
 
+/* La joie n'est pas une dignité : elle se marque, mais discrètement, et sans
+   la couleur qui signale les grandes dignités dans la même colonne. */
+.joie {
+  font-size: .78rem;
+  font-style: italic;
+  color: #46702f;
+  border-bottom: 1px dotted currentColor;
+  cursor: help;
+  white-space: nowrap;
+}
+
 /* ── Heure inconnue ──────────────────────────────────────────────────────── */
 .refus {
   border: 1px solid var(--rubrique);

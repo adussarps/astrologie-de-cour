@@ -173,6 +173,46 @@ export const FORCE_DES_LIEUX = {
   },
 };
 
+// ─── Les joies ───────────────────────────────────────────────────────────────
+// Gaudia planetarum. Chaque planète a une maison où elle se plaît, et la
+// tradition emploie pour le dire le mot de joie, sans métaphore : elle y fait
+// ce qu'elle sait faire, et la matière du lieu est de sa propre nature.
+//
+// Ce n'est pas une dignité : la joie ne compte pour rien dans l'almuten, et
+// une planète en sa joie peut être pérégrine, brûlée, mal logée. Elle dit
+// seulement que l'astre est chez lui dans la matière — ce qui, pour un
+// maléfique, ne veut pas dire qu'il ne nuit pas, mais que sa nuisance est à
+// sa place et se contient. Saturne en douzième est un geôlier dans une
+// prison : il y est utile, et personne ne l'invite à souper.
+export const JOIES = {
+  source: 'Firmicus Maternus, Mathesis, II, 19 ; Bonatti, Liber astronomiae, tr. III',
+  regle: 'La joie n’ajoute aucune dignité et n’entre dans aucun compte. Elle dit que la '
+    + 'planète est chez elle dans la matière de ce lieu, et qu’elle y agit selon sa nature '
+    + 'sans y être contrariée.',
+  table: { 1: 'mercure', 3: 'lune', 5: 'venus', 6: 'mars', 9: 'soleil', 11: 'jupiter', 12: 'saturne' },
+  gloses: {
+    mercure: 'Mercure se réjouit en la première maison, qui est celle du commencement et de '
+      + 'l’esprit : c’est le lieu où la langue, le compte et l’écriture sont l’homme même',
+    lune: 'la Lune se réjouit en la troisième, que les Anciens nommaient dea : le lieu des '
+      + 'courts chemins, de la parenté et des lettres, et la Lune est de tous les astres le '
+      + 'plus prompt à aller et venir',
+    venus: 'Vénus se réjouit en la cinquième, bona fortuna : les enfants, les dons, les fêtes '
+      + '— la matière du lieu est sa matière propre',
+    mars: 'Mars se réjouit en la sixième, mala fortuna : le travail subi, la maladie, ce qu’on '
+      + 'tranche. Un maléfique en un lieu maléfique est à son emploi, et il y nuit moins qu’ailleurs',
+    soleil: 'le Soleil se réjouit en la neuvième, deus : la religion, la science, les songes — '
+      + 'le lieu d’où l’on voit loin, et le Soleil est ce qui fait voir',
+    jupiter: 'Jupiter se réjouit en la onzième, bonus daemon : les amis, l’espérance, ce qu’on '
+      + 'obtient du prince. C’est la maison de la faveur, et Jupiter est la planète qui l’accorde',
+    saturne: 'Saturne se réjouit en la douzième, malus daemon : la prison, la retraite, les '
+      + 'ennemis qu’on ne voit pas. Il y est chez lui comme le geôlier dans sa geôle — sa '
+      + 'nuisance y est à sa place, et donc bornée',
+  },
+};
+
+/** Vrai si l'astre occupe la maison de sa joie. */
+export const enSaJoie = (clef, maison) => JOIES.table[maison] === clef;
+
 // ─── L'homme zodiacal ────────────────────────────────────────────────────────
 // La mélothésie : chaque signe gouverne une partie du corps, de la tête aux
 // pieds dans l'ordre du zodiaque. Ce n'est pas un ornement de calendrier :
