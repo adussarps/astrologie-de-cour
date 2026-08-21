@@ -7,9 +7,11 @@
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, POIDS,
   MAISONS, ASPECTS, ORBES, PARTS, NATURES_SIGNES, FORCE_DES_LIEUX,
-  ETATS_SOLAIRES, LUMIERE, MATIERES, MELOTHESIE, SIGNIFICATIONS,
+  ETATS_SOLAIRES, LUMIERE, MATIERES, MELOTHESIE, SIGNIFICATIONS, laGrandeDignite,
 } from './doctrine.js';
-import { PLANETES, SIGNES, GENRES, maisonDe, signeDe, mod360, enSigne } from './ciel.js';
+import {
+  PLANETES, SIGNES, GENRES, maisonDe, signeDe, mod360, enSigne, ecartAngulaire,
+} from './ciel.js';
 
 const NOMS = Object.fromEntries(PLANETES.map((p) => [p.clef, p.nom]));
 NOMS.teste = 'Teste du dragon';
@@ -41,7 +43,6 @@ export function seigneurDeLaTriplicite(longitude, deJour) {
  *  C'est la seule opération de tout le site qui produise un classement. */
 export function dignitesDe(longitude, deJour) {
   const signe = signeDe(longitude);
-  const degre = mod360(longitude) % 30;
   const trouvees = [];
 
   trouvees.push({ planete: DOMICILES.table[signe], dignite: 'domicile', poids: POIDS.domicile });
@@ -58,7 +59,6 @@ export function dignitesDe(longitude, deJour) {
   trouvees.push({ planete: seigneurDuTerme(longitude), dignite: 'terme', poids: POIDS.terme });
   trouvees.push({ planete: seigneurDeLaFace(longitude), dignite: 'face', poids: POIDS.face });
 
-  void degre;
   return trouvees;
 }
 
@@ -98,7 +98,7 @@ export function etatDe(clef, longitude, deJour) {
 }
 
 /** L'écart angulaire absolu entre deux longitudes, de 0 à 180. */
-const ecartDe = (x, y) => Math.abs(((x - y + 180) % 360) - 180);
+const ecartDe = ecartAngulaire;
 
 /** Les regards que les planètes se portent, avec l'orbe propre à chacune.
  *
@@ -397,7 +397,7 @@ export function proximiteExaltation(clef, longitude) {
   if (!e) return null;
   const degreExalt = e.signe * 30 + e.degre;
   // La distance angulaire à un degré, la plus courte des deux, dans [0, 180].
-  const ecartA = (cible) => Math.abs(((mod360(longitude) - cible + 540) % 360) - 180);
+  const ecartA = (cible) => ecartAngulaire(longitude, cible);
   const exaltation = ecartA(degreExalt);
   const chute = ecartA(degreExalt + 180);
   const pres = Math.min(exaltation, chute);
@@ -445,6 +445,15 @@ const modeDu = (longitude) =>
 const elementDu = (longitude) =>
   TRIPLICITES.table.find((t) => t.signes.includes(signeDe(longitude))).element;
 
+/** « pérégrin » ou « pérégrine », selon l'astre. Une seule définition pour tout
+ *  le site : le genre des planètes est dans ciel.js, et nulle part ailleurs. */
+export const peregrinDe = (clef) => (GENRES[clef] === 'f' ? 'pérégrine' : 'pérégrin');
+
+/** Les deux luminaires prennent l'article, les cinq planètes ne le prennent
+ *  pas : on écrit « la Lune » et « le Soleil », mais « Mars » et « Vénus ». */
+export const avecArticle = (clef) => (clef === 'lune' ? 'la Lune'
+  : clef === 'soleil' ? 'le Soleil' : nomDe(clef));
+
 /** L'accord en genre — la Lune est pérégrine, Saturne est pérégrin. */
 const accord = (clef) => {
   const f = GENRES[clef] === 'f';
@@ -460,12 +469,22 @@ const accord = (clef) => {
 /** « de feu », « de terre », mais « d'air » et « d'eau ». */
 const deLElement = (element) => (/^[aeiouy]/.test(element) ? `d’${element}` : `de ${element}`);
 
-/** L'état d'une planète dit en français, et non en jargon. */
+/** L'état d'une planète dit en français, et non en jargon.
+ *
+ *  On distingue ici ce que le reste du site distingue : tenir son domicile
+ *  n'est pas tenir sa face. Écrire « chez lui, et fort » d'une planète qui n'a
+ *  qu'une face contredirait le compte de force affiché quelques lignes plus
+ *  bas, et c'est le lecteur qui aurait raison de ne plus nous croire. */
 function etatEnMots(astre) {
   if (!astre.etat) return '';
   const a = accord(astre.clef);
-  if (astre.etat.tenues.length) {
+  const grandes = laGrandeDignite(astre.etat.tenues);
+  if (grandes.length) {
     return `${astre.etat.tenues.join(' et ')} — ${a.il.toLowerCase()} y est ${a.chezSoi}, et ${a.fort}`;
+  }
+  if (astre.etat.tenues.length) {
+    return `${astre.etat.tenues.join(' et ')} — un appui, mais petit : `
+      + `${a.il.toLowerCase()} y tient debout sans y commander`;
   }
   if (astre.etat.perdues.length) {
     return `${astre.etat.perdues.join(' et ')} — ${a.il.toLowerCase()} y est mal ${a.loge}`;
@@ -478,7 +497,12 @@ function etatEnMots(astre) {
 function etatBref(astre) {
   if (!astre.etat) return 'sans dignité — un nœud n’est pas une planète';
   const a = accord(astre.clef);
-  if (astre.etat.tenues.length) return `${astre.etat.tenues.join(' et ')}, et donc ${a.fort}`;
+  if (laGrandeDignite(astre.etat.tenues).length) {
+    return `${astre.etat.tenues.join(' et ')}, et donc ${a.fort}`;
+  }
+  if (astre.etat.tenues.length) {
+    return `${astre.etat.tenues.join(' et ')} seulement — un petit appui, qui ne commande pas`;
+  }
   if (astre.etat.perdues.length) return `${astre.etat.perdues.join(' et ')}, et donc mal ${a.loge}`;
   return `${a.peregrin} — sans aucune dignité en ce lieu, et donc sans appui`;
 }
@@ -606,14 +630,14 @@ export function sommaire(figure) {
 /** Le jugement en toutes lettres — chaque phrase renvoyant à sa règle. */
 export function enPhrases(figure) {
   const p = [];
-  const nom = (c) => nomDe(c);
+  const nom = avecArticle;
   const seigneur = figure.seigneurAscendantPlace;
 
   p.push({
     titre: 'La secte',
     texte: figure.deJour
-      ? `Nativité de jour : le Soleil est en la ${figure.soleilEnMaison}ᵉ maison, au-dessus de la terre. Les seigneurs de triplicité diurnes gouvernent, et le Soleil l’emporte sur la Lune.`
-      : `Nativité de nuit : le Soleil est en la ${figure.soleilEnMaison}ᵉ maison, sous la terre. Les seigneurs de triplicité nocturnes gouvernent, et la Lune l’emporte sur le Soleil.`,
+      ? `Nativité de jour : le Soleil est en la ${rangHtml(figure.soleilEnMaison)} maison, au-dessus de la terre. Les seigneurs de triplicité diurnes gouvernent, et le Soleil l’emporte sur la Lune.`
+      : `Nativité de nuit : le Soleil est en la ${rangHtml(figure.soleilEnMaison)} maison, sous la terre. Les seigneurs de triplicité nocturnes gouvernent, et la Lune l’emporte sur le Soleil.`,
     source: 'Alcabitius, dist. III — la secte du jour et de la nuit',
   });
 
@@ -621,10 +645,10 @@ export function enPhrases(figure) {
     titre: 'L’ascendant',
     texte: `L’horoscopus — le degré qui monte — est à ${enSigne(figure.ascendant)}. `
       + `Son seigneur est ${nom(figure.seigneurAscendant)}, qui se trouve à ${enSigne(seigneur.longitude)}, `
-      + `en la ${seigneur.maison}ᵉ maison`
+      + `en la ${rangHtml(seigneur.maison)} maison`
       + (seigneur.etat.tenues.length ? `, ${seigneur.etat.tenues.join(' et ')}.`
         : seigneur.etat.perdues.length ? `, ${seigneur.etat.perdues.join(' et ')}.`
-          : `, pérégrine — sans dignité aucune en ce lieu.`),
+          : `, ${peregrinDe(figure.seigneurAscendant)} — sans dignité aucune en ce lieu.`),
     source: 'Alcabitius, dist. I — les domiciles ; dist. IV — l’état des planètes',
   });
 

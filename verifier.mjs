@@ -9,7 +9,7 @@ globalThis.Astronomy = Astronomy;
 import tzlookup from 'tz-lookup';
 globalThis.tzlookup = tzlookup;
 
-const { jourJulien, positions, maisons, heuresInegales, heuresPlanetaires, enSigne } =
+const { jourJulien, positions, maisons, heuresInegales, heuresPlanetaires, enSigne, ecartAngulaire } =
   await import('./src/ciel.js');
 const { juger, proximiteExaltation, enDegresMinutes } = await import('./src/jugement.js');
 const { EXALTATIONS } = await import('./src/doctrine.js');
@@ -179,6 +179,49 @@ console.log('\n── Les degrés de perfection');
   console.log('       calculé de tête, et annoncé 0° 18′. C’est pour cela qu’on le calcule ici.');
 }
 
+console.log('\n── L’écart angulaire : une distance, donc symétrique et bornée');
+{
+  // Ce contrôle manquait, et son absence a laissé passer une formule qui rendait
+  // des écarts de 340° : Vénus à six degrés du Soleil était déclarée libre au
+  // lieu de brûlée, et des aspects entiers étaient manqués. Rien ne se voyait.
+  let symetrique = true; let borne = true; let contreExemple = null;
+  for (let x = 0; x < 360; x += 1.7) {
+    for (let y = 0; y < 360; y += 3.1) {
+      const a = ecartAngulaire(x, y);
+      if (Math.abs(a - ecartAngulaire(y, x)) > 1e-9) { symetrique = false; contreExemple ??= [x, y]; }
+      if (!(a >= 0 && a <= 180)) { borne = false; contreExemple ??= [x, y]; }
+      // Et invariante par tour complet, sur l'un comme sur l'autre argument.
+      if (Math.abs(a - ecartAngulaire(x + 360, y - 720)) > 1e-9) symetrique = false;
+    }
+  }
+  const controles = [
+    ['symétrique : écart(x,y) = écart(y,x)', true, symetrique],
+    ['bornée à [0, 180]', true, borne],
+    ['nulle sur soi-même', 0, ecartAngulaire(211.4, 211.4)],
+    ['maximale à l’opposition', 180, ecartAngulaire(10, 190)],
+    ['franchit le point vernal', 20, Math.round(ecartAngulaire(10, 350))],
+  ];
+  for (const [quoi, attendu, obtenu] of controles) {
+    const ok = attendu === obtenu;
+    if (!ok) echecs++;
+    console.log(`   ${ok ? '✓' : '✗'} ${quoi.padEnd(46)} `
+      + `${ok ? '' : `attendu ${attendu}, obtenu ${obtenu}${contreExemple ? ` (ex. ${contreExemple})` : ''}`}`);
+  }
+
+  // La table des regards doit se refermer : tout couple dans l'orbe y figure.
+  const louis = NATIVITES.find((n) => n.clef === 'louis-orleans');
+  const { jj } = versTempsUniversel({ ...louis, convention: 'vraie' });
+  const f = juger({ positions: positions(jj), maisons: maisons(jj, louis.latitude, louis.longitude) });
+  const venus = f.astres.find((a) => a.clef === 'venus');
+  const auSoleil = f.regards.find((r) =>
+    [r.a, r.b].includes('venus') && [r.a, r.b].includes('soleil'));
+  const accord = !auSoleil || auSoleil.aspect.angle !== 0
+    || (venus.solaire.classe !== 'libre') === (auSoleil.ecart <= 8.5);
+  if (!accord) echecs++;
+  console.log(`   ${accord ? '✓' : '✗'} l’état solaire s’accorde à la table des regards  `
+    + `(Vénus ${venus.solaire.ecart.toFixed(1)}° du Soleil, ${venus.solaire.classe})`);
+}
+
 console.log('\n── Le compte de force : trois témoignages, il en faut deux');
 {
   // On teste la loi, pas les exemples. Une planète est construite de toutes
@@ -344,7 +387,6 @@ for (const [libelle, jour] of [['20 mars (les tables)', 20], ['24 mars (le ciel)
   console.log(`   ${libelle.padEnd(22)} Saturne ${enSigne(p.saturne.longitude)}  `
     + `Jupiter ${enSigne(p.jupiter.longitude)}  Mars ${enSigne(p.mars.longitude)}   écart ${ecart.toFixed(0)}′`);
 }
-void CONJONCTION_1345;
 
 console.log(echecs ? `\n${echecs} contrôle(s) en échec.` : '\nTous les contrôles passent.');
 process.exit(echecs ? 1 : 0);

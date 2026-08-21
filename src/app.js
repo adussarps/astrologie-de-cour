@@ -1,16 +1,17 @@
 // L'interface. Tout se calcule dans le navigateur ; rien ne sort de la machine.
 
 import {
-  jourJulien, positions, maisons, heuresInegales, heuresPlanetaires,
-  enSigne, dateGregorienne, PLANETES, NOMS_JOURS, SIGNES,
+  positions, maisons, heuresInegales, heuresPlanetaires,
+  enSigne, dateGregorienne, PLANETES, SIGNES,
 } from './ciel.js';
 import {
-  juger, enPhrases, nomDe, sommaire, lectureDesMaisons, enDegresMinutes, rangHtml,
+  juger, enPhrases, nomDe, sommaire, lectureDesMaisons, enDegresMinutes, rangHtml, peregrinDe,
 } from './jugement.js';
+import { html } from './texte.js';
 import { carre, GLYPHES } from './figure.js';
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, MAISONS,
-  POIDS, PARTS, RESERVES,
+  POIDS, PARTS, RESERVES, laGrandeDignite,
 } from './doctrine.js';
 import { NATIVITES, CONJONCTION_1345, AUTRES_PIECES } from './corpus.js';
 import {
@@ -26,8 +27,6 @@ import { dossierNativite, dossierAnnee, dossierInterrogation } from './dossier.j
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
-const html = (s) => String(s ?? '')
-  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 const BASCULE_GREGORIENNE = { annee: 1582, mois: 10, jour: 15 };
 const estJulien = ({ annee, mois, jour }) =>
@@ -57,9 +56,10 @@ function dresser(saisie) {
 function tableauDesAstres(figure) {
   const lignes = figure.astres.map((a) => {
     const dignites = a.etat
-      ? [...a.etat.tenues, ...a.etat.perdues].join(', ') || (a.etat.pérégrine ? 'pérégrine' : '')
+      ? [...a.etat.tenues, ...a.etat.perdues].join(', ')
+        || (a.etat.pérégrine ? peregrinDe(a.clef) : '')
       : '—';
-    return `<tr class="${a.etat?.tenues.length ? 'dignifie' : ''}">
+    return `<tr class="${laGrandeDignite(a.etat?.tenues).length ? 'dignifie' : ''}">
       <td class="glyphe">${GLYPHES[a.clef] ?? ''}</td>
       <td>${html(a.nom)}${a.retrograde && !a.noeud ? ' <span class="retro">℞</span>' : ''}</td>
       <td class="deg">${html(enSigne(a.longitude))}</td>
@@ -408,7 +408,7 @@ function rendreAnnee(saisie, age) {
   // donner, oui ou non — se lit plus bas, où l'on montre le compte entier.
   const force = etat?.tenues.length ? etat.tenues.join(' et ')
     : etat?.perdues.length ? etat.perdues.join(' et ')
-      : 'pérégrine — sans dignité aucune en ce lieu';
+      : `${peregrinDe(m.clef)} — sans dignité aucune en ce lieu`;
 
   const carreAnnuel = carre(f.annuelle, {
     titre: 'Revolutio anni',
@@ -589,7 +589,9 @@ function initQuestions() {
   $('#formulaire-annee').addEventListener('submit', (e) => {
     e.preventDefault();
     const saisie = lireFormulaire();
-    if (!Number.isFinite(saisie.heure)) {
+    // Le champ vide vaut zéro une fois converti — il faut donc regarder la
+    // saisie, non le nombre, sous peine de dresser la profection sur minuit.
+    if ($('#heure').value === '') {
       $('#resultat-annee').innerHTML = '<p class="mise-en-garde">Il faut d’abord une heure de '
         + 'naissance dans l’officine : sans ascendant natal, il n’y a pas de profection.</p>';
       return;
@@ -857,4 +859,3 @@ initOfficine();
 initQuestions();
 initNativites();
 initMethode();
-void NOMS_JOURS;

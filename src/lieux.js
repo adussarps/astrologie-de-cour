@@ -6,6 +6,8 @@
 // le réseau manque ou refuse, la liste courte et la saisie manuelle des
 // coordonnées suffisent : le site continue de fonctionner seul.
 
+import { html } from './texte.js';
+
 const PHOTON = 'https://photon.komoot.io/api/';
 
 // Les lieux du dossier. Ils restent proposés d'office, avant toute recherche.
@@ -116,8 +118,8 @@ export function installerRechercheDeLieu({ champ, liste, etat, surChoix }) {
     liste.innerHTML = resultats.map((r, i) => `<li role="option" id="lieu-opt-${i}"
         class="${i === actif ? 'actif' : ''}" data-rang="${i}"
         aria-selected="${i === actif}">
-        <span class="nom">${r.nom.replace(/</g, '&lt;')}</span>
-        ${r.note ? `<span class="note">${r.note}</span>` : ''}
+        <span class="nom">${html(r.nom)}</span>
+        ${r.note ? `<span class="note">${html(r.note)}</span>` : ''}
         <span class="coord">${r.latitude.toFixed(2)}°, ${r.longitude.toFixed(2)}°</span>
       </li>`).join('');
     liste.hidden = false;

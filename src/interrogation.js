@@ -3,8 +3,10 @@
 // On ne relit pas la nativité : on dresse le ciel à l'instant même où la
 // question est posée. Le consultant est l'ascendant et son seigneur ; la
 // chose demandée est la maison qui la gouverne, et son seigneur. La question
-// « aboutit » — perficitur — si les deux seigneurs se regardent, ou si la Lune
-// porte la lumière de l'un à l'autre.
+// « aboutit » — perficitur — si les deux seigneurs s'appliquent l'un à l'autre,
+// ou si une planète plus rapide qu'eux porte la lumière du premier au second.
+// Qu'ils se regardent ne suffit pas : un aspect qui se sépare dit que la chose
+// est déjà faite, ou manquée. C'est la distinction que ce module tient partout.
 //
 // Le traité de référence, le De interrogationibus de Sahl ibn Bishr, est
 // organisé maison par maison : un chapitre par espèce de question. Bonatti
@@ -18,9 +20,12 @@
 // reliées les cinq nativités royales — a écrit contre cela son Livre de
 // divinacions.
 
-import { mod360, enSigne, signeDe } from './ciel.js';
-import { seigneurDuSigne, nomDe, rangHtml } from './jugement.js';
-import { MAISONS, ASPECTS, ORBES, CONDITIONS, NATURES_SIGNES } from './doctrine.js';
+import { mod360, enSigne, signeDe, ecartAngulaire, GENRES } from './ciel.js';
+import { nomDe, rangHtml, peregrinDe, avecArticle } from './jugement.js';
+import {
+  MAISONS, ASPECTS, ASPECTS_DURS, ORBES, CONDITIONS, NATURES_SIGNES, ETATS_SOLAIRES,
+  FORCE_DES_LIEUX,
+} from './doctrine.js';
 
 export const SOURCES = {
   interrogation: 'Sahl ibn Bishr, De interrogationibus (trad. Jean de Séville) ; '
@@ -82,13 +87,13 @@ export function considerations(figure) {
         + `et il est le seul à mettre ainsi en cause celui qui tient le calcul.`,
     });
   }
-  const ecartSoleil = Math.abs(((seigneurAsc.longitude - soleil.longitude + 540) % 360) - 180);
-  if (ecartSoleil > 172) {
+  const ecartSoleil = ecartAngulaire(seigneurAsc.longitude, soleil.longitude);
+  if (ecartSoleil <= ETATS_SOLAIRES.combustion) {
     avis.push({
       grave: false,
-      texte: `Le seigneur de l’ascendant est brûlé par le Soleil, à moins de huit degrés : `
-        + `<b>le consultant ne voit pas clair dans sa propre affaire</b>, ou l’on cherche à `
-        + `l’abuser.`,
+      texte: `Le seigneur de l’ascendant est brûlé par le Soleil, à ${ecartSoleil.toFixed(1)} `
+        + `degrés de lui : <b>le consultant ne voit pas clair dans sa propre affaire</b>, ou `
+        + `l’on cherche à l’abuser.`,
     });
   }
   if (lune) {
@@ -104,8 +109,7 @@ export function considerations(figure) {
   return avis;
 }
 
-/** La distance angulaire entre deux astres, dans [0, 180]. */
-const separation = (la, lb) => Math.abs(((la - lb + 540) % 360) - 180);
+const separation = ecartAngulaire;
 
 /** Le regard entre deux astres, s'il y en a un dans les orbes — et, ce qui
  *  importe davantage, s'il se fait ou s'il se défait.
@@ -244,14 +248,13 @@ function quand(jonction, seigneurChose) {
 
 /** Les deux luminaires prennent l'article, les cinq planètes n'en prennent
  *  pas : on dit « la Lune se sépare de Mercure ». */
-const avecArticle = (clef) =>
-  clef === 'lune' ? 'la Lune' : clef === 'soleil' ? 'le Soleil' : nomDe(clef);
 
 /** Les dignités d'un astre, en un membre de phrase. */
 function dignites(a) {
   if (a.etat?.tenues.length) return a.etat.tenues.join(' et ');
   if (a.etat?.perdues.length) return a.etat.perdues.join(' et ');
-  return 'pérégrine, sans dignité au lieu où elle est';
+  return `${peregrinDe(a.clef)}, sans dignité au lieu où ${GENRES[a.clef] === 'f' ? 'elle' : 'il'} `
+    + 'se tient';
 }
 
 /** La Lune est-elle vide de course ? Elle n'achève plus aucun aspect avant de
@@ -303,10 +306,10 @@ export function jugerInterrogation(figure, rangMaison) {
       texte: `<b>${nomC}</b> gouverne à la fois l’ascendant et la ${rangHtml(rangMaison)} `
         + `maison. La chose et celui qui la demande ne font qu’un : l’affaire ne dépend de `
         + `personne d’autre, et elle se fera ou non selon l’état seul de cette planète — `
-        + `${dignites(consultant)}, en maison ${consultant.force}.`,
+        + `${dignites(consultant)}, ${FORCE_DES_LIEUX.enPlace[consultant.force]}.`,
     };
   } else if (jonction?.applique) {
-    const dur = jonction.nom === 'opposition' || jonction.nom === 'quadrature';
+    const dur = ASPECTS_DURS.has(jonction.nom);
     echeance = quand(jonction, seigneurChose);
     verdict = {
       clef: dur ? 'dur' : 'doux', reponse: 'oui',
@@ -319,7 +322,7 @@ export function jugerInterrogation(figure, rangMaison) {
           ? jonction.nom === 'opposition'
             ? 'Mais par opposition : elle se fait au prix d’un conflit ouvert, et l’on n’en '
               + 'sortira pas content des deux côtés.'
-            : 'Mais par quadrature : elle se fait avec peine, contrariété et retard.'
+            : 'Mais par quartil : elle se fait avec peine, contrariété et retard.'
           : 'Et par un regard favorable : elle se fait sans grande peine.'),
     };
   } else if (jonction && !jonction.applique) {
@@ -428,4 +431,3 @@ export function jugerInterrogation(figure, rangMaison) {
   };
 }
 
-void seigneurDuSigne;

@@ -15,6 +15,7 @@
 // contraire des aiguilles d'une montre, en partant de l'ascendant à gauche.
 
 import { SIGNES, enSigne, signeDe, mod360, PLANETES } from './ciel.js';
+import { html } from './texte.js';
 
 // U+FE0E force la présentation « texte » : sans lui, les navigateurs rendent
 // les signes du zodiaque en émoji de couleur, ce qui n'est pas l'effet cherché.
@@ -76,9 +77,8 @@ export function carre(figure, cartouche = {}, { cote = 620, partsVisibles = true
   const e = [];
 
   const poly = (pts, classe) => `<polygon class="${classe}" points="${pts.map((p) => p.join(',')).join(' ')}"/>`;
-  const echap = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const txt = (x, y, s, classe, extra = '') =>
-    `<text class="${classe}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" ${extra}>${echap(s)}</text>`;
+    `<text class="${classe}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" ${extra}>${html(s)}</text>`;
 
   // Les douze champs, puis le trait.
   for (let i = 0; i < 12; i++) e.push(poly(regs[i], 'champ'));
@@ -141,7 +141,7 @@ export function carre(figure, cartouche = {}, { cote = 620, partsVisibles = true
       const classe = `astre${h.part ? ' part' : ''}${h.fort ? ' fort' : ''}`;
       e.push(`<text x="${bx.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle">`
         + `<tspan class="${classe}">${h.glyphe}${h.retrograde ? '℞' : ''}</tspan>`
-        + `<tspan class="astre-degre" dx="4">${echap(h.texte)}</tspan></text>`);
+        + `<tspan class="astre-degre" dx="4">${html(h.texte)}</tspan></text>`);
     });
   }
 
@@ -156,7 +156,7 @@ export function carre(figure, cartouche = {}, { cote = 620, partsVisibles = true
 
   return `<svg class="carre" viewBox="${-marge} ${-marge} ${W + marge * 2} ${W + marge * 2}"
     xmlns="http://www.w3.org/2000/svg" role="img"
-    aria-label="Carré astrologique : ${echap(cartouche.titre ?? 'figure du ciel')}">
+    aria-label="Carré astrologique : ${html(cartouche.titre ?? 'figure du ciel')}">
     <g>${e.join('\n')}</g>
   </svg>`;
 }

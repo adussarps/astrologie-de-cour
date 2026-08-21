@@ -16,9 +16,9 @@ import { SIGNES, PLANETES, GENRES, enSigne, signeDe, mod360, dateGregorienne } f
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, POIDS,
   MAISONS, ASPECTS, ORBES, PARTS, RESERVES, NATURES_SIGNES, FORCE_DES_LIEUX,
-  SIGNIFICATIONS, ETATS_SOLAIRES, CONDITIONS, LUMIERE, MATIERES,
+  SIGNIFICATIONS, ETATS_SOLAIRES, CONDITIONS, LUMIERE, MATIERES, MELOTHESIE,
 } from './doctrine.js';
-import { nomDe, seigneurDuSigne, enDegresMinutes } from './jugement.js';
+import { nomDe, seigneurDuSigne, enDegresMinutes, peregrinDe } from './jugement.js';
 import { CONVENTIONS, enHeures, enDecalage } from './temps.js';
 
 const NOMS = Object.fromEntries(PLANETES.map((p) => [p.clef, p.nom]));
@@ -50,9 +50,13 @@ non le calcul, qu'il pourrait faire faire par un autre.
     la position  →  ce dont elle est le signe  →  ce que cela donne, concrètement.
 
 Voici la FORME voulue, sur un exemple qui n'est pas le tien : « Mercure est brûlé par le
-Soleil, à huit degrés de lui : la planète de la plume, du compte et de la parole n'agit plus
+Soleil, à ⟨tant⟩ degrés de lui : la planète de la plume, du compte et de la parole n'agit plus
 pour son propre compte. Ce qui s'écrit de cette main sortira sous une autre signature, et le
 profit ira à celui qu'on voit. » — Une position, sa signification, sa conséquence.
+
+Le ⟨tant⟩ de cet exemple n'est pas un nombre : c'est la place d'un nombre. Il est en toutes
+lettres pour que tu ne le recopies pas. Chaque nombre de ton jugement doit se lire quelque
+part dans le dossier ci-dessous, et nulle part ailleurs.
 
 Épreuve que tu t'appliques à toi-même avant de rendre ta copie : si une phrase de ton
 jugement pouvait tomber juste sur n'importe quelle autre figure, elle ne vaut rien. Raye-la.
@@ -183,9 +187,11 @@ deux mots, et elle doit figurer dans ta première phrase comme dans ta dernière
   1. PEUX-TU JUGER ? Commence par les considérations de Bonatti, qui te sont données calculées.
      Elles ne répondent pas à la question : elles disent si l'on a le droit d'y répondre. S'il
      y en a une grave — l'ascendant dans les trois premiers ou les trois derniers degrés d'un
-     signe, Saturne en septième maison —, dis-le avant toute autre chose et pèse s'il ne faut
-     pas refuser. Un refus motivé est un jugement complet, et c'est même le plus honnête que
-     ce genre produise. Note en particulier que la septième maison est le lieu de l'astrologien
+     signe, Saturne en septième maison —, dis-le avant toute autre chose. Attention : refuser
+     ne veut pas dire taire la réponse. La réponse calculée t'est donnée et tu l'exposes
+     toujours ; ce que les considérations mettent en cause, c'est le droit de s'y fier. Le
+     jugement le plus honnête que ce genre produise a cette forme : « la figure répond oui,
+     et voici pourquoi il ne faut pas s'y fier ». Note en particulier que la septième maison est le lieu de l'astrologien
      lui-même : Bonatti est le seul à mettre ainsi en cause celui qui tient le calcul, et cela
      mérite d'être dit.
 
@@ -195,8 +201,8 @@ deux mots, et elle doit figurer dans ta première phrase comme dans ta dernière
        — séparation : l'aspect se défait. La chose est DÉJÀ faite ou déjà manquée, et le
          consultant interroge trop tard. C'est un non, et il faut le dire comme tel.
        — translation de lumière : la chose se fera par un tiers. Dis lequel — la nature de la
-         planète qui porte désigne l'homme qu'il faut aller chercher. C'est la voie la plus
-         actionnable de toutes : elle nomme une démarche à faire.
+         planète qui porte désigne l'homme qu'il faut aller chercher. C'est de toutes les voies
+         celle dont on tire le plus : elle nomme une démarche à faire.
        — collection de lumière : la chose se fera par un plus grand que les deux parties. Il
          faut porter l'affaire devant quelqu'un ; elle ne se fera pas autrement.
        — prohibition : un tiers s'interpose et arrive le premier. Nomme sa nature.
@@ -359,6 +365,10 @@ Orbes (${ORBES.source}) : ${orb}
 Les parts (${PARTS.source})
   ${PARTS.table.map((p) => `${p.nom} (${p.latin}) — ${p.detail}`).join('\n  ')}
 
+L'homme zodiacal, pour le corps (${MELOTHESIE.source})
+  ${MELOTHESIE.regle}
+  ${MELOTHESIE.table.map((m, i) => `${SIGNES[i]} : ${m}`).join('\n  ')}
+
 ${significations()}
 
 ${conditions()}
@@ -491,7 +501,7 @@ function figureEnClair(figure) {
       + `  RÈGLE DE SAIGNÉE : ${c.lune.interdit}\n`
       + `  La sixième maison — la maladie, les serviteurs, les bêtes menues et le travail subi, `
       + `c’est-à-dire tout ce à quoi l’on est assujetti — a pour seigneur ${c.maladie.seigneur.nom}, `
-      + `en maison ${c.maladie.seigneur.maison} (${c.maladie.seigneur.force}), `
+      + `en la ${rang(c.maladie.seigneur.maison)} maison (${c.maladie.seigneur.force}), `
       + `${etatEnClair(c.maladie.seigneur)}.\n`
       + `  Ce que ${c.maladie.seigneur.nom} charge dans le corps : ${c.maladie.corps}\n`
       + (c.maladie.hotes.length
@@ -576,7 +586,7 @@ function figureEnClair(figure) {
     const seigneur = figure.astres.find((a) => a.clef === seigneurDuSigne(p.longitude));
     return `  ${p.nom.padEnd(20)} tombe en la ${maison ? `${rang(maison.rang)} maison — ${maison.titre} `
       + `(${maison.detail})` : '?'}\n`
-      + `    son seigneur est ${seigneur.nom}, en la ${seigneur.maison}e maison, `
+      + `    son seigneur est ${seigneur.nom}, en la ${rang(seigneur.maison)} maison, `
       + `${etatEnClair(seigneur)}`;
   }).join('\n');
 
@@ -632,6 +642,11 @@ function contexte({ saisie, temps, heures, planetaires, julien }) {
     + `${julien ? ' (calendrier JULIEN, comme l\'aurait lu un calculateur du temps)' : ' (calendrier grégorien)'}`,
     `Heure annoncée : ${saisie.heure} h ${String(saisie.minute).padStart(2, '0')}`,
     `Lieu : latitude ${saisie.latitude}°, longitude ${saisie.longitude}°`,
+    'Sexe du natif : NON DEMANDÉ, donc inconnu. Le site ne le demande pas, et tu ne dois pas '
+    + 'le deviner. Cela a une conséquence précise : la Part du Mariage se prend dans un sens '
+    + 'pour un homme et dans l’autre pour une femme, si bien que le degré calculé ci-dessous '
+    + 'vaut pour l’une des deux lectures seulement. Dis-le, et ne tranche pas. Partout '
+    + 'ailleurs, écris sans supposer ni le sexe ni l’état matrimonial.',
   ];
   if (temps) {
     lignes.push(`Convention de temps appliquée : ${c?.nom ?? temps.convention}`
@@ -643,7 +658,7 @@ function contexte({ saisie, temps, heures, planetaires, julien }) {
   }
   if (heures && planetaires) {
     lignes.push(`Heure inégale : naissance ${planetaires.deJour ? 'de jour' : 'de nuit'}, à la `
-      + `${planetaires.rang}e heure ${planetaires.deJour ? 'du jour' : 'de la nuit'}`);
+      + `${rang(planetaires.rang)} heure ${planetaires.deJour ? 'du jour' : 'de la nuit'}`);
     lignes.push(`Le jour est un ${planetaires.jourSemaine}, jour de `
       + `${nomDe(planetaires.seigneurDuJour)} ; l'heure présente est heure de `
       + `${nomDe(planetaires.seigneurDeLHeure)}`);
@@ -667,8 +682,6 @@ function enDate(jj) {
 /** Le rang d'une maison : la première est « 1re », les autres « ne ». */
 const rang = (n) => (n === 1 ? '1re' : `${n}e`);
 
-/** « pérégrin » ou « pérégrine », selon l'astre. */
-const peregrin = (clef) => (GENRES[clef] === 'f' ? 'pérégrine' : 'pérégrin');
 
 /** Le compte des trois témoignages, écrit de sorte qu'on voie lequel manque.
  *  Un jugement qui dit « faible » sans dire pourquoi ne se vérifie pas. */
@@ -713,13 +726,13 @@ function lesChangements(annee) {
     const dignN = n.etat?.tenues.length ?? 0;
     const dignA = a.etat?.tenues.length ?? 0;
     if (dignN === 0 && dignA > 0) {
-      notes.push(`de ${peregrin(n.clef)} à ${a.etat.tenues.join(' et ')}`);
+      notes.push(`de ${peregrinDe(n.clef)} à ${a.etat.tenues.join(' et ')}`);
     }
     if (dignN > 0 && dignA === 0) {
-      notes.push(`perd ses dignités, devient ${peregrin(n.clef)}`);
+      notes.push(`perd ses dignités, devient ${peregrinDe(n.clef)}`);
     }
-    const brulN = n.solaire?.clef === 'combuste';
-    const brulA = a.solaire?.clef === 'combuste';
+    const brulN = n.solaire?.classe === 'combuste';
+    const brulA = a.solaire?.classe === 'combuste';
     if (!brulN && brulA) notes.push('entre dans la combustion du Soleil');
     if (brulN && !brulA) notes.push('sort de la combustion du Soleil');
     if (n.retrograde !== a.retrograde) {
@@ -755,8 +768,8 @@ export function dossierAnnee({ saisie, resultat, annee }) {
 
   return [
     consigne(PLAN_REVOLUTION),
-    SEPARATEUR('LA COMMANDE') + `Rédige le jugement de la ${annee.age}e année de ce natif — `
-      + `un jugement de révolution, non de nativité.\n\n`
+    SEPARATEUR('LA COMMANDE') + `Rédige le jugement de l'année qui court des ${annee.age} ans `
+      + `de ce natif à ses ${annee.age + 1} ans — un jugement de révolution, non de nativité.\n\n`
       + `La révolution court du ${enDate(annee.jj)} au ${enDate(annee.finit)}.`,
     SEPARATEUR('LA NATIVITÉ (le fond, qui ne se rejuge pas)') + contexte({ ...resultat, saisie }),
     '',
@@ -808,7 +821,9 @@ export function dossierInterrogation({ saisie, resultat, question, jugement }) {
       + `      « ${question} »\n\n`
       + `LA RÉPONSE CALCULÉE EST : ${j.verdict.reponse.toUpperCase()}\n`
       + `Elle t'est donnée. Tu ne la choisis pas, tu l'exposes — et tu la donnes dès ta `
-      + `première phrase.`,
+      + `première phrase. Si une considération grave figure ci-dessous, tu donnes quand même `
+      + `cette réponse, puis tu dis pourquoi la figure n'est pas en état qu'on s'y fie : `
+      + `récuser le jugement n'est pas le taire.`,
     SEPARATEUR('LES CONSIDÉRATIONS AVANT JUGEMENT') + gardes,
     SEPARATEUR('LE CONSULTANT ET LA CHOSE')
       + `  Consultant : l'ascendant, et son seigneur ${nomDe(j.consultant.clef)}, `

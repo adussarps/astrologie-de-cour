@@ -18,9 +18,9 @@
 // Rien ici n'est inventé : les deux règles sont mécaniques, et la seconde
 // tient en une division euclidienne.
 
-import { positions, maisons, mod360, signeDe } from './ciel.js';
+import { positions, maisons, mod360 } from './ciel.js';
 import { juger, seigneurDuSigne, nomDe } from './jugement.js';
-import { MAISONS } from './doctrine.js';
+import { MAISONS, laGrandeDignite } from './doctrine.js';
 
 export const SOURCES = {
   revolution: 'Alcabitius, dist. V ; Abū Maʿshar, De revolutionibus nativitatum ; '
@@ -117,12 +117,12 @@ export function moisDeLAnnee(figureNatale, age, jjDebut, jjFin) {
  *
  *  Le compte est un fold sur trois témoignages ; on le rend entier plutôt que
  *  réduit à un booléen, parce que le jugement doit pouvoir dire lequel manque. */
-export const GRANDES_DIGNITES = ['en son domicile', 'en son exaltation', 'en sa triplicité'];
-
 export function laForce(a) {
-  if (!a) return { fort: false, appuis: [], manques: ['la planète est absente de la figure'] };
+  if (!a) {
+    return { fort: false, compte: 0, appuis: [], manques: ['la planète est absente de la figure'] };
+  }
   const tenues = a.etat?.tenues ?? [];
-  const grandes = tenues.filter((t) => GRANDES_DIGNITES.includes(t));
+  const grandes = laGrandeDignite(tenues);
   // Le cazimi n'est pas une brûlure : au cœur du Soleil, la planète est portée
   // et non consumée. Seules la combustion et les rayons débilitent.
   const brulee = a.solaire?.classe === 'combuste' || a.solaire?.classe === 'rayons';
@@ -221,4 +221,3 @@ export function figureDeLAnnee({ jjNatal, age, latitude, longitude }) {
 export const dansLAnnee = (figure, jj) =>
   figure && jj >= figure.jj && (figure.finit === null || jj < figure.finit);
 
-void signeDe;

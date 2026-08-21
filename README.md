@@ -97,10 +97,13 @@ chiffre qui fait autorité, pas le ciel.**
 |---|---|---|
 | Positions planétaires | `astronomy-engine` confronté à Swiss Ephemeris en 1331, 1345 et 1991 | écart maximal **48″**, la plupart sous 20″ |
 | Maisons d’Alcabitius | confrontées à Swiss Ephemeris (`hsys 'B'`) sur trois époques et trois latitudes | **écart nul** |
-| Heures inégales et planétaires | confrontées aux légendes latines de cinq manuscrits du XIVᵉ siècle | **4 sur 5 exacts**, le cinquième documenté |
+| Heures inégales et planétaires | confrontées aux cinq légendes latines du manuscrit Oxford, St John’s College 164 | **4 sur 5 exacts**, le cinquième documenté |
+| Écart angulaire | symétrie et bornes vérifiées sur 22 000 couples | **exact** |
+| Ascendants | comparés aux éphémérides publiées pour trois naissances cotées AA (Trump, Cendrars, Macron) | **1′ ou moins** |
 
-Les deux premiers contrôles ont été faits avec `pyswisseph` pendant le développement ; le
-troisième tourne à chaque `npm test`.
+Les deux premiers contrôles ont été faits avec `pyswisseph` pendant le développement et ne se
+rejouent pas depuis ce dépôt : il faudrait installer Swiss Ephemeris pour les refaire. Les
+trois derniers tournent à chaque `npm test`.
 
 ## Le dossier pour un modèle de langue
 
@@ -108,8 +111,10 @@ Chaque figure — nativité, révolution d’année, interrogation — s’accom
 copie un dossier de six à huit mille mots, à coller dans ChatGPT ou tout autre modèle, pour
 qu’il rédige le *judicium*.
 
-Aucune clé, aucun serveur, aucun appel réseau : le site reste statique et rien ne sort de la
-machine. Surtout, **le modèle ne reçoit aucune latitude doctrinale**. C’est le point. Un
+Aucune clé, aucun serveur : le site est statique, et le dossier est construit dans le
+navigateur — il n’est envoyé nulle part, c’est vous qui le collez où vous voulez. Le seul
+appel réseau de tout le site est la recherche de lieu, qui envoie à Photon le nom que vous
+tapez, et rien d’autre. Surtout, **le modèle ne reçoit aucune latitude doctrinale**. C’est le point. Un
 modèle de langue connaît mille fois mieux le Bélier caractériel du XXᵉ siècle qu’Alcabitius,
 et laissé libre il produirait de l’horoscope de magazine sous un vernis ancien. On lui donne
 donc tout, et rien d’autre : la figure calculée ici, les tables de doctrine avec leur source,

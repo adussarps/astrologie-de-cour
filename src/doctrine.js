@@ -100,6 +100,17 @@ export const POIDS = {
   domicile: 5, exaltation: 4, triplicite: 3, terme: 2, face: 1,
 };
 
+/** La coupure entre les grandes et les petites dignités.
+ *
+ *  Trois donnent le pouvoir de faire — le domicile, l'exaltation, la
+ *  triplicité. Les deux dernières ne donnent qu'un appui : la tradition dit
+ *  qu'un homme dans son terme est comme un homme chez un hôte, et un homme
+ *  dans sa face comme un homme dans la rue de sa maison. Il y tient debout, il
+ *  n'y commande rien. Compter la face pour une force est l'erreur ordinaire,
+ *  et elle change tous les jugements de force. */
+export const GRANDES_DIGNITES = ['en son domicile', 'en son exaltation', 'en sa triplicité'];
+export const laGrandeDignite = (tenues = []) => tenues.filter((t) => GRANDES_DIGNITES.includes(t));
+
 // ─── Les douze maisons ───────────────────────────────────────────────────────
 // Alcabitius, dist. I : « De domibus et earum significationibus » (p. 9).
 // Ce sont les douze questions qu'un prince achète. Ce ne sont pas douze
@@ -148,6 +159,13 @@ export const FORCE_DES_LIEUX = {
     2: 'succédente', 5: 'succédente', 8: 'succédente', 11: 'succédente',
     3: 'cadente', 6: 'cadente', 9: 'cadente', 12: 'cadente',
   },
+  // « en un angle », mais « en une maison succédente » : l'article n'est pas le
+  // même, et interpoler la clef brute donne « en maison angle ».
+  enPlace: {
+    angle: 'en un angle',
+    succédente: 'en une maison succédente',
+    cadente: 'en une maison cadente',
+  },
   gloses: {
     angle: 'en un angle : la chose est manifeste, et elle vient promptement',
     succédente: 'en une maison succédente : la chose vient, mais après un temps',
@@ -185,6 +203,14 @@ export const ASPECTS = {
     { nom: 'opposition', angle: 180, glyphe: '☍', nature: 'd’inimitié parfaite' },
   ],
 };
+
+/** Les deux figures d'inimitié — le quartil et l'opposition — tirées de la
+ *  table elle-même. On ne les nomme pas ailleurs : un jugement qui écrirait
+ *  « quadrature » désignerait un aspect qui n'existe dans aucune table, et se
+ *  tromperait en silence. */
+export const ASPECTS_DURS = new Set(
+  ASPECTS.table.filter((a) => a.nature.includes('inimitié')).map((a) => a.nom),
+);
 
 // L'orbe est propre à chaque planète : c'est la « moitié de son rayon de
 // lumière », et deux planètes se voient quand leurs moitiés se touchent.

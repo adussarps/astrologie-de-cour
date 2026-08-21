@@ -35,6 +35,19 @@ GENRES.queue = 'f';
 
 const mod360 = (x) => ((x % 360) + 360) % 360;
 
+/** L'écart angulaire entre deux longitudes, de 0 à 180 degrés.
+ *
+ *  Le reste de JavaScript garde le signe du dividende : (−20) % 360 vaut −20 et
+ *  non 340. Écrire (x − y + 180) % 360 − 180 donne donc des écarts au-delà de
+ *  180° dès que x précède y de plus d'un demi-cercle, et — plus grave — rend la
+ *  fonction asymétrique. Le +540 remet le tour complet avant le modulo.
+ *
+ *  Un écart angulaire est une distance : elle doit être symétrique et bornée à
+ *  180. Ces deux lois sont vérifiées dans verifier.mjs, parce que leur violation
+ *  ne se voit nulle part — elle se contente de fausser les combustions et de
+ *  faire manquer des aspects. */
+export const ecartAngulaire = (x, y) => Math.abs(((x - y + 540) % 360) - 180);
+
 /** Jour julien à partir d'une date donnée dans son propre calendrier.
  *  `julien: true` pour toute date antérieure à octobre 1582. */
 export function jourJulien({ annee, mois, jour, heure = 0, julien }) {
