@@ -391,14 +391,13 @@ function noterConvention() {
 const DOSSIERS = new Map();
 
 /** Le chemin principal. Le dossier fait plusieurs milliers de mots : aucune URL
- *  ne le porterait, et il n'existe pas de paramètre ChatGPT qui l'accepte. Le
- *  seul geste honnête est donc celui-ci — on copie, et on ouvre l'onglet. */
+ *  ne le porterait. On le copie, et le lecteur le colle dans le modèle qu'il
+ *  veut — le site ne nomme aucun fournisseur et n'en ouvre aucun. */
 function actions(clef, texte) {
   DOSSIERS.set(clef, texte);
   const mots = texte.split(/\s+/).length;
   return `<div class="actions" data-dossier="${clef}">
-    <button type="button" class="principal vers-chatgpt">Faire lire ma figure par ChatGPT</button>
-    <button type="button" class="lien copier">Copier seulement</button>
+    <button type="button" class="principal copier">Interpréter avec un LLM</button>
     <p class="actions-note" aria-live="polite">≈ ${mots.toLocaleString('fr-FR')} mots : la figure,
       les tables de doctrine avec leurs sources, la méthode, le ton, et ce que le modèle n’a pas
       le droit de dire. Il n’a rien à inventer.</p>
@@ -409,28 +408,23 @@ function actions(clef, texte) {
   </div>`;
 }
 
-const CHATGPT = 'https://chatgpt.com/';
-
 function initCopie() {
   document.addEventListener('click', (e) => {
-    const b = e.target.closest?.('.vers-chatgpt, .copier');
+    const b = e.target.closest?.('.copier');
     if (!b) return;
     const zone = b.closest('.actions');
     const texte = DOSSIERS.get(zone?.dataset.dossier);
     if (!texte) return;
-    const versChatgpt = b.classList.contains('vers-chatgpt');
 
-    // Les deux appels doivent partir dans le même tour de boucle que le clic :
-    // le presse-papier et l'ouverture d'onglet exigent l'un et l'autre une
-    // activation de l'utilisateur, qu'un await consommerait.
+    // L'appel doit partir dans le même tour de boucle que le clic : le
+    // presse-papier exige une activation de l'utilisateur, qu'un await
+    // consommerait.
     const copie = navigator.clipboard?.writeText(texte);
-    if (versChatgpt) window.open(CHATGPT, '_blank', 'noopener');
 
     const note = zone.querySelector('.actions-note');
     const dire = (m) => { note.textContent = m; note.classList.add('dit'); };
-    const fait = () => dire(versChatgpt
-      ? 'Dossier copié. Collez-le (⌘V, ou Ctrl+V) dans l’onglet ChatGPT qui vient de s’ouvrir.'
-      : 'Dossier copié. Collez-le où vous voulez.');
+    const fait = () => dire('Dossier copié. Collez-le (⌘V, ou Ctrl+V) dans le modèle de '
+      + 'votre choix — il contient la consigne, il n’y a rien à ajouter.');
 
     Promise.resolve(copie).then(fait).catch(() => {
       // L'API moderne exige un contexte sécurisé et une permission ; ni l'un

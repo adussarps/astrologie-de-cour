@@ -124,10 +124,10 @@ C’est le chemin principal du site, et il est délibéré : le jugement déterm
 mais dur à lire, et un modèle de langue le rend en prose sans avoir rien à inventer.
 
 Chaque figure — nativité, révolution d’année, interrogation — porte donc un bouton
-**Faire lire ma figure par ChatGPT**, qui copie un dossier de six à huit mille mots et ouvre
-l’onglet ; il ne reste qu’à coller. Un second bouton copie sans ouvrir, pour un autre modèle.
-Le dossier ne tiendrait dans aucune URL, et il n’existe pas de paramètre qui l’accepterait :
-copier puis ouvrir est le seul geste honnête.
+**Interpréter avec un LLM**, qui copie un dossier de six à huit mille mots ; il ne reste qu’à
+le coller dans le modèle de son choix. Le site ne nomme aucun fournisseur, n’en ouvre aucun et
+n’en recommande aucun : le dossier ne tiendrait dans aucune URL, il porte sa consigne avec lui,
+et il vaut pour n’importe quel modèle assez grand pour le lire.
 
 Aucune clé, aucun serveur : le site est statique, et le dossier est construit dans le
 navigateur — il n’est envoyé nulle part, c’est vous qui le collez où vous voulez. Le seul

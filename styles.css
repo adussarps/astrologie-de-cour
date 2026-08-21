@@ -247,7 +247,6 @@ button.lien:hover { color: #7a2718; }
 /* ── Le chemin principal ─────────────────────────────────────────────────── */
 .actions { margin-top: 4px; }
 .actions .principal { width: 100%; font-size: 1.12rem; padding: 16px 24px; }
-.actions .copier { margin-top: 6px; }
 .actions-note {
   margin: 10px 0 0;
   font-size: .85rem;
