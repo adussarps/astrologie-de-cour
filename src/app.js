@@ -1064,6 +1064,13 @@ function initMethode() {
     <td>${html(p.detail)}</td>
     </tr>`).join('');
 
+  const joiesTable = Object.entries(JOIES.table).map(([m, p]) => `<tr>
+    <td class="deg">${m}</td>
+    <td><b>${html(MAISONS.table[Number(m) - 1].titre)}</b></td>
+    <td>${html(nomDe(p))}</td>
+    <td>${html(JOIES.raisons[p])}</td>
+    </tr>`).join('');
+
   $('#tables-doctrine').innerHTML = `
     <div class="table-doctrine">
       <h3>Les cinq dignités, signe par signe</h3>
@@ -1080,6 +1087,15 @@ function initMethode() {
       <h3>Les douze maisons et leurs questions</h3>
       <p class="source-table">${html(MAISONS.source)}</p>
       <table class="releve"><tbody>${maisonsTable}</tbody></table>
+    </div>
+    <div class="table-doctrine">
+      <h3>Les joies — <i>gaudia planetarum</i></h3>
+      <p class="source-table">${html(JOIES.source)} — ${html(JOIES.regle)} C’est la seule
+      condition favorable de toute la doctrine qui ne pèse rien : une planète en sa joie peut
+      être pérégrine, brûlée, mal logée. Elle n’en est pas moins chez elle.</p>
+      <table class="releve">
+        <thead><tr><th>№</th><th>La maison</th><th>S’y réjouit</th><th>Pourquoi</th></tr></thead>
+        <tbody>${joiesTable}</tbody></table>
     </div>
     <div class="table-doctrine">
       <h3>Les parts</h3>

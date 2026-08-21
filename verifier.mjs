@@ -324,8 +324,9 @@ console.log('\n── Les joies : sept planètes, sept maisons, et aucune dignit
     planetesJoie.length === 7 && new Set(planetesJoie).size === 7
       && new Set(maisonsJoie).size === 7,
     `${planetesJoie.length} planètes, ${new Set(maisonsJoie).size} maisons`);
-  ok('chaque planète a sa glose',
-    planetesJoie.every((p) => typeof JOIES.gloses[p] === 'string' && JOIES.gloses[p].length > 20),
+  ok('chaque planète a sa glose et sa raison',
+    planetesJoie.every((p) => [JOIES.gloses[p], JOIES.raisons[p]]
+      .every((t) => typeof t === 'string' && t.length > 20)),
     Object.keys(JOIES.gloses).join(', '));
 
   const { jj } = versTempsUniversel({

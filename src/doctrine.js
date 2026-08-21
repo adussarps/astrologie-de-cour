@@ -190,6 +190,25 @@ export const JOIES = {
     + 'planète est chez elle dans la matière de ce lieu, et qu’elle y agit selon sa nature '
     + 'sans y être contrariée.',
   table: { 1: 'mercure', 3: 'lune', 5: 'venus', 6: 'mars', 9: 'soleil', 11: 'jupiter', 12: 'saturne' },
+  // La glose se suffit à elle-même — c'est celle qu'on remet au modèle. La
+  // raison est la même chose sans le sujet ni le lieu, pour une table où ils
+  // sont déjà en colonne.
+  raisons: {
+    mercure: 'le lieu du commencement et de l’esprit, où la langue, le compte et l’écriture '
+      + 'sont l’homme même',
+    lune: 'dea : les courts chemins, la parenté, les lettres — et la Lune est de tous les '
+      + 'astres le plus prompt à aller et venir',
+    venus: 'bona fortuna : les enfants, les dons, les fêtes. La matière du lieu est sa '
+      + 'matière propre',
+    mars: 'mala fortuna : le travail subi, la maladie, ce qu’on tranche. Un maléfique en un '
+      + 'lieu maléfique est à son emploi, et il y nuit moins qu’ailleurs',
+    soleil: 'deus : la religion, la science, les songes — le lieu d’où l’on voit loin, et le '
+      + 'Soleil est ce qui fait voir',
+    jupiter: 'bonus daemon : les amis, l’espérance, ce qu’on obtient du prince. C’est la '
+      + 'maison de la faveur, et Jupiter est la planète qui l’accorde',
+    saturne: 'malus daemon : la prison, la retraite, les ennemis qu’on ne voit pas. Il y est '
+      + 'chez lui comme le geôlier dans sa geôle — sa nuisance y est à sa place, donc bornée',
+  },
   gloses: {
     mercure: 'Mercure se réjouit en la première maison, qui est celle du commencement et de '
       + 'l’esprit : c’est le lieu où la langue, le compte et l’écriture sont l’homme même',
