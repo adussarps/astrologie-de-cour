@@ -99,15 +99,18 @@ blockquote {
 blockquote cite { display: block; font-size: .88em; font-style: normal; color: var(--encre-pale); margin-top: .5em; }
 blockquote cite::before { content: '— '; }
 
-.avertissement {
+.invitation {
   border: 1px solid var(--trait);
-  border-left: 4px solid var(--rubrique);
+  border-left: 4px solid var(--or);
   background: var(--parchemin-clair);
-  padding: 18px 24px;
+  padding: 22px 28px;
   margin-bottom: 34px;
-  max-width: 74ch;
+  max-width: 76ch;
 }
-.avertissement p { margin: 0; }
+.invitation h2 { color: var(--rubrique); font-size: 1.5rem; margin-bottom: .35em; }
+.invitation p { margin: 0 0 .7em; }
+.invitation p:last-child { margin-bottom: 0; }
+.promesse { font-style: italic; color: var(--encre-pale); }
 
 /* ── Le formulaire ───────────────────────────────────────────────────────── */
 .officine {
@@ -208,6 +211,90 @@ button.secondaire:hover { background: rgba(143, 47, 33, .07); }
   font-style: italic;
 }
 .renvoi::before { content: '▸ '; color: var(--or); font-style: normal; }
+
+/* ── Le sommaire : six cartes ────────────────────────────────────────────── */
+.sommaire { margin-top: 40px; }
+.sommaire > h3 {
+  color: var(--rubrique);
+  border-bottom: 1px solid var(--trait);
+  padding-bottom: 8px;
+  margin-bottom: 18px;
+}
+.sommaire {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+  gap: 16px;
+}
+.sommaire > h3 { grid-column: 1 / -1; }
+.carte-sommaire {
+  border: 1px solid var(--trait);
+  background: var(--parchemin-clair);
+  padding: 16px 18px;
+  position: relative;
+}
+.glyphe-sommaire {
+  position: absolute;
+  top: 12px; right: 14px;
+  font-family: var(--glyphes);
+  font-size: 1.5rem;
+  color: var(--or);
+  letter-spacing: .04em;
+}
+.carte-sommaire h4 {
+  font-size: .74rem;
+  text-transform: uppercase;
+  letter-spacing: .11em;
+  color: var(--encre-pale);
+  font-weight: 500;
+  margin: 0 3.6em .2em 0;
+}
+.carte-sommaire .valeur {
+  font-size: 1.32rem;
+  color: var(--rubrique);
+  margin: 0 0 .45em;
+  line-height: 1.15;
+}
+.carte-sommaire .detail { margin: 0; font-size: .89rem; line-height: 1.55; }
+
+/* ── Les douze matières ──────────────────────────────────────────────────── */
+.lecture { margin-top: 44px; }
+.lecture > h3 {
+  color: var(--rubrique);
+  border-bottom: 1px solid var(--trait);
+  padding-bottom: 8px;
+}
+.lecture .preambule { max-width: 76ch; margin-bottom: 16px; }
+.maison-lue { border-bottom: 1px solid var(--trait); }
+.maison-lue > summary {
+  display: grid;
+  grid-template-columns: 2.4em 1fr auto;
+  gap: 14px;
+  align-items: baseline;
+  padding: 11px 4px;
+  cursor: pointer;
+  list-style: none;
+}
+.maison-lue > summary::-webkit-details-marker { display: none; }
+.maison-lue > summary:hover { background: var(--parchemin-clair); }
+.maison-lue .numero {
+  font-size: 1.35rem;
+  color: var(--encre-pale);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.maison-lue.angle .numero { color: var(--or); font-weight: 600; }
+.maison-lue .seigneur-court {
+  font-family: var(--glyphes);
+  color: var(--rubrique);
+  font-size: .95rem;
+  white-space: nowrap;
+}
+.maison-lue[open] > summary { background: var(--parchemin-clair); }
+.maison-lue .corps {
+  padding: 4px 4px 18px calc(2.4em + 14px);
+  max-width: 82ch;
+}
+.maison-lue .corps p { margin: 0 0 .5em; }
 
 table.releve { border-collapse: collapse; width: 100%; font-size: .93rem; margin: 12px 0 26px; }
 table.releve th, table.releve td { text-align: left; padding: 6px 12px 6px 0; border-bottom: 1px solid var(--trait); }

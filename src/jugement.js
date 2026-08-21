@@ -6,9 +6,9 @@
 
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, POIDS,
-  MAISONS, ASPECTS, ORBES, PARTS,
+  MAISONS, ASPECTS, ORBES, PARTS, NATURES_SIGNES, FORCE_DES_LIEUX,
 } from './doctrine.js';
-import { PLANETES, maisonDe, signeDe, mod360, enSigne } from './ciel.js';
+import { PLANETES, SIGNES, GENRES, maisonDe, signeDe, mod360, enSigne } from './ciel.js';
 
 const NOMS = Object.fromEntries(PLANETES.map((p) => [p.clef, p.nom]));
 NOMS.teste = 'Teste du dragon';
@@ -172,6 +172,171 @@ export function juger({ positions: pos, maisons: mai }) {
       hotes: astres.filter((a) => a.maison === i + 1),
     })),
   };
+}
+
+const rang = (k) => `${k}<sup>e</sup>`;
+
+const modeDu = (longitude) =>
+  NATURES_SIGNES.modes.find((m) => m.signes.includes(signeDe(longitude)));
+const elementDu = (longitude) =>
+  TRIPLICITES.table.find((t) => t.signes.includes(signeDe(longitude))).element;
+
+/** L'accord en genre — la Lune est pérégrine, Saturne est pérégrin. */
+const accord = (clef) => {
+  const f = GENRES[clef] === 'f';
+  return {
+    il: f ? 'Elle' : 'Il', le: f ? 'la' : 'le',
+    chezSoi: f ? 'chez elle' : 'chez lui',
+    fort: f ? 'forte' : 'fort',
+    loge: f ? 'logée' : 'logé',
+    peregrin: f ? 'pérégrine' : 'pérégrin',
+  };
+};
+
+/** « de feu », « de terre », mais « d'air » et « d'eau ». */
+const deLElement = (element) => (/^[aeiouy]/.test(element) ? `d’${element}` : `de ${element}`);
+
+/** L'état d'une planète dit en français, et non en jargon. */
+function etatEnMots(astre) {
+  if (!astre.etat) return '';
+  const a = accord(astre.clef);
+  if (astre.etat.tenues.length) {
+    return `${astre.etat.tenues.join(' et ')} — ${a.il.toLowerCase()} y est ${a.chezSoi}, et ${a.fort}`;
+  }
+  if (astre.etat.perdues.length) {
+    return `${astre.etat.perdues.join(' et ')} — ${a.il.toLowerCase()} y est mal ${a.loge}`;
+  }
+  return `${a.peregrin} — ${a.il.toLowerCase()} n’a aucune dignité en ce lieu, `
+    + `et n’y trouve pas d’appui`;
+}
+
+/** Le même état, mais en une incise — pour les phrases qui portent déjà un verbe. */
+function etatBref(astre) {
+  if (!astre.etat) return 'sans dignité — un nœud n’est pas une planète';
+  const a = accord(astre.clef);
+  if (astre.etat.tenues.length) return `${astre.etat.tenues.join(' et ')}, et donc ${a.fort}`;
+  if (astre.etat.perdues.length) return `${astre.etat.perdues.join(' et ')}, et donc mal ${a.loge}`;
+  return `${a.peregrin} — sans aucune dignité en ce lieu, et donc sans appui`;
+}
+
+/** Le jugement maison par maison.
+ *
+ *  La technique est celle du seigneur : on ne juge pas une matière par le
+ *  signe où elle tombe, mais par l'état de la planète qui gouverne ce signe et
+ *  par le lieu où cette planète se trouve. C'est le cœur de la pratique
+ *  médiévale, et c'est entièrement mécanique — rien n'est inventé ici. */
+export function lectureDesMaisons(figure) {
+  return figure.maisonsHabitees.map((m) => {
+    const seigneur = figure.astres.find((a) => a.clef === m.seigneur);
+    const lieuSeigneur = figure.maisonsHabitees[seigneur.maison - 1];
+    const force = FORCE_DES_LIEUX.table[seigneur.maison];
+    const a = accord(m.seigneur);
+
+    const phrases = [];
+    phrases.push(`Le seigneur en est <b>${nomDe(m.seigneur)}</b>, `
+      + `qui se tient à ${enSigne(seigneur.longitude)}, en la ${rang(seigneur.maison)} maison, `
+      + `${etatEnMots(seigneur)}.`);
+
+    phrases.push(seigneur.maison === m.rang
+      ? `${a.il} est dans la matière même qu’${a.il.toLowerCase()} gouverne : la chose se tient `
+        + `d’elle-même, sans rien devoir à un autre lieu.`
+      : `La matière — ${m.detail} — se joue donc dans le lieu `
+        + `<b>${lieuSeigneur.genitif}</b> : ${lieuSeigneur.detail}.`);
+
+    phrases.push(`${a.il} est ${FORCE_DES_LIEUX.gloses[force]}.`);
+    if (seigneur.retrograde) {
+      phrases.push(`${a.il} est <b>rétrograde</b> : la chose revient sur elle-même, se reprend, `
+        + `se défait et se refait.`);
+    }
+
+    if (m.hotes.length) {
+      const liste = m.hotes.map((h) => `<b>${h.nom}</b> à ${enSigne(h.longitude)}`
+        + (h.etat?.tenues.length ? ` (${h.etat.tenues.join(', ')})` : '')).join(', ');
+      phrases.push(`S’y ${m.hotes.length > 1 ? 'tiennent' : 'tient'} en outre ${liste} — et une `
+        + `planète présente dans une maison pèse plus lourd que son seigneur absent.`);
+    }
+
+    return {
+      rang: m.rang,
+      titre: m.titre,
+      latin: m.latin,
+      question: m.detail,
+      pointe: m.pointe,
+      mode: modeDu(m.pointe),
+      element: elementDu(m.pointe),
+      seigneur: m.seigneur,
+      angulaire: force === 'angle',
+      phrases,
+    };
+  });
+}
+
+/** Trois ou quatre phrases pour qui n'a pas le temps de tout lire. */
+export function sommaire(figure) {
+  const soleil = figure.astres.find((a) => a.clef === 'soleil');
+  const lune = figure.astres.find((a) => a.clef === 'lune');
+  const seigneur = figure.seigneurAscendantPlace;
+  const mode = modeDu(figure.ascendant);
+  const maisonSeigneur = figure.maisonsHabitees[seigneur.maison - 1];
+  const accordSeigneur = accord(figure.seigneurAscendant);
+
+  return [
+    {
+      clef: 'soleil',
+      etiquette: 'Votre Soleil',
+      valeur: `${SIGNES[signeDe(soleil.longitude)]}`,
+      detail: `à ${enSigne(soleil.longitude)}, en la ${rang(soleil.maison)} maison — celle `
+        + `${figure.maisonsHabitees[soleil.maison - 1].genitif}. `
+        + `C’est la ligne que tout le monde connaît aujourd’hui ; en 1380 c’en était une parmi trente, `
+        + `et pas la première.`,
+    },
+    {
+      clef: 'lune',
+      etiquette: 'Votre Lune',
+      valeur: `${SIGNES[signeDe(lune.longitude)]}`,
+      detail: `à ${enSigne(lune.longitude)}, en la ${rang(lune.maison)} maison. `
+        + `La Lune est l’astre du corps et des humeurs : c’est elle que le médecin regarde d’abord, `
+        + `avant une saignée comme avant une purge.`,
+    },
+    {
+      clef: 'ascendant',
+      etiquette: 'Votre ascendant',
+      valeur: `${SIGNES[signeDe(figure.ascendant)]}`,
+      detail: `${enSigne(figure.ascendant)} montait à l’horizon. Signe ${mode.nom} `
+        + `<i>(${mode.latin})</i> et ${deLElement(elementDu(figure.ascendant))} : ${mode.glose}. `
+        + `<b>C’est la pièce maîtresse</b> — elle change de degré toutes les quatre minutes, `
+        + `et c’est elle qui distribue les douze maisons.`,
+    },
+    {
+      clef: 'seigneur',
+      etiquette: 'Le seigneur de votre ascendant',
+      valeur: nomDe(figure.seigneurAscendant),
+      detail: `${accordSeigneur.il} gouverne votre première maison, celle de la vie et du corps, `
+        + `et ${accordSeigneur.il.toLowerCase()} se tient à ${enSigne(seigneur.longitude)}, `
+        + `en la ${rang(seigneur.maison)} maison — celle ${maisonSeigneur.genitif}. `
+        + `${accordSeigneur.il} y est ${etatBref(seigneur)}. `
+        + `Un astrologien de cour aurait commencé par là.`,
+    },
+    {
+      clef: 'almuten',
+      etiquette: 'L’almuten',
+      valeur: nomDe(figure.almuten.vainqueur.planete),
+      detail: `Sur le degré ascendant, cette planète cumule ${figure.almuten.vainqueur.score} forces `
+        + `(${figure.almuten.vainqueur.dignites.join(', ')}) et l’emporte sur toutes les autres. `
+        + `De l’arabe <i>al-mubtazz</i>, « celui qui l’emporte ». C’est elle qui gouverne la figure `
+        + `entière — pas le signe.`,
+    },
+    {
+      clef: 'secte',
+      etiquette: 'La secte',
+      valeur: figure.deJour ? 'de jour' : 'de nuit',
+      detail: figure.deJour
+        ? `Le Soleil était au-dessus de la terre. Les seigneurs de triplicité diurnes gouvernent, `
+          + `et le Soleil l’emporte sur la Lune comme témoin de la vie.`
+        : `Le Soleil était sous la terre. Les seigneurs de triplicité nocturnes gouvernent, `
+          + `et la Lune l’emporte sur le Soleil comme témoin de la vie.`,
+    },
+  ];
 }
 
 /** Le jugement en toutes lettres — chaque phrase renvoyant à sa règle. */

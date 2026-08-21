@@ -107,19 +107,52 @@ export const POIDS = {
 export const MAISONS = {
   source: 'Alcabitius, dist. I (les maisons et leurs significations)',
   table: [
-    { latin: 'vita', titre: 'La vie', detail: 'le corps, le commencement, la complexion' },
-    { latin: 'substantia', titre: 'L’avoir', detail: 'les biens meubles, ce qu’on gagne de sa main' },
-    { latin: 'fratres', titre: 'Les frères', detail: 'la parenté, les courts voyages, les lettres' },
-    { latin: 'pater', titre: 'Le père', detail: 'la terre, l’héritage, les villes, la fin des choses' },
-    { latin: 'filii', titre: 'Les enfants', detail: 'les messagers, les dons, la joie' },
-    { latin: 'infirmitas', titre: 'La maladie', detail: 'les serfs, les bêtes menues, le travail subi' },
-    { latin: 'uxor', titre: 'Le mariage', detail: 'les procès, les adversaires déclarés, les associés' },
-    { latin: 'mors', titre: 'La mort', detail: 'la peur, l’héritage du mort, ce qui est en souffrance' },
-    { latin: 'itinera', titre: 'Les longs voyages', detail: 'la religion, les songes, la science' },
-    { latin: 'regnum', titre: 'La dignité', detail: 'le règne, le métier, la mère, ce que le monde voit' },
-    { latin: 'boni daemonis', titre: 'Les amis', detail: 'l’espérance, la fortune, ce qu’on obtient du prince' },
-    { latin: 'inimici', titre: 'Les ennemis cachés', detail: 'la prison, la trahison, les grandes bêtes' },
+    { latin: 'vita', titre: 'La vie', genitif: 'de la vie', detail: 'le corps, le commencement, la complexion' },
+    { latin: 'substantia', titre: 'L’avoir', genitif: 'de l’avoir', detail: 'les biens meubles, ce qu’on gagne de sa main' },
+    { latin: 'fratres', titre: 'Les frères', genitif: 'des frères', detail: 'la parenté, les courts voyages, les lettres' },
+    { latin: 'pater', titre: 'Le père', genitif: 'du père', detail: 'la terre, l’héritage, les villes, la fin des choses' },
+    { latin: 'filii', titre: 'Les enfants', genitif: 'des enfants', detail: 'les messagers, les dons, la joie' },
+    { latin: 'infirmitas', titre: 'La maladie', genitif: 'de la maladie', detail: 'les serfs, les bêtes menues, le travail subi' },
+    { latin: 'uxor', titre: 'Le mariage', genitif: 'du mariage', detail: 'les procès, les adversaires déclarés, les associés' },
+    { latin: 'mors', titre: 'La mort', genitif: 'de la mort', detail: 'la peur, l’héritage du mort, ce qui est en souffrance' },
+    { latin: 'itinera', titre: 'Les longs voyages', genitif: 'des longs voyages', detail: 'la religion, les songes, la science' },
+    { latin: 'regnum', titre: 'La dignité', genitif: 'de la dignité', detail: 'le règne, le métier, la mère, ce que le monde voit' },
+    { latin: 'boni daemonis', titre: 'Les amis', genitif: 'des amis', detail: 'l’espérance, la fortune, ce qu’on obtient du prince' },
+    { latin: 'inimici', titre: 'Les ennemis cachés', genitif: 'des ennemis cachés', detail: 'la prison, la trahison, les grandes bêtes' },
   ],
+};
+
+// ─── La nature des signes ────────────────────────────────────────────────────
+// Alcabitius, dist. I : « De qualitatibus signorum ». Un signe n'est pas un
+// caractère d'homme : c'est une qualité de la matière qui s'y traite. Mobile,
+// la chose commence vite et ne dure pas ; fixe, elle est lente à venir et
+// lente à partir ; commune, elle est double et change en chemin.
+export const NATURES_SIGNES = {
+  source: 'Alcabitius, dist. I (les qualités des signes)',
+  modes: [
+    { nom: 'mobile', latin: 'tropicum', signes: [0, 3, 6, 9],
+      glose: 'ce qui s’y traite commence vite et ne dure guère' },
+    { nom: 'fixe', latin: 'fixum', signes: [1, 4, 7, 10],
+      glose: 'ce qui s’y traite est lent à venir et lent à partir' },
+    { nom: 'commun', latin: 'bicorporeum', signes: [2, 5, 8, 11],
+      glose: 'ce qui s’y traite est double, et change en chemin' },
+  ],
+};
+
+// Alcabitius, dist. IV : la force d'une planète tient d'abord au lieu qu'elle
+// occupe. Angle, succédente, cadente — dans cet ordre décroissant.
+export const FORCE_DES_LIEUX = {
+  source: 'Alcabitius, dist. IV (la force des planètes selon les maisons)',
+  table: {
+    1: 'angle', 4: 'angle', 7: 'angle', 10: 'angle',
+    2: 'succédente', 5: 'succédente', 8: 'succédente', 11: 'succédente',
+    3: 'cadente', 6: 'cadente', 9: 'cadente', 12: 'cadente',
+  },
+  gloses: {
+    angle: 'en un angle : la chose est manifeste, et elle vient promptement',
+    succédente: 'en une maison succédente : la chose vient, mais après un temps',
+    cadente: 'en une maison cadente : la chose est faible, différée, ou se fait mal voir',
+  },
 };
 
 // ─── Les aspects ─────────────────────────────────────────────────────────────

@@ -4,7 +4,7 @@ import {
   jourJulien, positions, maisons, heuresInegales, heuresPlanetaires,
   enSigne, PLANETES, NOMS_JOURS,
 } from './ciel.js';
-import { juger, enPhrases, nomDe } from './jugement.js';
+import { juger, enPhrases, nomDe, sommaire, lectureDesMaisons } from './jugement.js';
 import { carre, GLYPHES } from './figure.js';
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, MAISONS,
@@ -93,6 +93,47 @@ function tableauDesMaisons(figure) {
     <tbody>${lignes}</tbody></table>`;
 }
 
+const GLYPHES_SOMMAIRE = { ascendant: 'ASC', seigneur: '⚜\uFE0E', secte: '◐\uFE0E' };
+
+/** Les six lignes qu'un astrologien aurait dites en premier. */
+function blocSommaire(figure) {
+  const cartes = sommaire(figure).map((s) => `<div class="carte-sommaire">
+      <span class="glyphe-sommaire">${GLYPHES_SOMMAIRE[s.clef]
+        ?? GLYPHES[s.clef] ?? GLYPHES[figure.almuten.vainqueur.planete] ?? '·'}</span>
+      <h4>${html(s.etiquette)}</h4>
+      <p class="valeur">${html(s.valeur)}</p>
+      <p class="detail">${s.detail}</p>
+    </div>`).join('');
+  return `<section class="sommaire">
+    <h3>En six lignes</h3>
+    ${cartes}
+  </section>`;
+}
+
+/** Le jugement par le seigneur : douze matières, douze verdicts mécaniques. */
+function blocLecture(figure) {
+  const items = lectureDesMaisons(figure).map((m) => `<details class="maison-lue${m.angulaire ? ' angle' : ''}">
+      <summary>
+        <span class="numero">${m.rang}</span>
+        <span class="matiere"><b>${html(m.titre)}</b> <i class="cote">${html(m.latin)}</i>
+          <br><span class="cote">${html(m.question)}</span></span>
+        <span class="seigneur-court">${GLYPHES[m.seigneur] ?? ''} ${html(nomDe(m.seigneur))}</span>
+      </summary>
+      <div class="corps">${m.phrases.map((p) => `<p>${p}</p>`).join('')}</div>
+    </details>`).join('');
+
+  return `<section class="lecture">
+    <h3>Les douze matières, jugées une à une</h3>
+    <p class="preambule">On ne juge pas une matière par le signe où elle tombe, mais par
+    <b>l’état de la planète qui gouverne ce signe et par le lieu où elle se trouve</b>. C’est
+    toute la technique, et elle est entièrement mécanique : rien n’est ajouté ici que le
+    calcul ne donne. Dépliez une maison pour lire son jugement.</p>
+    ${items}
+    <span class="renvoi">Alcabitius, dist. I (les significations des maisons) et dist. IV
+    (la force des planètes selon les lieux).</span>
+  </section>`;
+}
+
 function blocHeures(heures, planetaires) {
   if (!heures || !planetaires) return '';
   const m = (x) => `${Math.round(x)} min`;
@@ -135,6 +176,8 @@ function rendreFigure(saisie, cartouche, { titreCarre = '' } = {}) {
           ${blocHeures(heures, planetaires)}
         </div>
       </div>
+      ${blocSommaire(figure)}
+      ${blocLecture(figure)}
       <h3 style="margin-top:34px">Le relevé</h3>
       ${tableauDesAstres(figure)}
       <h3>Les douze maisons</h3>

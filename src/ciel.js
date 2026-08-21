@@ -17,15 +17,21 @@ export const SIGNES = [
 ];
 
 // Les sept planètes, dans l'ordre des sphères — de la plus lointaine à la plus proche.
+// Le genre sert à écrire le jugement en français correct : la Lune est pérégrine,
+// Saturne est pérégrin.
 export const PLANETES = [
-  { clef: 'saturne', nom: 'Saturne', corps: 'Saturn', glyphe: '♄' },
-  { clef: 'jupiter', nom: 'Jupiter', corps: 'Jupiter', glyphe: '♃' },
-  { clef: 'mars', nom: 'Mars', corps: 'Mars', glyphe: '♂' },
-  { clef: 'soleil', nom: 'Soleil', corps: 'Sun', glyphe: '☉' },
-  { clef: 'venus', nom: 'Vénus', corps: 'Venus', glyphe: '♀' },
-  { clef: 'mercure', nom: 'Mercure', corps: 'Mercury', glyphe: '☿' },
-  { clef: 'lune', nom: 'Lune', corps: 'Moon', glyphe: '☽' },
+  { clef: 'saturne', nom: 'Saturne', corps: 'Saturn', glyphe: '♄', genre: 'm' },
+  { clef: 'jupiter', nom: 'Jupiter', corps: 'Jupiter', glyphe: '♃', genre: 'm' },
+  { clef: 'mars', nom: 'Mars', corps: 'Mars', glyphe: '♂', genre: 'm' },
+  { clef: 'soleil', nom: 'Soleil', corps: 'Sun', glyphe: '☉', genre: 'm' },
+  { clef: 'venus', nom: 'Vénus', corps: 'Venus', glyphe: '♀', genre: 'f' },
+  { clef: 'mercure', nom: 'Mercure', corps: 'Mercury', glyphe: '☿', genre: 'm' },
+  { clef: 'lune', nom: 'Lune', corps: 'Moon', glyphe: '☽', genre: 'f' },
 ];
+
+export const GENRES = Object.fromEntries(PLANETES.map((p) => [p.clef, p.genre]));
+GENRES.teste = 'f';
+GENRES.queue = 'f';
 
 const mod360 = (x) => ((x % 360) + 360) % 360;
 
