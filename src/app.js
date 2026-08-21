@@ -404,9 +404,11 @@ function rendreAnnee(saisie, age) {
   const fin = dateGregorienne(f.finit);
   const m = f.maitre;
   const etat = m.annuel.etat;
-  const force = etat?.tenues.length ? `en ${etat.tenues.join(' et ')} — forte`
-    : etat?.perdues.length ? `en ${etat.perdues.join(' et ')} — mal logée`
-      : 'pérégrine — sans dignité ni appui';
+  // On dit ici ce que la planète tient, et rien de plus : le verdict — peut-elle
+  // donner, oui ou non — se lit plus bas, où l'on montre le compte entier.
+  const force = etat?.tenues.length ? etat.tenues.join(' et ')
+    : etat?.perdues.length ? etat.perdues.join(' et ')
+      : 'pérégrine — sans dignité aucune en ce lieu';
 
   const carreAnnuel = carre(f.annuelle, {
     titre: 'Revolutio anni',
@@ -444,6 +446,12 @@ function rendreAnnee(saisie, age) {
         <p>C’est la règle propre au genre, et elle n’a pas d’équivalent dans la nativité : le
         maître de l’année se juge <b>deux fois</b>. Son état au natal dit ce qu’il peut
         promettre ; son état à la révolution dit ce qu’il en fera cette année-ci.</p>
+        <p>Une planète peut donner ce qu’elle signifie si elle réunit <b>deux témoignages sur
+        trois</b> : le lieu (angle ou succédente), la grande dignité — domicile, exaltation ou
+        triplicité, car le terme et la face ne commandent rien — et la liberté, c’est-à-dire
+        directe et hors des rayons du Soleil.</p>
+        ${leCompte('À la naissance', f.maitre.ecart.natal)}
+        ${leCompte('Dans l’année', f.maitre.ecart.annuel)}
         <p class="cas-du-maitre ${f.maitre.ecart.clef}">${html(f.maitre.ecart.texte)}</p>
       </section>
       ${blocMois(f)}
@@ -457,6 +465,19 @@ function rendreAnnee(saisie, age) {
         bougent plus.</p>
       </section>
     </div>
+  </div>`;
+}
+
+/** Le compte des trois témoignages, montré pièce à pièce. Dire « faible » sans
+ *  dire ce qui manque, c'est demander qu'on vous croie sur parole. */
+function leCompte(quand, force) {
+  if (!force) return '';
+  const ligne = (classe, texte) => `<li class="${classe}">${html(texte)}</li>`;
+  return `<div class="compte ${force.fort ? 'peut' : 'ne-peut'}">
+    <p><b>${html(quand)}</b> — ${force.compte} sur 3 :
+    ${force.fort ? 'elle peut donner' : 'elle ne peut pas donner'}</p>
+    <ul>${force.appuis.map((x) => ligne('pour', x)).join('')}${
+  force.manques.map((x) => ligne('contre', x)).join('')}</ul>
   </div>`;
 }
 

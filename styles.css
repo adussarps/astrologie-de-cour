@@ -308,6 +308,16 @@ button.copier:hover { background: var(--rubrique); }
 .cas-du-maitre.promis, .cas-du-maitre.agite { border-left-color: var(--or); }
 .cas-du-maitre.sourd { border-left-color: var(--encre-pale); font-style: italic; }
 
+/* Le compte des trois témoignages, pièce à pièce. */
+.compte { margin: 10px 0; font-size: .92rem; }
+.compte > p { margin: 0 0 3px; }
+.compte ul { list-style: none; margin: 0; padding: 0 0 0 2px; }
+.compte li { padding-left: 18px; position: relative; line-height: 1.5; }
+.compte li::before { position: absolute; left: 0; font-variant-numeric: tabular-nums; }
+.compte li.pour::before { content: '+'; color: #6b8f5e; }
+.compte li.contre::before { content: '−'; color: var(--rubrique); }
+.compte li.contre { color: var(--encre-pale); }
+
 .table-mois { width: 100%; border-collapse: collapse; margin: 14px 0 12px; font-size: .9rem; }
 .table-mois td { border-bottom: 1px solid var(--trait); padding: 7px 10px 7px 0; vertical-align: top; }
 .table-mois .mois-date { white-space: nowrap; color: var(--encre-pale); font-variant-numeric: tabular-nums; }

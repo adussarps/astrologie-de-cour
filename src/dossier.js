@@ -670,6 +670,15 @@ const rang = (n) => (n === 1 ? '1re' : `${n}e`);
 /** « pérégrin » ou « pérégrine », selon l'astre. */
 const peregrin = (clef) => (GENRES[clef] === 'f' ? 'pérégrine' : 'pérégrin');
 
+/** Le compte des trois témoignages, écrit de sorte qu'on voie lequel manque.
+ *  Un jugement qui dit « faible » sans dire pourquoi ne se vérifie pas. */
+function comptesEnClair(etiquette, f) {
+  if (!f) return '';
+  return `${etiquette} : ${f.compte}/3 — ${f.fort ? 'ELLE PEUT DONNER' : 'ELLE NE PEUT PAS'}\n`
+    + f.appuis.map((x) => `        pour   : ${x}\n`).join('')
+    + f.manques.map((x) => `        contre : ${x}\n`).join('');
+}
+
 /** Les douze mois de l'année révolue, avec leur matière et leur seigneur.
  *  C'est le seul calendrier que la technique produise honnêtement : il dit
  *  quelle matière est en jeu à quel moment, non ce qui arrivera. */
@@ -764,6 +773,11 @@ export function dossierAnnee({ saisie, resultat, annee }) {
       + `(${m.natal.force}), ${etatEnClair(m.natal)}\n`
       + `    à la révolution : ${enSigne(m.annuel.longitude)}, maison ${m.annuel.maison} `
       + `(${m.annuel.force}), ${etatEnClair(m.annuel)}\n`
+      + `    PEUT-ELLE DONNER ? Trois témoignages, il en faut deux — le lieu (angle ou\n`
+      + `      succédente), la grande dignité (domicile, exaltation, triplicité ; le terme et\n`
+      + `      la face ne comptent pas), la liberté (directe et hors des rayons).\n`
+      + comptesEnClair('      au natal       ', m.ecart.natal)
+      + comptesEnClair('      à la révolution', m.ecart.annuel)
       + `    LEQUEL DES QUATRE CAS : ${m.ecart.clef} — ${m.ecart.texte}\n`
       + `  Règle : on avance d'un signe par année de vie depuis l'ascendant natal ; le seigneur `
       + `du lieu où l'on tombe gouverne l'année entière.\n`

@@ -84,9 +84,12 @@ export function decalageLegal(zone, dateUtc) {
     const parties = new Intl.DateTimeFormat('en-US', { timeZone: zone, timeZoneName: 'longOffset' })
       .formatToParts(dateUtc);
     const texte = parties.find((p) => p.type === 'timeZoneName')?.value ?? '';
-    const m = /GMT([+-])(\d{2}):(\d{2})/.exec(texte);
+    // Les fuseaux d'avant l'unification portent des secondes : Berne valait
+    // UTC+0:29:46 jusqu'en 1894, Paris UTC+0:09:21 jusqu'en 1911.
+    const m = /GMT([+-])(\d{2}):(\d{2})(?::(\d{2}))?/.exec(texte);
     if (!m) return 0;
-    return (m[1] === '-' ? -1 : 1) * (Number(m[2]) + Number(m[3]) / 60);
+    return (m[1] === '-' ? -1 : 1)
+      * (Number(m[2]) + Number(m[3]) / 60 + Number(m[4] ?? 0) / 3600);
   } catch {
     return null;
   }

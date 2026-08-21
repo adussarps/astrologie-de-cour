@@ -17,7 +17,7 @@ const { jugerInterrogation } = await import('./src/interrogation.js');
 const { NATIVITES, CONJONCTION_1345 } = await import('./src/corpus.js');
 const { versTempsUniversel, equationDuTemps, fuseauDe, decalageLegal, conventionParDefaut } =
   await import('./src/temps.js');
-const { figureDeLAnnee, profection, dansLAnnee } = await import('./src/annee.js');
+const { figureDeLAnnee, profection, dansLAnnee, laForce } = await import('./src/annee.js');
 
 let echecs = 0;
 
@@ -177,6 +177,101 @@ console.log('\n── Les degrés de perfection');
     + `${enDegresMinutes(v.perfection.exaltation)} de son degré d’exaltation (27° Poissons).`);
   console.log('       Un modèle de langage à qui l’on ne donnait pas ce nombre l’avait');
   console.log('       calculé de tête, et annoncé 0° 18′. C’est pour cela qu’on le calcule ici.');
+}
+
+console.log('\n── Le compte de force : trois témoignages, il en faut deux');
+{
+  // On teste la loi, pas les exemples. Une planète est construite de toutes
+  // pièces pour chacune des huit combinaisons possibles.
+  const astre = ({ lieu = 'angle', tenues = [], perdues = [], retro = false, sol = 'libre' }) => ({
+    force: lieu, retrograde: retro,
+    etat: { tenues, perdues, pérégrine: !tenues.length && !perdues.length },
+    solaire: { classe: sol, ecart: 0 },
+  });
+  const domicile = ['en son domicile'];
+  const face = ['en sa face'];
+
+  const controles = [
+    // Les trois témoignages sont indépendants, et deux suffisent.
+    ['trois appuis : fort', true, laForce(astre({ tenues: domicile })).fort],
+    ['deux appuis : fort', true, laForce(astre({ lieu: 'cadente', tenues: domicile })).fort],
+    ['un seul appui : faible', true, !laForce(astre({ lieu: 'cadente' })).fort],
+    ['aucun appui : faible', true,
+      !laForce(astre({ lieu: 'cadente', retro: true, perdues: ['en son exil'] })).fort],
+
+    // La succédente compte comme lieu ; la cadente non.
+    ['la succédente donne le lieu', true, laForce(astre({ lieu: 'succédente' })).compte >= 1],
+    ['la cadente ne le donne pas', 0,
+      laForce(astre({ lieu: 'cadente', retro: true, sol: 'combuste' })).compte],
+
+    // La correction qui a motivé tout ceci : la face n'est pas une force.
+    ['la face seule ne vaut pas dignité', true,
+      !laForce(astre({ lieu: 'cadente', tenues: face })).fort],
+    ['le terme seul non plus', true,
+      !laForce(astre({ lieu: 'cadente', tenues: ['en son terme'] })).fort],
+    ['mais la triplicité, oui', true,
+      laForce(astre({ lieu: 'cadente', tenues: ['en sa triplicité'] })).fort],
+
+    // Le cazimi porte, il ne brûle pas : il laisse le témoignage de liberté
+    // debout, là où la combustion et les rayons le retirent.
+    ['le cazimi laisse la liberté', 1, laForce(astre({ lieu: 'cadente', sol: 'cazimi' })).compte],
+    ['la combustion la retire', 0, laForce(astre({ lieu: 'cadente', sol: 'combuste' })).compte],
+    ['les rayons aussi', 0, laForce(astre({ lieu: 'cadente', sol: 'rayons' })).compte],
+    ['le cazimi ne supplée pas au reste', true,
+      !laForce(astre({ lieu: 'cadente', sol: 'cazimi' })).fort],
+  ];
+
+  // Le compte est un fold : les appuis et les manques partitionnent les trois
+  // témoignages, sans recouvrement ni perte, quelle que soit la planète.
+  let partition = true;
+  for (const lieu of ['angle', 'succédente', 'cadente']) {
+    for (const tenues of [[], face, domicile]) {
+      for (const sol of ['libre', 'combuste', 'cazimi']) {
+        for (const retro of [false, true]) {
+          const f = laForce(astre({ lieu, tenues, sol, retro }));
+          if (f.appuis.length + f.manques.length !== 3) partition = false;
+          if (f.appuis.length !== f.compte) partition = false;
+          if (f.fort !== (f.compte >= 2)) partition = false;
+        }
+      }
+    }
+  }
+  controles.push(['appuis + manques = 3, sur les 54 cas', true, partition]);
+  controles.push(['une planète absente est faible', true, !laForce(null).fort]);
+
+  for (const [quoi, attendu, obtenu] of controles) {
+    const ok = attendu === obtenu;
+    if (!ok) echecs++;
+    console.log(`   ${ok ? '✓' : '✗'} ${quoi.padEnd(46)} ${ok ? '' : `attendu ${attendu}, obtenu ${obtenu}`}`);
+  }
+}
+
+console.log('\n── Contrôle externe : trois ascendants contre les éphémérides publiées');
+{
+  // Le seul contrôle que ce site puisse vraiment passer : la figure qu'il
+  // dresse est-elle la même que celle des éphémérides publiées ? On prend des
+  // naissances cotées AA, dont l'heure est tirée d'un acte, et l'on compare
+  // l'ascendant — qui concentre toute la chaîne du temps, fuseaux anciens
+  // compris. Cendrars naît sous l'heure de Berne, UTC+0:29:46.
+  // Valeurs publiées : Astro-Databank pour Trump (29° Lion 58′) et Cendrars
+  // (12° Bélier), Astrotheme pour Macron (28° Capricorne 48′).
+  const temoins = [
+    { nom: 'Trump (Queens, 1946)', annee: 1946, mois: 6, jour: 14, heure: 10, minute: 54,
+      latitude: 40.7000, longitude: -73.8164, attendu: 149.97 },
+    { nom: 'Cendrars (La Chaux-de-Fonds, 1887)', annee: 1887, mois: 9, jour: 1, heure: 19,
+      minute: 45, latitude: 47.1000, longitude: 6.8333, attendu: 12.5 },
+    { nom: 'Macron (Amiens, 1977)', annee: 1977, mois: 12, jour: 21, heure: 10, minute: 40,
+      latitude: 49.8942, longitude: 2.2957, attendu: 298.8 },
+  ];
+  for (const t of temoins) {
+    const { jj } = versTempsUniversel({ ...t, julien: false, convention: 'legale' });
+    const f = juger({ positions: positions(jj), maisons: maisons(jj, t.latitude, t.longitude) });
+    const ecart = Math.abs(((f.ascendant - t.attendu + 540) % 360) - 180) * 60;
+    const ok = ecart < 60;
+    if (!ok) echecs++;
+    console.log(`   ${ok ? '✓' : '✗'} ${t.nom.padEnd(36)} ${enSigne(f.ascendant)}  `
+      + `(${ecart.toFixed(0)}′ de l’ascendant publié)`);
+  }
 }
 
 console.log('\n── La profection mensuelle');

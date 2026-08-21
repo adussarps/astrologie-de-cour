@@ -101,6 +101,59 @@ export function moisDeLAnnee(figureNatale, age, jjDebut, jjFin) {
   });
 }
 
+/** Une planète peut-elle donner ce qu'elle signifie ?
+ *
+ *  Trois conditions, et il en faut deux. Bonatti les tient séparées et c'est
+ *  ainsi qu'il faut les compter — un seul appui ne suffit jamais.
+ *
+ *    le lieu     — angle ou succédente : elle a d'où agir. Cadente, elle voit
+ *                  sans atteindre.
+ *    la dignité  — domicile, exaltation ou triplicité seulement. Le terme et
+ *                  la face sont les « petites dignités » : un homme dans sa
+ *                  face est chez un autre, il y tient debout mais n'y commande
+ *                  rien. Les compter comme une force est l'erreur ordinaire.
+ *    la liberté  — directe, et hors des rayons du Soleil. Rétrograde elle se
+ *                  reprend, combuste elle est brûlée, sous les rayons voilée.
+ *
+ *  Le compte est un fold sur trois témoignages ; on le rend entier plutôt que
+ *  réduit à un booléen, parce que le jugement doit pouvoir dire lequel manque. */
+export const GRANDES_DIGNITES = ['en son domicile', 'en son exaltation', 'en sa triplicité'];
+
+export function laForce(a) {
+  if (!a) return { fort: false, appuis: [], manques: ['la planète est absente de la figure'] };
+  const tenues = a.etat?.tenues ?? [];
+  const grandes = tenues.filter((t) => GRANDES_DIGNITES.includes(t));
+  // Le cazimi n'est pas une brûlure : au cœur du Soleil, la planète est portée
+  // et non consumée. Seules la combustion et les rayons débilitent.
+  const brulee = a.solaire?.classe === 'combuste' || a.solaire?.classe === 'rayons';
+
+  const temoignages = [
+    { clef: 'lieu', tenu: a.force === 'angle' || a.force === 'succédente',
+      oui: `elle est en ${a.force === 'angle' ? 'un angle' : 'une succédente'}`,
+      non: 'elle est cadente — elle voit la matière sans l’atteindre' },
+    { clef: 'dignité', tenu: grandes.length > 0,
+      oui: grandes.join(' et '),
+      non: tenues.length
+        ? `elle n’y tient qu’${tenues.join(' et ')} — une petite dignité, qui ne commande pas`
+        : (a.etat?.perdues.length ? a.etat.perdues.join(' et ') : 'elle y est pérégrine') },
+    { clef: 'liberté', tenu: !a.retrograde && !brulee,
+      oui: a.solaire?.classe === 'cazimi'
+        ? 'elle est directe et au cœur même du Soleil'
+        : 'elle est directe et hors des rayons',
+      non: [a.retrograde ? 'elle est rétrograde' : null,
+        a.solaire?.classe === 'combuste' ? 'elle est brûlée par le Soleil' : null,
+        a.solaire?.classe === 'rayons' ? 'elle est sous les rayons' : null,
+      ].filter(Boolean).join(' et ') },
+  ];
+
+  return {
+    fort: temoignages.filter((t) => t.tenu).length >= 2,
+    compte: temoignages.filter((t) => t.tenu).length,
+    appuis: temoignages.filter((t) => t.tenu).map((t) => t.oui),
+    manques: temoignages.filter((t) => !t.tenu).map((t) => t.non),
+  };
+}
+
 /** Le maître de l'année, jugé deux fois.
  *
  *  C'est la règle propre au genre, et elle n'a pas d'équivalent dans la
@@ -109,28 +162,24 @@ export function moisDeLAnnee(figureNatale, age, jjDebut, jjFin) {
  *  année-ci. Les quatre cas ne se confondent pas, et c'est de leur écart que
  *  vient tout le jugement annuel. */
 export function lEcartDuMaitre(natal, annuel) {
-  const fort = (a) => a && (a.force === 'angle' || (a.etat?.tenues.length ?? 0) > 0)
-    && !(a.solaire?.clef === 'combuste');
-  const fN = fort(natal);
-  const fA = fort(annuel);
-  if (fN && fA) {
-    return { clef: 'tenu', texte: 'Le maître de l’année est fort à la nativité et fort à la '
-      + 'révolution : ce que la figure promet en cette matière, l’année le donne. C’est le seul '
-      + 'des quatre cas où l’on peut parler net.' };
-  }
-  if (fN && !fA) {
-    return { clef: 'promis', texte: 'Le maître de l’année est fort à la nativité mais faible à '
-      + 'la révolution : la promesse tient, l’année la sert mal. La matière est différée, non '
-      + 'perdue — on la reprendra quand la profection y reviendra.' };
-  }
-  if (!fN && fA) {
-    return { clef: 'agite', texte: 'Le maître de l’année est faible à la nativité mais fort à '
-      + 'la révolution : beaucoup de mouvement cette année sur une matière que la nativité ne '
-      + 'promet pas. On s’y dépensera sans que le fond change.' };
-  }
-  return { clef: 'sourd', texte: 'Le maître de l’année est faible à la nativité et faible à la '
-    + 'révolution : l’année est sourde en cette matière. Rien ne s’y décide, et l’on perd son '
-    + 'temps à y pousser.' };
+  const fN = laForce(natal);
+  const fA = laForce(annuel);
+
+  const CAS = {
+    tenu: 'Le maître de l’année est fort à la nativité et fort à la révolution : ce que la figure '
+      + 'promet en cette matière, l’année le donne. C’est le seul des quatre cas où l’on peut '
+      + 'parler net.',
+    promis: 'Le maître de l’année est fort à la nativité mais faible à la révolution : la promesse '
+      + 'tient, l’année la sert mal. La matière est différée, non perdue — on la reprendra quand '
+      + 'la profection y reviendra.',
+    agite: 'Le maître de l’année est faible à la nativité mais fort à la révolution : beaucoup de '
+      + 'mouvement cette année sur une matière que la nativité ne promet pas. On s’y dépensera '
+      + 'sans que le fond change.',
+    sourd: 'Le maître de l’année est faible à la nativité et faible à la révolution : l’année est '
+      + 'sourde en cette matière. Rien ne s’y décide, et l’on perd son temps à y pousser.',
+  };
+  const clef = fN.fort ? (fA.fort ? 'tenu' : 'promis') : (fA.fort ? 'agite' : 'sourd');
+  return { clef, texte: CAS[clef], natal: fN, annuel: fA };
 }
 
 /** La figure de l'année, entière : la révolution, la profection, le maître. */
