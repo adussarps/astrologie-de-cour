@@ -81,10 +81,16 @@ export function positions(jj) {
     const v = Astronomy.GeoVector(p.corps, t, true);
     const e = Astronomy.Ecliptic(v);
     const veille = Astronomy.Ecliptic(Astronomy.GeoVector(p.corps, tempsDe(jj - 0.5), true));
+    // Le mouvement propre, en degrés par jour, signé. Il dit la rétrogradation,
+    // mais surtout lequel de deux astres marche vers l'autre : sans lui on ne
+    // peut pas distinguer un regard qui s'applique d'un regard qui se sépare,
+    // et c'est toute la différence entre une chose à venir et une chose faite.
+    const marche = (((e.elon - veille.elon + 540) % 360) - 180) * 2;
     out[p.clef] = {
       longitude: mod360(e.elon),
       latitude: e.elat,
-      retrograde: mod360(e.elon - veille.elon) > 180,
+      vitesse: marche,
+      retrograde: marche < 0,
     };
   }
   // La Teste et la Queue du dragon : nœuds lunaires moyens (Meeus, 47.7).

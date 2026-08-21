@@ -275,11 +275,54 @@ button.copier:hover { background: var(--rubrique); }
 .considerations p.grave { color: var(--rubrique); font-weight: 500; }
 
 .verdict { border-left: 3px solid var(--trait); padding-left: 14px !important; }
-.verdict.doux { border-left-color: #6b8f5e; }
+.verdict.doux, .verdict.translation, .verdict.collection { border-left-color: #6b8f5e; }
 .verdict.dur { border-left-color: var(--rubrique); }
-.verdict.rien { border-left-color: var(--encre-pale); }
+.verdict.rien, .verdict.vide, .verdict.passe { border-left-color: var(--encre-pale); }
 .verdict.lune, .verdict.meme { border-left-color: var(--or); }
 .verdict h3 { font-size: 1.15rem !important; }
+
+/* Oui ou non : une interrogation se conclut, elle ne se nuance pas. */
+.reponse {
+  display: inline-block;
+  font-variant: small-caps;
+  letter-spacing: .12em;
+  font-size: .78em;
+  padding: 1px 9px;
+  margin-right: 8px;
+  vertical-align: .12em;
+  border: 1px solid currentColor;
+}
+.reponse.oui { color: #4f7343; }
+.reponse.non { color: var(--rubrique); }
+
+.obstacles { border-left: 3px solid var(--rubrique); padding-left: 14px !important; }
+.echeance { border-left: 3px solid var(--or); padding-left: 14px !important; }
+
+/* La révolution : le cas du maître, et le calendrier des douze mois. */
+.cas-du-maitre {
+  border-left: 3px solid var(--trait);
+  padding: 8px 0 8px 14px;
+  font-size: .95rem;
+}
+.cas-du-maitre.tenu { border-left-color: #6b8f5e; }
+.cas-du-maitre.promis, .cas-du-maitre.agite { border-left-color: var(--or); }
+.cas-du-maitre.sourd { border-left-color: var(--encre-pale); font-style: italic; }
+
+.table-mois { width: 100%; border-collapse: collapse; margin: 14px 0 12px; font-size: .9rem; }
+.table-mois td { border-bottom: 1px solid var(--trait); padding: 7px 10px 7px 0; vertical-align: top; }
+.table-mois .mois-date { white-space: nowrap; color: var(--encre-pale); font-variant-numeric: tabular-nums; }
+.table-mois .mois-matiere .cote { display: block; }
+.table-mois .mois-seigneur { white-space: nowrap; }
+.table-mois .mois-du-maitre { background: var(--parchemin-clair); }
+
+/* Le corps, et les degrés de perfection. */
+.corps, .perfection {
+  border: 1px solid var(--trait);
+  background: var(--parchemin-clair);
+  padding: 18px 24px !important;
+  margin-top: 22px;
+}
+.corps .interdit { color: var(--rubrique); }
 
 .mise-en-garde {
   font-style: italic;

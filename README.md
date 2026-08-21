@@ -105,7 +105,7 @@ troisième tourne à chaque `npm test`.
 ## Le dossier pour un modèle de langue
 
 Chaque figure — nativité, révolution d’année, interrogation — s’accompagne d’un bouton qui
-copie un dossier d’environ deux mille mots, à coller dans ChatGPT ou tout autre modèle, pour
+copie un dossier de six à huit mille mots, à coller dans ChatGPT ou tout autre modèle, pour
 qu’il rédige le *judicium*.
 
 Aucune clé, aucun serveur, aucun appel réseau : le site reste statique et rien ne sort de la
@@ -117,8 +117,60 @@ la méthode du seigneur, le ton, et la liste explicite de ce qu’il n’a pas l
 pas de portrait de caractère fondé sur le signe solaire, pas de durée de vie chiffrée, pas
 d’événement daté, aucune règle inventée. Il n’apporte que la prose.
 
+**Trois consignes, pas une.** Les trois genres ne se jugent pas de la même façon, et les
+confondre est l’erreur que les traités reprochent le plus. Le socle est commun — le ton, la
+règle de traduction, la dureté permise, les interdits — mais le plan du *judicium* change :
+
+| Genre | Plan | Ce qu’il refuse de juger |
+|---|---|---|
+| Nativité | les cinq matières du livre IV du *Tetrabiblos* : la complexion et le corps, le métier, l’avoir, la dignité, les parties adverses | la durée de vie, l’événement daté |
+| Révolution | la matière de l’année, le maître jugé deux fois, ce qui a changé depuis la nativité, le calendrier des douze mois | le métier, la complexion, le naturel — ils se décident à la naissance et n’en bougent plus |
+| Interrogation | peut-on juger, la voie d’aboutissement, l’échéance, la conduite à tenir | tout ce qui touche à la nativité, dont il ne doit pas parler |
+
+**Aucun nombre n’est laissé à calculer.** C’est la leçon d’un essai réel : un modèle à qui
+l’on donnait la position de Vénus mais pas son écart au degré d’exaltation a fait la
+soustraction de tête, et annoncé dix-huit minutes d’arc là où il y en avait trente-quatre. Le
+raisonnement était juste, le chiffre faux — et c’est le chiffre qu’on retient. Les écarts aux
+degrés d’exaltation et de chute, les distances aux aspects, l’âge de la Lune, les dates des
+douze mois sont donc tous précalculés et livrés en clair, avec l’ordre exprès de n’en déduire
+aucun autre.
+
 C’est aussi la bonne division du travail, historiquement : le calculateur dressait la figure,
 et le jugement était un texte rédigé.
+
+## Les trois genres, et ce qu’ils répondent
+
+**La nativité** dit ce qu’un homme est et de quoi il vit. Elle se juge une fois. Le métier
+s’y décide par la règle de Ptolémée — la planète qui se lève immédiatement avant le Soleil et
+le seigneur du milieu du ciel, dont on ne retient que Mercure, Vénus ou Mars — et la table
+nomme des métiers réels : les notaires, les changeurs, les teinturiers, les armuriers. La
+santé s’y juge par la mélothésie, l’homme zodiacal : chaque signe gouverne un membre, et l’on
+ne saigne pas celui dont la Lune occupe le signe. C’est la seule partie de l’art dont l’usage
+fût quotidien, et c’est par elle que l’astrologie tient à la médecine.
+
+**La révolution de l’année** ne rejuge rien. Elle dit ce qui, cette année-ci, est en jeu de ce
+que la nativité avait promis. La profection désigne la matière et le maître de l’année ; ce
+maître se lit deux fois, au natal et à la révolution, et les quatre cas ne se confondent pas
+— fort et fort, la matière se décide ; fort puis faible, la promesse tient mais l’année la
+sert mal ; faible puis fort, du mouvement pour rien ; faible et faible, l’année est sourde. La
+profection mensuelle divise ensuite l’année en douze, ce qui donne le seul calendrier que la
+technique produise honnêtement : non pas la date d’un événement, mais le mois où telle matière
+est en jeu.
+
+**L’interrogation** ignore la nativité et répond par oui ou par non. On vérifie d’abord, par
+les considérations de Bonatti, qu’on a le droit de juger — et un refus motivé est un jugement
+complet. Puis on cherche la voie : application directe, séparation (la chose est déjà faite ou
+déjà manquée), translation de lumière (elle se fera par un tiers, dont la nature désigne qui
+aller chercher), collection de lumière (il faut la porter devant un plus grand), prohibition,
+réfrénation, Lune vide de course. Chaque voie commande une conduite différente, et c’est là
+tout son usage. L’échéance se prend en comptant une unité de temps par degré restant, l’unité
+venant du lieu et du mode du signe — les auteurs ne s’accordent pas sur l’échelle, et le site
+le dit plutôt que de le taire.
+
+C’est aussi ici que l’art cesse d’être toléré. Juger une nativité passait pour naturel ; poser
+une question au ciel revient à tenir la réponse pour déjà écrite. C’est ce que Nicole Oresme
+attaque dans son *Livre de divinacions* — Oresme, traducteur de Charles V, dont le traité de
+la sphère ouvre le manuscrit même où sont reliées les cinq nativités royales.
 
 ## Le lieu, et quelle heure
 

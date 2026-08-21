@@ -2,9 +2,11 @@
 
 import {
   jourJulien, positions, maisons, heuresInegales, heuresPlanetaires,
-  enSigne, dateGregorienne, PLANETES, NOMS_JOURS,
+  enSigne, dateGregorienne, PLANETES, NOMS_JOURS, SIGNES,
 } from './ciel.js';
-import { juger, enPhrases, nomDe, sommaire, lectureDesMaisons } from './jugement.js';
+import {
+  juger, enPhrases, nomDe, sommaire, lectureDesMaisons, enDegresMinutes, rangHtml,
+} from './jugement.js';
 import { carre, GLYPHES } from './figure.js';
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, MAISONS,
@@ -133,6 +135,60 @@ function blocLecture(figure) {
   </section>`;
 }
 
+/** Le corps, par l'homme zodiacal — la seule partie de l'art dont l'usage fût
+ *  quotidien, parce que c'est par elle que l'astrologie tient à la médecine. */
+function blocCorps(figure) {
+  const c = figure.corps;
+  if (!c) return '';
+  const s = c.maladie.seigneur;
+  return `<section class="corps">
+    <h3>Le corps, et de quoi se garder</h3>
+    <p>Le signe qui monte donne la complexion du corps entier : <b>${html(c.complexion.signe)}</b>,
+    qui gouverne ${html(c.complexion.membre)}. Son seigneur ${html(c.complexion.seigneur.nom)}
+    est ${html(c.complexion.qualite)}${c.complexion.humeur
+  ? `, et son humeur est ${html(c.complexion.humeur)}` : ''}.</p>
+    <p>La Lune tient <b>${html(c.lune.signe)}</b>, qui gouverne ${html(c.lune.membre)}.
+    <b class="interdit">${html(c.lune.interdit)}</b> C’est une règle opératoire, imprimée dans
+    tous les almanachs : aucun médecin formé n’y contrevient.</p>
+    <p>La sixième maison range ensemble la maladie, les serviteurs, les bêtes menues et le
+    travail subi — tout ce à quoi l’on est assujetti. Son seigneur est
+    <b>${html(s.nom)}</b>, en ${rangHtml(s.maison)} maison, ${html(s.force)}. Ce qu’il charge
+    dans le corps : ${html(c.maladie.corps)}.</p>
+    <span class="renvoi">${html(c.source)}</span>
+  </section>`;
+}
+
+/** Les degrés de perfection. La table des exaltations donne un degré, non un
+ *  signe — et une planète qui s'en approche à quelques minutes ne se lit sur
+ *  aucune table de dignités. */
+function blocPerfection(figure) {
+  const p = figure.perfections;
+  if (!p) return '';
+  const lignes = [];
+  if (p.versExaltation?.notable) {
+    lignes.push(`<p><b>${html(p.versExaltation.nom)}</b> est à
+      <b>${html(enDegresMinutes(p.versExaltation.exaltation))}</b> de son degré d’exaltation
+      (${p.versExaltation.degreDansLeSigne}° ${html(SIGNES[p.versExaltation.signeExalt])}) :
+      c’est le corps le mieux placé de la figure, et de loin.</p>`);
+  }
+  if (p.versChute?.notable) {
+    lignes.push(`<p><b>${html(p.versChute.nom)}</b> est à
+      <b>${html(enDegresMinutes(p.versChute.chute))}</b> du degré de sa chute : c’est le corps
+      le plus mal placé, et cela ne se rattrape pas.</p>`);
+  }
+  if (!lignes.length) return '';
+
+  return `<section class="perfection">
+    <h3>Les degrés de perfection</h3>
+    <p class="preambule">La table des exaltations ne donne pas un signe : elle donne un
+    <b>degré</b> — Vénus au vingt-septième des Poissons, la Lune au troisième du Taureau.
+    Une planète qui s’en approche à quelques minutes est à son point de perfection, ce qui
+    ne se lit sur aucune table de dignités.</p>
+    ${lignes.join('')}
+    <span class="renvoi">Alcabitius, dist. I (les exaltations).</span>
+  </section>`;
+}
+
 /** Ce que valait l'heure annoncée, et ce qu'elle vaut au soleil du lieu.
  *  L'écart n'est pas un détail technique : c'est le sujet. */
 function blocTemps(temps) {
@@ -217,6 +273,8 @@ function rendreFigure(saisie, cartouche, { titreCarre = '', dossier = null } = {
         </div>
       </div>
       ${blocSommaire(figure)}
+      ${blocPerfection(figure)}
+      ${blocCorps(figure)}
       ${blocLecture(figure)}
       <h3 style="margin-top:34px">Le relevé</h3>
       ${tableauDesAstres(figure)}
@@ -366,7 +424,7 @@ function rendreAnnee(saisie, age) {
       <section>
         <h3>La maison de l’année</h3>
         <p>À <b>${age} ans</b>, la profection porte sur la
-        <b>${m.profection.rang}<sup>e</sup> maison</b> — ${html(m.profection.titre.toLowerCase())} :
+        <b>${rangHtml(m.profection.rang)} maison</b> — ${html(m.profection.titre.toLowerCase())} :
         ${html(m.profection.detail)}. C’est la matière que l’année met en jeu.</p>
         <p>Le signe profecté est ${html(enSigne(m.signeProfecte))}.</p>
         <span class="renvoi">${html(SOURCES_ANNEE.profection)}</span>
@@ -376,20 +434,58 @@ function rendreAnnee(saisie, age) {
         <p>Le seigneur de ce signe est <b>${html(m.nom)}</b> : c’est le <i>dominus anni</i>.
         Tout le jugement de l’année pend à l’état de cette seule planète.</p>
         <p>À la naissance il se tenait à ${html(enSigne(m.natal.longitude))}, en
-        ${m.natal.maison}<sup>e</sup> maison. Dans la figure de l’année il est à
-        ${html(enSigne(m.annuel.longitude))}, en <b>${m.annuel.maison}<sup>e</sup> maison</b>,
+        ${rangHtml(m.natal.maison)} maison. Dans la figure de l’année il est à
+        ${html(enSigne(m.annuel.longitude))}, en <b>${rangHtml(m.annuel.maison)} maison</b>,
         ${html(force)}.</p>
         <span class="renvoi">${html(SOURCES_ANNEE.revolution)}</span>
       </section>
+      <section>
+        <h3>Fort, ou faible — et où</h3>
+        <p>C’est la règle propre au genre, et elle n’a pas d’équivalent dans la nativité : le
+        maître de l’année se juge <b>deux fois</b>. Son état au natal dit ce qu’il peut
+        promettre ; son état à la révolution dit ce qu’il en fera cette année-ci.</p>
+        <p class="cas-du-maitre ${f.maitre.ecart.clef}">${html(f.maitre.ecart.texte)}</p>
+      </section>
+      ${blocMois(f)}
       <section>
         <h3>L’ascendant de l’année</h3>
         <p>${html(enSigne(f.annuelle.ascendant))} monte à l’instant du retour. L’almuten de la
         révolution est <b>${html(nomDe(f.annuelle.almuten.vainqueur.planete))}</b>.</p>
         <p class="mise-en-garde">La révolution ne remplace pas la nativité : elle se lit
-        <b>par-dessus</b>. Une année ne peut donner que ce que la nativité promet.</p>
+        <b>par-dessus</b>. Une année ne donne que ce que la nativité promet — et elle ne rejuge
+        ni le métier, ni la complexion, ni le naturel, qui se décident à la naissance et n’en
+        bougent plus.</p>
       </section>
     </div>
   </div>`;
+}
+
+/** Les douze mois de l'année révolue : le seul calendrier que la technique
+ *  produise honnêtement. Il ne dit pas ce qui arrivera, il dit quelle matière
+ *  est en jeu à quel moment. */
+function blocMois(f) {
+  const lignes = f.mois.map((m) => {
+    const d = dateGregorienne(m.debut);
+    const sien = m.clef === f.maitre.clef;
+    return `<tr class="${sien ? 'mois-du-maitre' : ''}">
+      <td class="mois-date">${d.jour}/${d.mois}/${d.annee}</td>
+      <td class="mois-matiere"><b>${html(m.maison.titre)}</b>
+        <span class="cote">${html(m.maison.detail)}</span></td>
+      <td class="mois-seigneur">${GLYPHES[m.clef] ?? ''} ${html(m.nom)}${
+  sien ? ' <span class="cote">— le maître de l’année</span>' : ''}</td>
+    </tr>`;
+  }).join('');
+
+  return `<section class="calendrier">
+    <h3>Les douze mois</h3>
+    <p>La même arithmétique que la profection annuelle, d’un cran plus fin : on avance d’un
+    signe par mois révolu. Chaque mois reçoit ainsi une matière et un seigneur.</p>
+    <table class="table-mois">${lignes}</table>
+    <p class="mise-en-garde">Ce calendrier ne dit pas qu’un événement arrivera à telle date.
+    Il dit quelle matière est en jeu à quel moment de l’année — c’est tout ce que la règle
+    autorise, et c’est déjà beaucoup.</p>
+    <span class="renvoi">Alcabitius, dist. IV ; Abū Maʿshar, De revolutionibus nativitatum.</span>
+  </section>`;
 }
 
 function rendreQuestion(rangMaison, texteQuestion) {
@@ -436,17 +532,31 @@ function rendreQuestion(rangMaison, texteQuestion) {
         <h3>Le consultant, et la chose</h3>
         <p>Vous êtes l’ascendant, ${html(enSigne(figure.ascendant))}, et son seigneur
         <b>${html(nomDe(j.consultant.clef))}</b>, qui se tient en
-        ${j.consultant.maison}<sup>e</sup> maison.</p>
-        <p>La chose demandée est la <b>${j.matiere.rang}<sup>e</sup> maison</b> —
+        ${rangHtml(j.consultant.maison)} maison.</p>
+        <p>La chose demandée est la <b>${rangHtml(j.matiere.rang)} maison</b> —
         ${html(j.matiere.titre.toLowerCase())} : ${html(j.matiere.detail)}. Son seigneur est
-        <b>${html(nomDe(j.seigneurChose.clef))}</b>, en ${j.seigneurChose.maison}<sup>e</sup>
+        <b>${html(nomDe(j.seigneurChose.clef))}</b>, en ${rangHtml(j.seigneurChose.maison)}
         maison.</p>
       </section>
       <section class="verdict ${j.verdict.clef}">
-        <h3>${html(j.verdict.titre)}</h3>
+        <h3><span class="reponse ${j.verdict.reponse}">${j.verdict.reponse}</span>
+        ${html(j.verdict.titre)}</h3>
         <p>${j.verdict.texte}</p>
+        ${j.jonction ? `<p class="cote">L’aspect est en <b>${html(j.jonction.mouvement)}</b> :
+        ${html(j.jonction.glose)}.</p>` : ''}
         <span class="renvoi">${html(SOURCES_QUESTION.interrogation)}</span>
       </section>
+      ${j.obstacles.length ? `<section class="obstacles">
+        <h3>Ce qui coupe la voie</h3>
+        ${j.obstacles.map((o) => `<p>${o.texte}</p>`).join('')}
+      </section>` : ''}
+      ${j.echeance ? `<section class="echeance">
+        <h3>Quand</h3>
+        <p>${j.echeance.texte}</p>
+        <p class="mise-en-garde">C’est le produit d’une table, non une chose que l’on sache.
+        Les auteurs ne s’accordent pas sur l’échelle, et il vaut mieux le dire que le taire.</p>
+        <span class="renvoi">${html(j.echeance.source)}</span>
+      </section>` : ''}
     </div>
   </div>`;
 }

@@ -18,9 +18,9 @@
 // reliées les cinq nativités royales — a écrit contre cela son Livre de
 // divinacions.
 
-import { mod360, enSigne } from './ciel.js';
-import { seigneurDuSigne, nomDe } from './jugement.js';
-import { MAISONS, ASPECTS, ORBES } from './doctrine.js';
+import { mod360, enSigne, signeDe } from './ciel.js';
+import { seigneurDuSigne, nomDe, rangHtml } from './jugement.js';
+import { MAISONS, ASPECTS, ORBES, CONDITIONS, NATURES_SIGNES } from './doctrine.js';
 
 export const SOURCES = {
   interrogation: 'Sahl ibn Bishr, De interrogationibus (trad. Jean de Séville) ; '
@@ -104,70 +104,311 @@ export function considerations(figure) {
   return avis;
 }
 
-/** Le regard entre deux astres, s'il y en a un dans les orbes. */
+/** La distance angulaire entre deux astres, dans [0, 180]. */
+const separation = (la, lb) => Math.abs(((la - lb + 540) % 360) - 180);
+
+/** Le regard entre deux astres, s'il y en a un dans les orbes — et, ce qui
+ *  importe davantage, s'il se fait ou s'il se défait.
+ *
+ *  C'est la distinction qui commande tout le genre. Un aspect qui s'applique
+ *  annonce une chose à venir ; le même aspect en séparation dit qu'elle est
+ *  déjà faite, ou déjà manquée. Les juger pareillement est l'erreur que Sahl
+ *  reproche aux ignorants, et elle renverse la réponse du tout au tout. */
 function regardEntre(a, b) {
-  const ecart = Math.abs(((a.longitude - b.longitude + 540) % 360) - 180);
-  const distance = 180 - ecart;
+  const distance = separation(a.longitude, b.longitude);
   for (const asp of ASPECTS.table) {
     const orbe = (ORBES.table[a.clef] ?? 6) / 2 + (ORBES.table[b.clef] ?? 6) / 2;
-    if (Math.abs(distance - asp.angle) <= orbe) {
-      return { ...asp, exact: Math.abs(distance - asp.angle) };
+    const exact = Math.abs(distance - asp.angle);
+    if (exact > orbe) continue;
+
+    // Un jour plus tard : l'écart à l'aspect exact se resserre-t-il ?
+    const apres = Math.abs(
+      separation(a.longitude + (a.vitesse ?? 0), b.longitude + (b.vitesse ?? 0)) - asp.angle,
+    );
+    const applique = apres < exact;
+    // La vitesse relative donne le nombre de jours jusqu'à l'exactitude.
+    const relative = Math.abs((a.vitesse ?? 0) - (b.vitesse ?? 0));
+    return {
+      ...asp,
+      exact,
+      applique,
+      mouvement: applique ? 'application' : 'séparation',
+      jours: relative > 1e-6 ? exact / relative : null,
+      glose: applique ? CONDITIONS.application : CONDITIONS.separation,
+    };
+  }
+  return null;
+}
+
+/** La plus rapide de deux planètes — celle qui porte le mouvement. */
+const plusRapide = (a, b) => Math.abs(a.vitesse ?? 0) > Math.abs(b.vitesse ?? 0);
+
+/** La translation de lumière : une planète se sépare de l'un des seigneurs et
+ *  s'applique à l'autre, portant de celui-ci à celui-là ce qu'il faut pour
+ *  joindre. La chose se fait alors par un tiers — un messager, une entremise,
+ *  quelqu'un qui n'est pas partie dans l'affaire. */
+function translationDeLumiere(astres, a, b) {
+  for (const t of astres) {
+    if (t.noeud || t.clef === a.clef || t.clef === b.clef) continue;
+    if (!plusRapide(t, a) || !plusRapide(t, b)) continue;
+    const versA = regardEntre(t, a);
+    const versB = regardEntre(t, b);
+    if (!versA || !versB) continue;
+    if (!versA.applique && versB.applique) {
+      return { porteur: t, quitte: a, joint: b, de: versA, vers: versB };
+    }
+    if (!versB.applique && versA.applique) {
+      return { porteur: t, quitte: b, joint: a, de: versB, vers: versA };
     }
   }
   return null;
 }
 
-/** Juger une interrogation : le consultant, la chose, et si elles se joignent. */
+/** La collection de lumière : une planète plus lente reçoit l'application des
+ *  deux seigneurs à la fois. Elle recueille leurs lumières et les assemble.
+ *  La chose se fait, mais par un plus grand que les deux parties — un juge,
+ *  un prélat, un seigneur devant qui l'on porte l'affaire. */
+function collectionDeLumiere(astres, a, b) {
+  for (const c of astres) {
+    if (c.noeud || c.clef === a.clef || c.clef === b.clef) continue;
+    if (plusRapide(c, a) || plusRapide(c, b)) continue;
+    const deA = regardEntre(a, c);
+    const deB = regardEntre(b, c);
+    if (deA?.applique && deB?.applique) {
+      return { collecteur: c, deA, deB };
+    }
+  }
+  return null;
+}
+
+/** La prohibition : avant que les deux seigneurs ne joignent, un tiers vient
+ *  se mettre entre eux et joint le premier. Quelqu'un empêche — et la figure
+ *  dit qui, par la nature de la planète qui s'interpose. */
+function prohibition(astres, a, b, jonction) {
+  if (!jonction?.applique || jonction.jours === null) return null;
+  for (const t of astres) {
+    if (t.noeud || t.clef === a.clef || t.clef === b.clef) continue;
+    for (const cible of [a, b]) {
+      const r = regardEntre(t, cible);
+      if (r?.applique && r.jours !== null && r.jours < jonction.jours) {
+        return { empecheur: t, cible, regard: r, avance: jonction.jours - r.jours };
+      }
+    }
+  }
+  return null;
+}
+
+/** La réfrénation : le seigneur qui s'applique tourne rétrograde avant
+ *  d'achever. La partie se retire au dernier moment, et l'affaire retombe. */
+function refranation(jonction, a, b) {
+  if (!jonction?.applique) return null;
+  const retrograde = [a, b].find((p) => p.retrograde);
+  return retrograde ? { planete: retrograde } : null;
+}
+
+/** Quand — la mesure du temps.
+ *
+ *  Le nombre de degrés qui reste jusqu'à l'aspect exact donne le nombre
+ *  d'unités ; le lieu et le mode du signe donnent l'unité. Les auteurs ne
+ *  s'accordent pas sur la table, et il faut le dire : Sahl, Bonatti et
+ *  Māshāʾallāh proposent des échelles voisines mais distinctes. Celle-ci suit
+ *  Bonatti. C'est la seule mesure de temps que le genre produise, et elle
+ *  vaut ce que vaut la règle — pas davantage. */
+const JOUR = { pluriel: 'jours', article: 'le jour' };
+const SEMAINE = { pluriel: 'semaines', article: 'la semaine' };
+const MOIS = { pluriel: 'mois', article: 'le mois' };
+const AN = { pluriel: 'années', article: 'l’année' };
+
+const UNITES = {
+  angle: { mobile: JOUR, commun: SEMAINE, fixe: MOIS },
+  succédente: { mobile: SEMAINE, commun: MOIS, fixe: AN },
+  cadente: { mobile: MOIS, commun: MOIS, fixe: AN },
+};
+
+function quand(jonction, seigneurChose) {
+  if (!jonction?.applique) return null;
+  const mode = NATURES_SIGNES.modes.find((m) => m.signes.includes(signeDe(seigneurChose.longitude)));
+  const unite = UNITES[seigneurChose.force]?.[mode.nom] ?? MOIS;
+  const nombre = Math.max(1, Math.round(jonction.exact));
+  return {
+    nombre, unite: unite.pluriel, mode: mode.nom, lieu: seigneurChose.force,
+    degres: jonction.exact,
+    texte: `Il reste ${jonction.exact.toFixed(1)}° jusqu’à l’aspect exact, et l’on compte une `
+      + `unité de temps par degré. Le seigneur de la chose est en signe ${mode.nom} et en `
+      + `maison ${seigneurChose.force} : l’unité est ${unite.article}. La règle donne donc `
+      + `<b>environ ${nombre} ${unite.pluriel}</b> — c’est ce que dit la table, non ce que je `
+      + `sais du monde.`,
+    source: 'Bonatti, Liber astronomiae, tr. VI ; les auteurs diffèrent sur l’échelle',
+  };
+}
+
+/** Les deux luminaires prennent l'article, les cinq planètes n'en prennent
+ *  pas : on dit « la Lune se sépare de Mercure ». */
+const avecArticle = (clef) =>
+  clef === 'lune' ? 'la Lune' : clef === 'soleil' ? 'le Soleil' : nomDe(clef);
+
+/** Les dignités d'un astre, en un membre de phrase. */
+function dignites(a) {
+  if (a.etat?.tenues.length) return a.etat.tenues.join(' et ');
+  if (a.etat?.perdues.length) return a.etat.perdues.join(' et ');
+  return 'pérégrine, sans dignité au lieu où elle est';
+}
+
+/** La Lune est-elle vide de course ? Elle n'achève plus aucun aspect avant de
+ *  sortir de son signe : c'est le seul témoignage qui tranche à lui seul, et
+ *  il tranche par la négative. */
+function videDeCourse(astres, lune) {
+  const reste = 30 - (mod360(lune.longitude) % 30);
+  const aVenir = astres.some((a) => {
+    if (a.noeud || a.clef === 'lune') return false;
+    const r = regardEntre(lune, a);
+    return r?.applique && r.exact < reste;
+  });
+  return aVenir ? null : { reste };
+}
+
+/** Juger une interrogation.
+ *
+ *  L'ordre compte, et il est celui de Sahl : on regarde d'abord si l'on a le
+ *  droit de juger, puis si la Lune porte encore quelque chose, puis les modes
+ *  d'aboutissement, du plus direct au plus détourné. Le premier qui se
+ *  présente emporte la réponse ; on ne cumule pas.
+ *
+ *  Une interrogation se conclut par oui ou par non. Sahl y insiste : un
+ *  jugement qui finit en nuances n'a pas été rendu. */
 export function jugerInterrogation(figure, rangMaison) {
   const matiere = figure.maisonsHabitees[rangMaison - 1];
   const consultant = figure.seigneurAscendantPlace;
   const seigneurChose = figure.astres.find((a) => a.clef === matiere.seigneur);
   const lune = figure.astres.find((a) => a.clef === 'lune');
-
-  const jonction = regardEntre(consultant, seigneurChose);
-  const parLaLune = !jonction && regardEntre(lune, consultant) && regardEntre(lune, seigneurChose)
-    ? { via: 'la Lune porte la lumière de l’un à l’autre' }
-    : null;
+  const astres = figure.astres.filter((a) => !a.noeud);
 
   const memePlanete = consultant.clef === seigneurChose.clef;
+  const jonction = memePlanete ? null : regardEntre(consultant, seigneurChose);
+  const vide = videDeCourse(astres, lune);
+  const translation = memePlanete ? null : translationDeLumiere(astres, consultant, seigneurChose);
+  const collection = memePlanete ? null : collectionDeLumiere(astres, consultant, seigneurChose);
+  const empechement = prohibition(astres, consultant, seigneurChose, jonction);
+  const retenue = refranation(jonction, consultant, seigneurChose);
 
+  const nomC = nomDe(consultant.clef);
+  const nomS = nomDe(seigneurChose.clef);
   let verdict;
+  let echeance = null;
+
   if (memePlanete) {
     verdict = {
-      clef: 'meme',
+      clef: 'meme', reponse: 'oui',
       titre: 'Le consultant et la chose ont le même seigneur',
-      texte: `<b>${nomDe(consultant.clef)}</b> gouverne à la fois l’ascendant et la `
-        + `${rangMaison}<sup>e</sup> maison. La chose et celui qui la demande ne font qu’un : `
-        + `l’affaire dépend de lui seul, et de l’état où se trouve cette planète.`,
+      texte: `<b>${nomC}</b> gouverne à la fois l’ascendant et la ${rangHtml(rangMaison)} `
+        + `maison. La chose et celui qui la demande ne font qu’un : l’affaire ne dépend de `
+        + `personne d’autre, et elle se fera ou non selon l’état seul de cette planète — `
+        + `${dignites(consultant)}, en maison ${consultant.force}.`,
     };
-  } else if (jonction) {
+  } else if (jonction?.applique) {
+    const dur = jonction.nom === 'opposition' || jonction.nom === 'quadrature';
+    echeance = quand(jonction, seigneurChose);
     verdict = {
-      clef: jonction.nom === 'opposition' || jonction.nom === 'quadrature' ? 'dur' : 'doux',
-      titre: `La question aboutit — par ${jonction.nom}`,
-      texte: `<b>${nomDe(consultant.clef)}</b>, seigneur du consultant, et `
-        + `<b>${nomDe(seigneurChose.clef)}</b>, seigneur de la chose, se regardent par `
-        + `<b>${jonction.nom}</b> (${jonction.angle}°, à ${jonction.exact.toFixed(1)}° près). `
-        + `La chose se fait. ${jonction.nom === 'opposition' ? 'Mais par opposition : elle se fait mal, tard, ou au prix d’un conflit.'
-          : jonction.nom === 'quadrature' ? 'Mais par quadrature : elle se fait avec peine et contrariété.'
-            : 'Et par un regard favorable : elle se fait sans grande peine.'}`,
+      clef: dur ? 'dur' : 'doux', reponse: 'oui',
+      titre: `La chose se fait — les deux seigneurs s’appliquent par ${jonction.nom}`,
+      texte: `<b>${nomC}</b>, seigneur du consultant, marche vers <b>${nomS}</b>, seigneur de `
+        + `la chose, et les joint par <b>${jonction.nom}</b> (${jonction.angle}°, à `
+        + `${jonction.exact.toFixed(1)}° de l’exactitude). L’aspect s’applique : la chose est `
+        + `à venir, et elle se fera d’elle-même, sans entremise. `
+        + (dur
+          ? jonction.nom === 'opposition'
+            ? 'Mais par opposition : elle se fait au prix d’un conflit ouvert, et l’on n’en '
+              + 'sortira pas content des deux côtés.'
+            : 'Mais par quadrature : elle se fait avec peine, contrariété et retard.'
+          : 'Et par un regard favorable : elle se fait sans grande peine.'),
     };
-  } else if (parLaLune) {
+  } else if (jonction && !jonction.applique) {
     verdict = {
-      clef: 'lune',
-      titre: 'La question aboutit — par translation de lumière',
-      texte: `Les deux seigneurs ne se voient pas, mais <b>la Lune</b> regarde l’un et l’autre : `
-        + `elle porte la lumière du premier au second. La chose se fera <b>par un tiers</b> — `
-        + `un messager, une entremise, quelqu’un qui n’est pas dans l’affaire.`,
+      clef: 'passe', reponse: 'non',
+      titre: 'L’aspect se défait — la chose est déjà passée',
+      texte: `<b>${nomC}</b> et <b>${nomS}</b> se regardent bien par ${jonction.nom}, mais `
+        + `l’aspect <b>se sépare</b> : il ne se fait pas, il s’achève. Selon la règle, cela ne `
+        + `dit pas que la chose viendra — cela dit qu’elle est <b>déjà faite, ou déjà manquée</b>, `
+        + `et que le consultant interroge sur une affaire dont le moment est derrière lui. `
+        + `C’est la distinction que Sahl reproche aux ignorants de ne pas faire : le même angle, `
+        + `pris à l’envers, renverse la réponse.`,
+    };
+  } else if (translation) {
+    echeance = quand(translation.vers, seigneurChose);
+    verdict = {
+      clef: 'translation', reponse: 'oui',
+      titre: 'La chose se fait — par translation de lumière',
+      texte: `Les deux seigneurs ne se joignent pas d’eux-mêmes. Mais `
+        + `<b>${avecArticle(translation.porteur.clef)}</b>, plus rapide que l’un et l’autre, se `
+        + `sépare de <b>${avecArticle(translation.quitte.clef)}</b> et s’applique à `
+        + `<b>${avecArticle(translation.joint.clef)}</b> : elle porte de celui-ci à celui-là ce `
+        + `qu’il faut pour joindre. <b>La chose se fera par un tiers</b> — un messager, une `
+        + `entremise, quelqu’un qui n’est pas partie dans l’affaire. Sa nature est celle de `
+        + `${avecArticle(translation.porteur.clef)} : c’est de ce côté-là qu’il faut chercher `
+        + `l’intermédiaire, et non attendre que les deux parties s’entendent seules.`,
+    };
+  } else if (collection) {
+    echeance = quand(collection.deB, seigneurChose);
+    verdict = {
+      clef: 'collection', reponse: 'oui',
+      titre: 'La chose se fait — par collection de lumière',
+      texte: `Les deux seigneurs ne se voient pas entre eux, mais tous deux s’appliquent à `
+        + `<b>${avecArticle(collection.collecteur.clef)}</b>, plus lente qu’eux, qui recueille leurs lumières `
+        + `et les assemble. <b>La chose se fera par un plus grand que les deux parties</b> — un `
+        + `juge, un prélat, un seigneur devant qui l’on porte l’affaire. Elle ne se fera pas `
+        + `autrement : il faut la porter devant quelqu’un.`,
+    };
+  } else if (vide) {
+    verdict = {
+      clef: 'vide', reponse: 'non',
+      titre: 'La Lune est vide de course',
+      texte: `Aucune voie ne joint les deux seigneurs, et la Lune elle-même n’achève plus aucun `
+        + `aspect avant de sortir de son signe : il lui reste ${vide.reste.toFixed(1)}° à `
+        + `parcourir sans rencontrer personne. <b>Rien ne viendra de la chose</b>, ni bien ni `
+        + `mal. L’affaire est sans suite — ce qui n’est pas la même réponse qu’un refus.`,
     };
   } else {
     verdict = {
-      clef: 'rien',
-      titre: 'La question n’aboutit pas',
-      texte: `<b>${nomDe(consultant.clef)}</b> et <b>${nomDe(seigneurChose.clef)}</b> ne se `
-        + `regardent d’aucun aspect, et la Lune ne joint pas l’un à l’autre. Selon la règle, `
-        + `<b>la chose ne se fera pas</b> — non qu’elle soit interdite, mais rien dans la `
-        + `figure ne la porte.`,
+      clef: 'rien', reponse: 'non',
+      titre: 'La chose ne se fait pas',
+      texte: `<b>${nomC}</b> et <b>${nomS}</b> ne se joignent par aucune voie : ni par aspect `
+        + `qui s’applique, ni par translation, ni par collection. Selon la règle, <b>la chose `
+        + `ne se fera pas</b> — non qu’elle soit défendue, mais rien dans la figure ne la porte. `
+        + `Il n’y a pas de milieu : on répond non.`,
     };
+  }
+
+  // L'empêchement et la réfrénation ne changent pas la voie, ils la coupent.
+  const obstacles = [];
+  if (vide && verdict.reponse === 'oui') {
+    obstacles.push({
+      clef: 'vide',
+      texte: `<b>La Lune est vide de course</b> — il lui reste ${vide.reste.toFixed(1)}° à `
+        + `parcourir sans joindre personne. Les deux témoignages se contredisent, et il faut `
+        + `le dire plutôt que de choisir : les seigneurs portent la chose, la Lune ne la porte `
+        + `pas. Les auteurs tranchent en sens inverse — Sahl tient la Lune vide pour décisive, `
+        + `d’autres la tiennent pour un retard. Concluez que la chose se fait, mais lentement `
+        + `et sans que personne l’aide.`,
+    });
+  }
+  if (empechement && verdict.reponse === 'oui') {
+    obstacles.push({
+      clef: 'prohibition',
+      texte: `<b>Prohibition.</b> Avant que les deux seigneurs n’achèvent, `
+        + `<b>${avecArticle(empechement.empecheur.clef)}</b> vient joindre `
+        + `<b>${avecArticle(empechement.cible.clef)}</b> — et y arrive le premier, avec `
+        + `${empechement.avance.toFixed(0)} jours d’avance. Quelqu’un se met entre les deux et `
+        + `empêche. Sa nature dit qui : cherchez du côté de ce que signifie `
+        + `${avecArticle(empechement.empecheur.clef)}.`,
+    });
+  }
+  if (retenue && verdict.reponse === 'oui') {
+    obstacles.push({
+      clef: 'refranation',
+      texte: `<b>Réfrénation.</b> <b>${avecArticle(retenue.planete.clef)}</b> est rétrograde : elle revient `
+        + `sur elle-même avant d’achever l’aspect. La partie se retire au dernier moment, et `
+        + `l’affaire, tenue pour conclue, retombe.`,
+    });
   }
 
   return {
@@ -175,7 +416,13 @@ export function jugerInterrogation(figure, rangMaison) {
     consultant,
     seigneurChose,
     jonction,
-    parLaLune,
+    translation,
+    collection,
+    vide,
+    empechement,
+    retenue,
+    obstacles,
+    echeance,
     verdict,
     considerations: considerations(figure),
   };

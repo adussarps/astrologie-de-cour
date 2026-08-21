@@ -7,6 +7,7 @@
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, POIDS,
   MAISONS, ASPECTS, ORBES, PARTS, NATURES_SIGNES, FORCE_DES_LIEUX,
+  ETATS_SOLAIRES, LUMIERE, MATIERES, MELOTHESIE, SIGNIFICATIONS,
 } from './doctrine.js';
 import { PLANETES, SIGNES, GENRES, maisonDe, signeDe, mod360, enSigne } from './ciel.js';
 
@@ -96,25 +97,154 @@ export function etatDe(clef, longitude, deJour) {
   return { tenues, perdues, pérégrine: tenues.length === 0 && perdues.length === 0 };
 }
 
-/** Les regards que les planètes se portent, avec l'orbe propre à chacune. */
+/** L'écart angulaire absolu entre deux longitudes, de 0 à 180. */
+const ecartDe = (x, y) => Math.abs(((x - y + 180) % 360) - 180);
+
+/** Les regards que les planètes se portent, avec l'orbe propre à chacune.
+ *
+ *  Un regard ne dit rien tant qu'on ignore son sens. Si la plus rapide des
+ *  deux marche vers l'aspect, il s'applique et la chose est à venir ; si elle
+ *  s'en éloigne, il se sépare et la chose est déjà faite. Alcabitius traite
+ *  l'application et la séparation à la dist. III, et c'est la distinction qui
+ *  sépare un pronostic d'un constat. */
 export function regards(positions) {
   const clefs = PLANETES.map((p) => p.clef);
   const trouves = [];
+  const pas = 0.05; // en jours : de quoi voir dans quel sens l'écart bouge
   for (let i = 0; i < clefs.length; i++) {
     for (let j = i + 1; j < clefs.length; j++) {
       const a = clefs[i], b = clefs[j];
-      const ecart = Math.abs(((positions[a].longitude - positions[b].longitude + 180) % 360) - 180);
+      const ecart = ecartDe(positions[a].longitude, positions[b].longitude);
       const orbe = (ORBES.table[a] + ORBES.table[b]) / 2;
       for (const asp of ASPECTS.table) {
         const distance = Math.abs(ecart - asp.angle);
-        if (distance <= orbe) {
-          trouves.push({ de: a, a: b, aspect: asp, ecart: distance, exact: distance < 1 });
-          break;
-        }
+        if (distance > orbe) continue;
+        const apres = Math.abs(ecartDe(
+          positions[a].longitude + (positions[a].vitesse ?? 0) * pas,
+          positions[b].longitude + (positions[b].vitesse ?? 0) * pas,
+        ) - asp.angle);
+        trouves.push({
+          de: a, a: b, aspect: asp, ecart: distance, exact: distance < 1,
+          applique: apres < distance,
+        });
+        break;
       }
     }
   }
   return trouves.sort((x, y) => x.ecart - y.ecart);
+}
+
+/** L'état d'une planète au regard du Soleil : brûlée, sous les rayons, ou
+ *  libre — et de quel côté du Soleil elle se tient. Une planète brûlée agit
+ *  sous le nom d'un autre ; c'est le plus lourd des accidents, et il ne se
+ *  voit sur aucune table de dignités. */
+export function etatSolaire(clef, longitude, soleil) {
+  if (clef === 'soleil') return null;
+  const ecart = ecartDe(longitude, soleil);
+  const classe = ecart <= ETATS_SOLAIRES.cazimi ? 'cazimi'
+    : ecart <= ETATS_SOLAIRES.combustion ? 'combuste'
+      : ecart <= ETATS_SOLAIRES.rayons ? 'rayons' : 'libre';
+  return {
+    classe,
+    ecart,
+    // Le Soleil devance-t-il la planète dans l'ordre des signes ? Alors la
+    // planète se lève avant lui, et elle est orientale.
+    orientale: mod360(soleil - longitude) < 180,
+    glose: ETATS_SOLAIRES.gloses[classe],
+  };
+}
+
+/** La lumière de la Lune : son écart au Soleil, et si elle croît ou décroît. */
+export function lumiereDeLaLune(lune, soleil) {
+  const elongation = mod360(lune - soleil);
+  const croissante = elongation < 180;
+  return {
+    elongation,
+    croissante,
+    // L'âge en jours, au mouvement synodique moyen : c'est l'ordre de
+    // grandeur, pas une éphéméride.
+    age: elongation / 360 * 29.53,
+    glose: croissante ? LUMIERE.croissante : LUMIERE.decroissante,
+  };
+}
+
+/** Les réceptions : quelles planètes logent quelles autres, et si elles se
+ *  voient. Une planète pérégrine mais reçue n'est pas sans appui — elle
+ *  emprunte. Et deux planètes qui ont échangé leurs domiciles sans se
+ *  regarder tiennent le lien le plus fort et le plus inutile de la doctrine. */
+export function receptions(astres, lesRegards) {
+  const planetes = astres.filter((a) => !a.noeud);
+  const voit = (x, y) => lesRegards.find((r) =>
+    (r.de === x && r.a === y) || (r.de === y && r.a === x));
+  const trouvees = [];
+
+  for (const hote of planetes) {
+    for (const recue of planetes) {
+      if (hote.clef === recue.clef) continue;
+      const signe = signeDe(recue.longitude);
+      const parDomicile = DOMICILES.table[signe] === hote.clef;
+      const ex = EXALTATIONS.table[hote.clef];
+      const parExaltation = ex && ex.signe === signe;
+      if (!parDomicile && !parExaltation) continue;
+      trouvees.push({
+        hote: hote.clef, recue: recue.clef,
+        par: parDomicile ? 'domicile' : 'exaltation',
+        regard: voit(hote.clef, recue.clef) ?? null,
+      });
+    }
+  }
+
+  // La réception mutuelle : chacune chez l'autre. On ne la retient que par
+  // domicile, qui est la seule forme sur laquelle toute la tradition s'accorde.
+  const mutuelles = [];
+  for (const r of trouvees) {
+    if (r.par !== 'domicile') continue;
+    const retour = trouvees.find((x) =>
+      x.par === 'domicile' && x.hote === r.recue && x.recue === r.hote);
+    if (retour && !mutuelles.some((m) => m.a === r.recue && m.b === r.hote)) {
+      mutuelles.push({ a: r.hote, b: r.recue, regard: r.regard });
+    }
+  }
+  return { simples: trouvees, mutuelles };
+}
+
+/** Le significateur du métier, selon la règle de Ptolémée.
+ *
+ *  Deux endroits, et deux seulement : la planète qui se lève immédiatement
+ *  avant le Soleil, et le seigneur du milieu du ciel. Ne peuvent être retenues
+ *  que Mercure, Vénus et Mars — les trois planètes de l'action. Si aucune ne
+ *  témoigne, Ptolémée dit que le métier est sans distinction, et il faut
+ *  l'écrire ainsi plutôt que de forcer la règle. */
+export function significateurDuMetier(figure) {
+  const ACTION = ['mercure', 'venus', 'mars'];
+  const soleil = figure.astres.find((a) => a.clef === 'soleil');
+
+  // Celle qui se lève juste avant le Soleil : parmi les orientales, la plus proche.
+  const orientales = figure.astres
+    .filter((a) => !a.noeud && a.clef !== 'soleil' && mod360(soleil.longitude - a.longitude) < 180)
+    .map((a) => ({ astre: a, distance: mod360(soleil.longitude - a.longitude) }))
+    .sort((x, y) => x.distance - y.distance);
+  const precede = orientales[0]?.astre ?? null;
+
+  const seigneurMC = figure.astres.find((a) => a.clef === seigneurDuSigne(figure.milieuDuCiel));
+
+  const retenus = [...new Set([precede, seigneurMC]
+    .filter((a) => a && ACTION.includes(a.clef)).map((a) => a.clef))];
+  const clef = ACTION.filter((p) => retenus.includes(p)).join('+');
+
+  // Ptolémée veut la planète qui fait son lever héliaque, c'est-à-dire qui
+  // vient de sortir des rayons. Loin du Soleil, elle « précède » encore, mais
+  // le témoignage s'affaiblit : il faut le dire plutôt que de le taire.
+  const distance = orientales[0]?.distance ?? null;
+  return {
+    precede,
+    distanceAuSoleil: distance,
+    leverFaible: distance !== null && distance > 30,
+    seigneurMC,
+    retenus,
+    combinaison: clef ? (MATIERES.metier.combinaisons[clef] ?? null) : null,
+    sansDistinction: retenus.length === 0,
+  };
 }
 
 /** Les parts. Une part est une distance reportée depuis l'ascendant, et
@@ -137,22 +267,28 @@ export function juger({ positions: pos, maisons: mai }) {
 
   const astres = [...PLANETES.map((p) => p.clef), 'teste', 'queue'].map((clef) => {
     const longitude = pos[clef].longitude;
+    const maison = maisonDe(longitude, mai.pointes);
     return {
       clef,
       nom: nomDe(clef),
       longitude,
+      vitesse: pos[clef].vitesse ?? 0,
       retrograde: pos[clef].retrograde,
       noeud: !!pos[clef].noeud,
-      maison: maisonDe(longitude, mai.pointes),
+      maison,
+      force: FORCE_DES_LIEUX.table[maison],
       seigneur: seigneurDuSigne(longitude),
       etat: pos[clef].noeud ? null : etatDe(clef, longitude, deJour),
+      solaire: pos[clef].noeud ? null : etatSolaire(clef, longitude, pos.soleil.longitude),
+      perfection: pos[clef].noeud ? null : proximiteExaltation(clef, longitude),
     };
   });
 
   const seigneurAscendant = seigneurDuSigne(mai.ascendant);
   const almuten = almutenDe(mai.ascendant, deJour);
+  const lesRegards = regards(pos);
 
-  return {
+  const figure = {
     deJour,
     soleilEnMaison,
     astres,
@@ -163,7 +299,9 @@ export function juger({ positions: pos, maisons: mai }) {
     seigneurAscendantPlace: astres.find((a) => a.clef === seigneurAscendant),
     almuten,
     parts: parts(pos, mai.ascendant, deJour),
-    regards: regards(pos),
+    regards: lesRegards,
+    lumiere: lumiereDeLaLune(pos.lune.longitude, pos.soleil.longitude),
+    receptions: receptions(astres, lesRegards),
     maisonsHabitees: MAISONS.table.map((m, i) => ({
       rang: i + 1,
       ...m,
@@ -172,9 +310,135 @@ export function juger({ positions: pos, maisons: mai }) {
       hotes: astres.filter((a) => a.maison === i + 1),
     })),
   };
+
+  // Le métier et le corps se prennent sur la figure entière : il leur faut le
+  // milieu du ciel et les astres déjà placés, donc ils viennent après.
+  figure.metier = significateurDuMetier(figure);
+  figure.corps = leCorps(figure);
+  figure.perfections = pointsDePerfection(astres);
+  return figure;
 }
 
-const rang = (k) => `${k}<sup>e</sup>`;
+/** Le corps, par l'homme zodiacal.
+ *
+ *  C'est la pièce qui rattache l'astrologie à la médecine, et la seule dont
+ *  l'usage fût réellement quotidien : on ne saigne pas un membre quand la
+ *  Lune parcourt le signe qui le gouverne. Trois lieux la commandent — le
+ *  signe qui monte, qui donne la complexion du corps entier ; le signe de la
+ *  Lune, qui dit le membre chargé au moment même ; et la sixième maison, qui
+ *  est celle de la maladie et de tout ce à quoi l'on est assujetti. */
+export function leCorps(figure) {
+  const lune = figure.astres.find((a) => a.clef === 'lune');
+  const sixieme = figure.maisonsHabitees[5];
+  const seigneurSixieme = figure.astres.find((a) => a.clef === sixieme.seigneur);
+  const seigneurAsc = figure.seigneurAscendantPlace;
+
+  const membreDe = (longitude) => MELOTHESIE.table[signeDe(longitude)];
+
+  return {
+    source: MELOTHESIE.source,
+    regle: MELOTHESIE.regle,
+    complexion: {
+      signe: SIGNES[signeDe(figure.ascendant)],
+      membre: membreDe(figure.ascendant),
+      element: elementDu(figure.ascendant),
+      seigneur: seigneurAsc,
+      // Le seigneur de l'ascendant porte la complexion : sa qualité est celle
+      // du corps, et son état dit si ce corps tient.
+      qualite: SIGNIFICATIONS.table[seigneurAsc.clef]?.qualite ?? null,
+      humeur: SIGNIFICATIONS.table[seigneurAsc.clef]?.humeur ?? null,
+    },
+    lune: {
+      signe: SIGNES[signeDe(lune.longitude)],
+      membre: membreDe(lune.longitude),
+      lumiere: figure.lumiere,
+      // La règle de saignée, appliquée : c'est un interdit, pas un conseil.
+      interdit: `On ne saigne ni ne taille ${membreDe(lune.longitude)} tant que la Lune `
+        + `tient ${SIGNES[signeDe(lune.longitude)]}.`,
+    },
+    maladie: {
+      maison: sixieme,
+      membre: membreDe(sixieme.pointe),
+      seigneur: seigneurSixieme,
+      corps: SIGNIFICATIONS.table[seigneurSixieme.clef]?.corps ?? null,
+      hotes: sixieme.hotes.filter((a) => !a.noeud).map((a) => ({
+        clef: a.clef, nom: a.nom,
+        corps: SIGNIFICATIONS.table[a.clef]?.corps ?? null,
+      })),
+    },
+  };
+}
+
+/** Où tombe une part, et quel est le seigneur de son signe — c'est ainsi
+ *  qu'on juge l'avoir : par le lieu de la part de Fortune et par son maître. */
+export function lieuDeLaPart(figure, clef) {
+  const part = figure.parts.find((p) => p.clef === clef);
+  if (!part) return null;
+  const maison = maisonDe(part.longitude, figure.pointes);
+  const seigneur = figure.astres.find((a) => a.clef === seigneurDuSigne(part.longitude));
+  return { part, maison, lieu: figure.maisonsHabitees[maison - 1], seigneur };
+}
+
+// ─── Ce qui manquait au jugement, et qui porte le plus ───────────────────────
+
+/** L'écart d'une planète à son propre degré d'exaltation, ou de chute.
+ *
+ *  La table des exaltations donne un signe et un degré précis — Vénus au
+ *  vingt-septième des Poissons, la Lune au troisième du Taureau. Toute la
+ *  tradition retient ce degré, et non le seul signe : une planète qui s'en
+ *  approche à quelques minutes est à son point de perfection, ce qui ne se
+ *  lit sur aucune table de dignités et vaut beaucoup mieux qu'un chiffre de
+ *  pondération. C'est le genre d'écart qu'un jugement doit nommer, et qu'il
+ *  ne faut surtout pas laisser calculer de tête.
+ *
+ *  Le degré opposé est celui de la chute, et la même mesure y vaut. */
+export function proximiteExaltation(clef, longitude) {
+  const e = EXALTATIONS.table[clef];
+  if (!e) return null;
+  const degreExalt = e.signe * 30 + e.degre;
+  // La distance angulaire à un degré, la plus courte des deux, dans [0, 180].
+  const ecartA = (cible) => Math.abs(((mod360(longitude) - cible + 540) % 360) - 180);
+  const exaltation = ecartA(degreExalt);
+  const chute = ecartA(degreExalt + 180);
+  const pres = Math.min(exaltation, chute);
+  return {
+    degreExalt,
+    signeExalt: e.signe,
+    degreDansLeSigne: e.degre,
+    exaltation,
+    chute,
+    // Trois degrés est l'orbe que la tradition accorde à une conjonction
+    // exacte ; au-delà, la proximité ne se remarque plus.
+    notable: pres < 3,
+    versLaChute: chute < exaltation,
+    ecart: pres,
+  };
+}
+
+/** L'écart en degrés et minutes d'arc, écrit — pour que rien ne s'arrondisse
+ *  en chemin et que le lecteur n'ait aucun calcul à refaire. */
+export function enDegresMinutes(ecart) {
+  const d = Math.floor(ecart);
+  const m = Math.round((ecart - d) * 60);
+  return m === 60 ? `${d + 1}° 00′` : `${d}° ${String(m).padStart(2, '0')}′`;
+}
+
+/** Le corps le plus proche de son point de perfection, et celui le plus
+ *  proche de sa chute. Un jugement doit les nommer tous les deux. */
+export function pointsDePerfection(astres) {
+  const mesures = astres
+    .filter((a) => !a.noeud && a.perfection)
+    .map((a) => ({ clef: a.clef, nom: a.nom, ...a.perfection }));
+  const versExaltation = mesures
+    .filter((m) => !m.versLaChute).sort((a, b) => a.exaltation - b.exaltation)[0] ?? null;
+  const versChute = mesures
+    .filter((m) => m.versLaChute).sort((a, b) => a.chute - b.chute)[0] ?? null;
+  return { versExaltation, versChute };
+}
+
+/** La première maison est « la 1re », les autres « la ne ». */
+export const rangHtml = (k) => (k === 1 ? '1<sup>re</sup>' : `${k}<sup>e</sup>`);
+const rang = rangHtml;
 
 const modeDu = (longitude) =>
   NATURES_SIGNES.modes.find((m) => m.signes.includes(signeDe(longitude)));
