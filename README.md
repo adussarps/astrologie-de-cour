@@ -227,12 +227,39 @@ l’encre rouge en tête de chaque matière, et les traités sont bâtis ainsi �
 chapitre par maison, Ptolémée un livre par genre de question. Mille quatre cents mots d’un
 seul tenant, personne ne les lit, et l’on n’en retient que la dernière phrase.
 
-**Et chaque rubrique se rend en deux temps.** D’abord « En clair » — trois lignes, cinquante
+**Et chaque rubrique se rend en trois temps.** D’abord « En clair » — trois lignes, cinquante
 mots, pas un seul mot de métier, pour quelqu’un qui n’a jamais ouvert un livre d’astrologie.
 Puis « Les témoignages » — les positions, les dignités, les degrés, le nom des règles et celui
-des livres, pour qui veut vérifier. Les deux disent la même chose ; ils ne la disent pas au
-même homme. S’il faut couper, on coupe dans la preuve et jamais dans le clair : un jugement
-qu’on ne comprend pas n’a pas été rendu, quelque bien prouvé qu’il soit.
+des livres, pour qui veut vérifier. Enfin « Aujourd’hui ». Les trois disent la même chose ;
+ils ne la disent pas au même homme. S’il faut couper, on coupe dans la preuve et jamais dans
+le clair : un jugement qu’on ne comprend pas n’a pas été rendu, quelque bien prouvé qu’il soit.
+
+**Le troisième temps change de voix, et c’est ce qui le rend possible.** « En clair » était
+déjà sans jargon, mais il restait en langue de 1380 : *un officier, jamais un seigneur
+terrien* se comprend sans dictionnaire et ne dit toujours pas ce que cela ferait dans une vie
+d’aujourd’hui. « Aujourd’hui » le traduit — *on aurait dit alors que le métier ne porte pas
+son nom ; cela se lirait maintenant comme un poste où le travail est fait sous la signature
+d’un autre.* Ce paragraphe n’est plus de l’astrologien : il est d’une main plus tardive, de
+celles qui glosent en marge des manuscrits des siècles après le copiste. Sans ce changement
+de voix, la persona s’effondrerait et l’interdit du vocabulaire moderne deviendrait incohérent.
+
+Trois règles le tiennent, faute de quoi il redeviendrait exactement l’horoscope que tout le
+reste refuse. Il **traduit sans ajouter** : la même affirmation dans une autre langue, jamais
+une seconde prédiction. Il **reste au même endroit du monde** — les quatre questions de 1380
+sont posées dans les termes d’à présent, un employeur, un contrat, un bailleur, un examen
+médical, et jamais ce que quelqu’un *est* ; « vous êtes quelqu’un de… » est la seule phrase
+absolument interdite de tout le dossier, parce que l’horoscope de magazine tient dans ces
+quatre mots. Il **s’annonce comme une lecture** et non comme un fait, la réserve étant ici
+l’exactitude même, puisque la traduction vient du modèle et non de la doctrine. Et quand une
+chose ne se traduit pas, il doit le dire : la défense de saigner le membre que la Lune occupe
+n’a pas d’équivalent, on ne saigne plus, il ne reste que l’indication du membre à surveiller.
+
+L’exception au vocabulaire moderne est donc étroite et vaut la peine d’être lue deux fois. Ce
+qui se lève dans ce paragraphe, c’est la langue ordinaire de notre temps. Ce qui n’y est
+toujours pas permis, c’est la liste des mots proscrits — énergie, potentiel, karma, être
+soi-même —, qui n’est pas du français moderne mais une autre divination, et précisément celle
+que ce dossier existe pour ne pas produire. **La vie d’aujourd’hui, oui ; l’astrologie
+d’aujourd’hui, jamais.**
 
 **La première rubrique, en revanche, n’est pas imposée.** Avant le plan, le modèle ouvre sur
 ce qui l’a arrêté dans cette figure-ci : une planète au cœur du Soleil, un corps à quelques
