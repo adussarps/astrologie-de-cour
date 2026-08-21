@@ -5,6 +5,8 @@
 
 import * as Astronomy from 'astronomy-engine';
 globalThis.Astronomy = Astronomy;
+import tzlookup from 'tz-lookup';
+globalThis.tzlookup = tzlookup;
 
 const ecrits = new Map();
 const VALEURS = { '#annee': '1991', '#mois': '2', '#jour': '19' };
@@ -16,7 +18,11 @@ const faireElement = (nom) => ({
   set innerHTML(v) { this._html = v; ecrits.set(nom, v); },
   set textContent(v) { ecrits.set(nom, v); },
   dataset: {},
+  hidden: false,
   classList: { toggle: () => {}, contains: () => false, add: () => {}, remove: () => {} },
+  setAttribute: () => {},
+  removeAttribute: () => {},
+  getAttribute: () => null,
   addEventListener: () => {},
   scrollIntoView: () => {},
   click: () => {},
@@ -33,7 +39,8 @@ globalThis.window = { scrollTo: () => {} };
 await import('./src/app.js');
 
 // Les vues qui se peuplent au chargement.
-const attendus = ['#lieux', '#note-calendrier', '#galerie', '#autres-pieces',
+// #lieux ne se peuple qu'à la saisie : la liste des lieux n'est plus figée.
+const attendus = ['#convention', '#note-calendrier', '#galerie', '#autres-pieces',
   '#tables-doctrine', '#reserves'];
 let echecs = 0;
 for (const clef of attendus) {

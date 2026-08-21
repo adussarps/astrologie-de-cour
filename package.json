@@ -11,10 +11,18 @@
     "fumee": "node fumee.mjs"
   },
   "devDependencies": {
-    "astronomy-engine": "^2.1.19"
+    "astronomy-engine": "^2.1.19",
+    "tz-lookup": "^6.1.25"
   },
   "keywords": [
-    "astrologie", "histoire", "moyen-age", "alcabitius", "tables-alphonsines",
-    "charles-v", "horoscope", "manuscrits", "digital-humanities"
+    "astrologie",
+    "histoire",
+    "moyen-age",
+    "alcabitius",
+    "tables-alphonsines",
+    "charles-v",
+    "horoscope",
+    "manuscrits",
+    "digital-humanities"
   ]
 }

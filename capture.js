@@ -46,6 +46,9 @@ const script = {
              document.querySelector('#minute').value = 30;
              document.querySelector('#formulaire').requestSubmit(); 'ok'`,
   'sans-heure': `document.querySelector('#sans-heure').click(); 'ok'`,
+  lieu: `const c = document.querySelector('#lieu');
+         c.focus(); c.value = 'Orth';
+         c.dispatchEvent(new Event('input', { bubbles: true })); 'ok'`,
   nativites: `document.querySelector('[data-vue=nativites]').click();
               document.querySelector('#galerie button').click(); 'ok'`,
   methode: `document.querySelector('[data-vue=methode]').click(); 'ok'`,

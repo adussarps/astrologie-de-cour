@@ -102,6 +102,31 @@ chiffre qui fait autorité, pas le ciel.**
 Les deux premiers contrôles ont été faits avec `pyswisseph` pendant le développement ; le
 troisième tourne à chaque `npm test`.
 
+## Le lieu, et quelle heure
+
+Une figure sans longitude n’est pas une figure, et une heure sans sa convention n’est pas une
+heure. Trois choses sont ici tenues séparées, parce qu’on les confond volontiers.
+
+**Interpréter l’instant saisi.** « 12 h 33 » le 19 février 1991 à Paris a été lu sur une
+pendule réglée sur l’heure légale, donc UTC+1 : l’instant est 11 h 33 TU. Le lire comme une
+heure solaire donnerait 12 h 24 TU — **cinquante minutes plus tard, soit treize degrés
+d’ascendant**, assez pour changer le signe qui monte et donc les douze maisons. Le fuseau
+vient de `tz-lookup` (coordonnées → zone IANA), et le décalage à la date exacte de la base tz
+du système, heure d’été et heures de guerre comprises. Avant 1891 aucun pays n’a d’heure
+légale nationale : l’heure d’un lieu est celle de son soleil, et c’est le temps **vrai** —
+celui du cadran solaire — qui s’applique, équation du temps comprise.
+
+**Le calcul.** Il se fait en temps universel et n’a aucune convention : le ciel ne sait pas
+quelle heure il est.
+
+**L’affichage.** Toujours en temps solaire vrai et en heures inégales, parce que c’est le
+cadre de 1380. Le site montre les trois lectures du même instant et l’équation du temps du
+jour, plutôt que de les cacher.
+
+Le lieu se cherche dans une liste courte embarquée — les lieux du dossier, disponibles hors
+ligne — puis dans [Photon](https://photon.komoot.io), géocodeur libre adossé à OpenStreetMap.
+Si le réseau manque, la liste courte et la saisie manuelle des coordonnées suffisent.
+
 ## Faire tourner le site
 
 Aucune construction, aucune dépendance à l’exécution. Un serveur de fichiers suffit :
@@ -127,8 +152,10 @@ src/doctrine.js    la base de règles — aucune donnée sans son champ `source`
 src/jugement.js    dignités, almuten, parts, regards, et le jugement en toutes lettres
 src/figure.js      le carré médiéval en SVG
 src/corpus.js      les nativités documentées, avec latin, traduction et cote
+src/temps.js       les conventions de temps — heure légale, heure vraie, équation du temps
+src/lieux.js       la recherche de lieu : liste du corpus hors ligne, puis Photon
 src/app.js         l'interface
-vendor/            astronomy-engine (MIT), figé
+vendor/            astronomy-engine (MIT) et tz-lookup (CC0), figés
 ```
 
 **La règle du dépôt :** aucune affirmation sans sa source. Chaque table de `doctrine.js` porte

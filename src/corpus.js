@@ -51,10 +51,12 @@ export const NATIVITES = [
         + 'inégale et seigneur de l’heure tombent juste. Le roi, non. Cette nuit-là à Paris, le '
         + 'soleil s’est couché à 16 h 52 et se lèvera à 7 h 36 : la nuit dure 14 h 44, l’heure '
         + 'inégale de nuit vaut 73 minutes, et la dixième heure court de 3 h 55 à 5 h 09. '
-        + 'L’heure annoncée, 5 h 36, tombe dans la onzième — de vingt-sept minutes, ou de douze '
-        + 'si l’on compte en temps vrai plutôt qu’en temps moyen. Emmanuel Poulle bute sur la '
-        + 'même chose sans la nommer : il situe la dixième heure « environ, à la fin de janvier, '
-        + 'entre 4 heures et 5 heures du matin ».',
+        + 'L’heure annoncée, 5 h 36, tombe dans la onzième — de vingt-sept minutes si on la lit '
+        + 'en temps moyen, et de quarante-deux si on la lit en temps vrai, car l’équation du '
+        + 'temps vaut −14,6 minutes ce jour-là et joue contre. Le cadran solaire n’excuse donc '
+        + 'rien : il aggrave. Emmanuel Poulle bute sur la même chose sans la nommer : il situe '
+        + 'la dixième heure « environ, à la fin de janvier, entre 4 heures et 5 heures du '
+        + 'matin ».',
       hypothese: 'Une explication tient à la règle de l’animodar. La précision à la minute '
         + 'n’est jamais celle d’une horloge : l’astrologien part de l’heure approximative que '
         + 'donnent les témoins, puis la rectifie par le calcul jusqu’à ce que la figure tienne. '

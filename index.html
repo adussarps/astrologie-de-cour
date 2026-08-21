@@ -66,10 +66,12 @@
         <input type="number" id="minute" min="0" max="59" placeholder="min" value="0">
       </div>
     </div>
-    <div class="champ">
+    <div class="champ champ-lieu">
       <label for="lieu">Lieu</label>
-      <input list="lieux" id="lieu" value="Paris" autocomplete="off">
-      <datalist id="lieux"></datalist>
+      <input id="lieu" value="Paris" autocomplete="off" spellcheck="false"
+             placeholder="une ville, un village…">
+      <ul id="lieux" class="suggestions" hidden></ul>
+      <span class="etat-lieu" id="etat-lieu" aria-live="polite"></span>
     </div>
     <div class="champ petit">
       <label for="latitude">Latitude</label>
@@ -79,16 +81,10 @@
       <label for="longitude">Longitude</label>
       <input type="number" id="longitude" step="0.0001" value="2.3522" required>
     </div>
-    <div class="champ">
-      <label for="fuseau">L’heure est donnée en</label>
-      <select id="fuseau">
-        <option value="local">heure locale du lieu (avant les fuseaux)</option>
-        <option value="-1">UTC−1</option>
-        <option value="0">UTC (heure de Greenwich)</option>
-        <option value="1" selected>UTC+1</option>
-        <option value="2">UTC+2</option>
-        <option value="3">UTC+3</option>
-      </select>
+    <div class="champ champ-convention">
+      <label for="convention">L’heure est donnée en</label>
+      <select id="convention"></select>
+      <span class="etat-lieu" id="etat-temps" aria-live="polite"></span>
     </div>
     <div class="boutons">
       <button type="submit" class="principal">Dresser la figure</button>
@@ -279,6 +275,7 @@
 </footer>
 
 <script src="vendor/astronomy.browser.min.js"></script>
+<script src="vendor/tz.js"></script>
 <script type="module" src="src/app.js"></script>
 </body>
 </html>

@@ -25,6 +25,15 @@ SOFTWARE.
 vendor/astronomy.browser.min.js — Astronomy Engine, Copyright (c) 2019-2026
 Don Cross, MIT License. https://github.com/cosinekitty/astronomy
 
+vendor/tz.js — tz-lookup de Ryan Juckett et Bryan Housel, domaine public
+(CC0 1.0 Universal), texte complet dans vendor/tz-lookup-LICENSE.
+https://github.com/photostructure/tz-lookup — les frontières de fuseaux
+viennent de Timezone Boundary Builder, issu d'OpenStreetMap (ODbL).
+
+Les recherches de lieu interrogent Photon (https://photon.komoot.io), moteur
+de géocodage libre de Komoot adossé à OpenStreetMap. Les données de lieux
+renvoyées sont sous licence ODbL, © les contributeurs d'OpenStreetMap.
+
 Les textes de présentation et les traductions françaises originales de ce dépôt
 sont diffusés sous licence Creative Commons Attribution 4.0 International
 (CC BY 4.0) : https://creativecommons.org/licenses/by/4.0/deed.fr

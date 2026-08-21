@@ -11,23 +11,16 @@ import {
   POIDS, PARTS, RESERVES,
 } from './doctrine.js';
 import { NATIVITES, CONJONCTION_1345, AUTRES_PIECES } from './corpus.js';
+import {
+  CONVENTIONS, versTempsUniversel, lectureDuTemps, conventionParDefaut,
+  fuseauDe, enHeures, enDecalage,
+} from './temps.js';
+import { installerRechercheDeLieu } from './lieux.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
 const html = (s) => String(s ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-const LIEUX = [
-  ['Paris', 48.8566, 2.3522], ['Orthez', 43.4906, -0.7728], ['Pau', 43.2951, -0.3708],
-  ['Bordeaux', 44.8378, -0.5792], ['Toulouse', 43.6047, 1.4442], ['Avignon', 43.9493, 4.8055],
-  ['Lyon', 45.7640, 4.8357], ['Marseille', 43.2965, 5.3698], ['Rouen', 49.4432, 1.0993],
-  ['Dijon', 47.3220, 5.0415], ['Reims', 49.2583, 4.0317], ['Nantes', 47.2184, -1.5536],
-  ['Lille', 50.6292, 3.0573], ['Strasbourg', 48.5734, 7.7521], ['Bruges', 51.2093, 3.2247],
-  ['Londres', 51.5074, -0.1278], ['Oxford', 51.7520, -1.2577], ['Rome', 41.9028, 12.4964],
-  ['Bologne', 44.4949, 11.3426], ['Florence', 43.7696, 11.2558], ['Venise', 45.4408, 12.3155],
-  ['Tolède', 39.8628, -4.0273], ['Barcelone', 41.3874, 2.1686], ['Séville', 37.3891, -5.9845],
-  ['Prague', 50.0755, 14.4378], ['Chiraz', 29.5918, 52.5837], ['Le Caire', 30.0444, 31.2357],
-];
 
 const BASCULE_GREGORIENNE = { annee: 1582, mois: 10, jour: 15 };
 const estJulien = ({ annee, mois, jour }) =>
@@ -35,20 +28,21 @@ const estJulien = ({ annee, mois, jour }) =>
   || (annee === 1582 && (mois < 10 || (mois === 10 && jour < 15)));
 
 /** Instant en jour julien, à partir d'une saisie. */
-function instant({ annee, mois, jour, heure, minute, longitude, fuseau }) {
-  const julien = estJulien({ annee, mois, jour });
-  const locale = heure + minute / 60;
-  const decalage = fuseau === 'local' ? longitude / 15 : Number(fuseau);
-  return { jj: jourJulien({ annee, mois, jour, heure: locale - decalage, julien }), julien };
+function instant(saisie) {
+  const julien = estJulien(saisie);
+  return { ...versTempsUniversel({ ...saisie, julien }), julien };
 }
 
 /** Tout ce qu'il faut pour afficher une figure. */
 function dresser(saisie) {
-  const { jj, julien } = instant(saisie);
+  const { jj, julien, convention, decalage, equation, zone } = instant(saisie);
   const mai = maisons(jj, saisie.latitude, saisie.longitude);
   const figure = juger({ positions: positions(jj), maisons: mai });
   const hi = heuresInegales(jj, saisie.latitude, saisie.longitude);
-  return { jj, julien, figure, heures: hi, planetaires: heuresPlanetaires(hi) };
+  return {
+    jj, julien, figure, heures: hi, planetaires: heuresPlanetaires(hi),
+    temps: { convention, decalage, equation, zone, ...lectureDuTemps(jj, saisie.longitude, zone) },
+  };
 }
 
 // ─── Rendu ───────────────────────────────────────────────────────────────────
@@ -134,6 +128,41 @@ function blocLecture(figure) {
   </section>`;
 }
 
+/** Ce que valait l'heure annoncée, et ce qu'elle vaut au soleil du lieu.
+ *  L'écart n'est pas un détail technique : c'est le sujet. */
+function blocTemps(temps) {
+  if (!temps) return '';
+  const c = CONVENTIONS[temps.convention];
+  const eq = temps.equation;
+  const signe = eq >= 0 ? '+' : '−';
+
+  const lignes = [];
+  lignes.push(`L’heure saisie a été lue comme <b>${html(c.nom)}</b> — ${html(c.detail)}.`);
+
+  if (temps.convention === 'legale') {
+    lignes.push(`Fuseau <b>${html(temps.zone ?? '—')}</b>, soit <b>${html(enDecalage(temps.decalage))}</b> `
+      + `à cette date : c’est ce que marquait la pendule, heure d’été comprise. `
+      + `Sans cela la figure serait fausse — le décalage entre l’heure légale et le soleil du lieu `
+      + `déplace l’ascendant d’un degré par quatre minutes.`);
+  } else {
+    lignes.push(`Aucun fuseau : avant 1891 il n’en existe pas, et l’heure d’un lieu est celle de `
+      + `son soleil. La longitude vaut <b>${html(enDecalage(temps.decalage - eq / 60))}</b>.`);
+  }
+
+  lignes.push(`Au soleil de ce lieu, cet instant est <b>${html(enHeures(temps.vrai))}</b> vrai `
+    + `et ${html(enHeures(temps.moyen))} moyen ; il est ${html(enHeures(temps.universel))} `
+    + `au méridien de Greenwich. L’équation du temps vaut ce jour-là `
+    + `<b>${signe}${Math.abs(eq).toFixed(1)} min</b> : c’est de cela que le cadran solaire `
+    + `${eq >= 0 ? 'avance sur' : 'retarde sur'} l’horloge.`);
+
+  return `<section>
+    <h3>L’heure, et laquelle</h3>
+    ${lignes.map((l) => `<p>${l}</p>`).join('')}
+    <span class="renvoi">Fuseaux : base tz du système, via tz-lookup. Équation du temps :
+    angle horaire du Soleil, astronomy-engine.</span>
+  </section>`;
+}
+
 function blocHeures(heures, planetaires) {
   if (!heures || !planetaires) return '';
   const m = (x) => `${Math.round(x)} min`;
@@ -152,7 +181,7 @@ function blocHeures(heures, planetaires) {
 }
 
 function rendreFigure(saisie, cartouche, { titreCarre = '' } = {}) {
-  const { figure, heures, planetaires, julien } = dresser(saisie);
+  const { figure, heures, planetaires, julien, temps } = dresser(saisie);
   const phrases = enPhrases(figure).map((p) => `<section>
       <h3>${html(p.titre)}</h3><p>${p.texte}</p>
       <span class="renvoi">${html(p.source)}</span>
@@ -174,6 +203,7 @@ function rendreFigure(saisie, cartouche, { titreCarre = '' } = {}) {
           ${titreCarre}
           ${phrases}
           ${blocHeures(heures, planetaires)}
+          ${blocTemps(temps)}
         </div>
       </div>
       ${blocSommaire(figure)}
@@ -227,8 +257,27 @@ function lireFormulaire() {
     annee: +$('#annee').value, mois: +$('#mois').value, jour: +$('#jour').value,
     heure: +$('#heure').value, minute: +$('#minute').value || 0,
     latitude: +$('#latitude').value, longitude: +$('#longitude').value,
-    fuseau: $('#fuseau').value,
+    convention: $('#convention').value,
   };
+}
+
+/** La convention proposée dépend de la date : l'heure légale n'existe pas
+ *  avant 1891. On la met à jour tant que le lecteur n'a pas choisi lui-même. */
+let conventionChoisieALaMain = false;
+
+function noterConvention() {
+  const annee = +$('#annee').value;
+  const select = $('#convention');
+  if (!conventionChoisieALaMain) select.value = conventionParDefaut(annee);
+
+  const zone = fuseauDe(+$('#latitude').value, +$('#longitude').value);
+  const etat = $('#etat-temps');
+  if (!etat) return;
+  if (select.value === 'legale') {
+    etat.textContent = zone ? `fuseau ${zone}` : 'fuseau introuvable — heure du lieu';
+  } else {
+    etat.textContent = annee >= 1891 ? 'avant les fuseaux — inhabituel après 1891' : 'avant les fuseaux';
+  }
 }
 
 function noterCalendrier() {
@@ -240,13 +289,32 @@ function noterCalendrier() {
 }
 
 function initOfficine() {
-  $('#lieux').innerHTML = LIEUX.map(([n]) => `<option value="${html(n)}">`).join('');
-  $('#lieu').addEventListener('input', (e) => {
-    const trouve = LIEUX.find(([n]) => n.toLowerCase() === e.target.value.trim().toLowerCase());
-    if (trouve) { $('#latitude').value = trouve[1]; $('#longitude').value = trouve[2]; }
+  $('#convention').innerHTML = Object.values(CONVENTIONS)
+    .map((c) => `<option value="${c.clef}">${html(c.nom)}</option>`).join('');
+  $('#convention').addEventListener('change', () => {
+    conventionChoisieALaMain = true;
+    noterConvention();
   });
-  for (const id of ['#annee', '#mois', '#jour']) $(id).addEventListener('input', noterCalendrier);
+
+  installerRechercheDeLieu({
+    champ: $('#lieu'),
+    liste: $('#lieux'),
+    etat: $('#etat-lieu'),
+    surChoix: (lieu) => {
+      $('#latitude').value = lieu.latitude.toFixed(4);
+      $('#longitude').value = lieu.longitude.toFixed(4);
+      noterConvention();
+    },
+  });
+
+  for (const id of ['#latitude', '#longitude']) {
+    $(id).addEventListener('input', noterConvention);
+  }
+  for (const id of ['#annee', '#mois', '#jour']) {
+    $(id).addEventListener('input', () => { noterCalendrier(); noterConvention(); });
+  }
   noterCalendrier();
+  noterConvention();
 
   $('#formulaire').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -295,10 +363,10 @@ function ficheNativite(n) {
   if (n.heureInconnue) {
     return `${entete}${source}
       <p>${html(n.apres)}</p>
-      ${rendreSansHeure({ ...n, heure: 12, minute: 0, fuseau: 'local' })}`;
+      ${rendreSansHeure({ ...n, heure: 12, minute: 0, convention: 'vraie' })}`;
   }
 
-  const saisie = { ...n, fuseau: 'local' };
+  const saisie = { ...n, convention: 'vraie' };
   const { markup, planetaires } = rendreFigure(saisie, {
     titre: n.nom.split(',')[0],
     lignes: [`${n.jour}/${n.mois}/${n.annee}`,
