@@ -496,8 +496,8 @@ function actions(clef, texte) {
   return `<div class="actions" data-dossier="${clef}">
     <button type="button" class="principal copier">Interpréter avec un LLM</button>
     <p class="actions-note" aria-live="polite">≈ ${mots.toLocaleString('fr-FR')} mots : la figure,
-      les tables de doctrine avec leurs sources, la méthode, le ton, et ce que le modèle n’a pas
-      le droit de dire. Il n’a rien à inventer.</p>
+      les tables avec leurs sources, et ce que le modèle n’a pas le droit de dire. Il n’a rien
+      à inventer.</p>
     <details class="dossier-voir">
       <summary>Voir le dossier</summary>
       <pre>${html(texte)}</pre>

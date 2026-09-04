@@ -212,98 +212,30 @@ tapez, et rien d’autre. Surtout, **le modèle ne reçoit aucune latitude doctr
 modèle de langue connaît mille fois mieux le Bélier caractériel du XXᵉ siècle qu’Alcabitius,
 et laissé libre il produirait de l’horoscope de magazine sous un vernis ancien. On lui donne
 donc tout, et rien d’autre : la figure calculée ici, les tables de doctrine avec leur source,
-la méthode du seigneur, le ton, et la liste explicite de ce qu’il n’a pas le droit de dire —
-pas de portrait de caractère fondé sur le signe solaire, pas d’âge de la mort, pas d’événement
-daté, aucune règle inventée. Il n’apporte que la prose. Là où il devrait se taire faute de
-doctrine fixée, on ne se contente pas de le lui interdire : on lui remet la marche complète
-des deux auteurs sur la figure, pour qu’il rende l’écart au lieu d’un blanc — une interdiction
-sans preuve invite à la contourner.
+et la liste explicite de ce qu’il n’a pas le droit de dire — pas de portrait de caractère
+fondé sur le signe solaire, pas d’âge de la mort, pas d’événement daté, aucune règle
+inventée. Il n’apporte que la prose. Là où il devrait se taire faute de doctrine fixée, on
+ne se contente pas de le lui interdire : on lui remet la marche complète des deux auteurs
+sur la figure, pour qu’il rende l’écart au lieu d’un blanc — une interdiction sans preuve
+invite à la contourner.
 
-**Le jugement est rendu par rubriques.** Une section titrée par matière, et le titre donne la
-conclusion plutôt que le sujet : non pas « Le métier », mais « Le métier — un officier, jamais
-un seigneur terrien ». Qui ne lit que les cinq titres tient le jugement entier. Ce n’est pas
-une concession à la lecture en diagonale : *rubrique* désigne le titre que le copiste passe à
-l’encre rouge en tête de chaque matière, et les traités sont bâtis ainsi — Sahl donne un
-chapitre par maison, Ptolémée un livre par genre de question. Mille quatre cents mots d’un
-seul tenant, personne ne les lit, et l’on n’en retient que la dernière phrase.
-
-**Et chaque rubrique se rend en trois temps.** D’abord « En clair » — trois lignes, cinquante
-mots, pas un seul mot de métier, pour quelqu’un qui n’a jamais ouvert un livre d’astrologie.
-Puis « Les témoignages » — les positions, les dignités, les degrés, le nom des règles et celui
-des livres, pour qui veut vérifier. Enfin « Aujourd’hui ». Les trois disent la même chose ;
-ils ne la disent pas au même homme. S’il faut couper, on coupe dans la preuve et jamais dans
-le clair : un jugement qu’on ne comprend pas n’a pas été rendu, quelque bien prouvé qu’il soit.
-
-**Le troisième temps change de voix, et c’est ce qui le rend possible.** « En clair » était
-déjà sans jargon, mais il restait en langue de 1380 : *un officier, jamais un seigneur
-terrien* se comprend sans dictionnaire et ne dit toujours pas ce que cela ferait dans une vie
-d’aujourd’hui. « Aujourd’hui » le traduit — *on aurait dit alors que le métier ne porte pas
-son nom ; cela se lirait maintenant comme un poste où le travail est fait sous la signature
-d’un autre.* Ce paragraphe n’est plus de l’astrologien : il est d’une main plus tardive, de
-celles qui glosent en marge des manuscrits des siècles après le copiste. Sans ce changement
-de voix, la persona s’effondrerait et l’interdit du vocabulaire moderne deviendrait incohérent.
-
-Trois règles le tiennent, faute de quoi il redeviendrait exactement l’horoscope que tout le
-reste refuse. Il **traduit sans ajouter** : la même affirmation dans une autre langue, jamais
-une seconde prédiction. Il **reste au même endroit du monde** — les quatre questions de 1380
-sont posées dans les termes d’à présent, un employeur, un contrat, un bailleur, un examen
-médical, et jamais ce que quelqu’un *est* ; « vous êtes quelqu’un de… » est la seule phrase
-absolument interdite de tout le dossier, parce que l’horoscope de magazine tient dans ces
-quatre mots. Il **s’annonce comme une lecture** et non comme un fait, la réserve étant ici
-l’exactitude même, puisque la traduction vient du modèle et non de la doctrine. Et quand une
-chose ne se traduit pas, il doit le dire : la défense de saigner le membre que la Lune occupe
-n’a pas d’équivalent, on ne saigne plus, il ne reste que l’indication du membre à surveiller.
-
-L’exception au vocabulaire moderne est donc étroite et vaut la peine d’être lue deux fois. Ce
-qui se lève dans ce paragraphe, c’est la langue ordinaire de notre temps. Ce qui n’y est
-toujours pas permis, c’est la liste des mots proscrits — énergie, potentiel, karma, être
-soi-même —, qui n’est pas du français moderne mais une autre divination, et précisément celle
-que ce dossier existe pour ne pas produire. **La vie d’aujourd’hui, oui ; l’astrologie
-d’aujourd’hui, jamais.**
-
-**La première rubrique, en revanche, n’est pas imposée.** Avant le plan, le modèle ouvre sur
-ce qui l’a arrêté dans cette figure-ci : une planète au cœur du Soleil, un corps à quelques
-minutes d’arc de son degré d’exaltation, une réception mutuelle sans regard — le titre existe
-et n’arrive jamais —, l’almuten qui se trouve être aussi le seigneur de l’ascendant. C’est le
-seul endroit de la consigne où on lui demande de juger plutôt que d’exécuter, et c’est voulu :
-un maître ouvre sur ce qu’il a vu, pas sur le premier chapitre de son manuel. Deux garde-fous
-seulement, mais ils portent tout. La rareté doit se lire dans le dossier comme n’importe quel
-autre fait — une singularité inventée pour faire une belle entrée ruinerait le reste. Et la
-plupart des figures n’ont rien d’extraordinaire : dans ce cas le modèle doit l’écrire et
-passer, parce qu’un astrologien qui trouve du prodige dans toutes les figures qu’on lui
-apporte n’est plus consulté longtemps. L’interrogation seule n’a pas d’ouverture : on n’a pas
-apporté cette figure-là pour qu’on l’admire, on l’a apportée pour en tirer un oui ou un non.
-
-**Le jugement peut être heureux.** La consigne exige toujours qu’on nomme la matière la plus
-mal tenue et qu’on lui donne un paragraphe entier — un astrologien qui ne dit que du bien ne
-sert à rien. Mais la symétrie manquait, et elle est aussi une affaire d’exactitude : celui qui
-ne trouve jamais rien de bon a cessé de lire la figure aussi sûrement que le flatteur. Un
-bénéfique fort et bien logé, une Lune croissante en lumière, une réception mutuelle qui se
-voit vraiment se rapportent donc comme des faits, sans qu’on y accole aussitôt un « mais il
-faudra rester prudent ». À deux conditions, les mêmes que pour la dureté : la joie se fonde
-sur un témoignage du dossier, et elle se dit dans la langue de 1380 — un profit, une
-protection, un ami, une faveur obtenue, un corps qui se répare — jamais dans les mots
-d’aujourd’hui, qui restent interdits sans exception.
-
-Que la tradition ait un mot technique pour cela n’est pas un hasard, et le site le calcule
-désormais : les **joies** (*gaudia planetarum*). Chaque planète a une maison où elle se plaît,
-et les livres disent qu’elle s’y *réjouit*, sans métaphore — Mercure en première, la Lune en
-troisième, Vénus en cinquième, Mars en sixième, le Soleil en neuvième, Jupiter en onzième,
-Saturne en douzième. Ce n’est pas une dignité : la joie ne pèse rien dans l’almuten, et une
-planète en sa joie peut être pérégrine ou brûlée. Elle dit seulement que l’astre est chez lui
-dans la matière du lieu. Pour un maléfique, cela ne veut pas dire qu’il ne nuit pas, mais que
-sa nuisance est à sa place et se contient : Saturne en douzième est un geôlier dans une
-prison, il y est utile, et personne ne l’invite à souper.
+**La lecture a deux parties.** D’abord le ciel, en une seule voix, quatre à six cents mots :
+ce qui tient la figure, ce que cela donne concrètement, deux ou trois gestes. Ensuite trois
+ou quatre axes seulement — les matières que *cette* figure charge vraiment (le métier, l’avoir,
+le corps, les contrats), jamais les douze maisons, jamais un portrait. Les titres concluent
+plutôt qu’ils n’annoncent : « Le métier — le travail porte le nom d’un autre ». « Vous êtes
+quelqu’un de… » est interdit. La date de naissance est dans le dossier ; elle a déjà produit
+la figure, on ne la relit pas à part comme un signe solaire.
 
 **Trois consignes, pas une.** Les trois genres ne se jugent pas de la même façon, et les
-confondre est l’erreur que les traités reprochent le plus. Le socle est commun — le ton, la
-règle de traduction, la dureté permise, les interdits — mais le plan du *judicium* change :
+confondre est l’erreur que les traités reprochent le plus. Le socle est commun — traduire
+une position en chose du monde, les interdits — mais le plan change :
 
 | Genre | Plan | Ce qu’il refuse de juger |
 |---|---|---|
-| Nativité | une ouverture libre, puis les cinq matières du livre IV du *Tetrabiblos* : la complexion et le corps, le métier, l’avoir, la dignité, les parties adverses | l’âge de la mort — il reçoit à la place la marche des deux auteurs, et doit en rendre l’écart ; l’événement daté |
-| Révolution | une ouverture libre sur l’année, puis la matière de l’année, le maître jugé deux fois, ce qui a changé depuis la nativité, le calendrier des douze mois | le métier, la complexion, le naturel — ils se décident à la naissance et n’en bougent plus |
-| Interrogation | sans ouverture : peut-on juger, la voie d’aboutissement, l’échéance, la conduite à tenir | tout ce qui touche à la nativité, dont il ne doit pas parler |
+| Nativité | le ciel, puis trois ou quatre axes | l’âge de la mort — il reçoit à la place la marche des deux auteurs, et doit en rendre l’écart ; l’événement daté |
+| Révolution | cette année (matière profectée, maître lu deux fois), puis ce que l’année charge | le métier, la complexion, le naturel — ils se décident à la naissance et n’en bougent plus |
+| Interrogation | peut-on juger, la voie, l’échéance, une conduite | tout ce qui touche à la nativité, dont il ne doit pas parler |
 
 **Aucun nombre n’est laissé à calculer.** C’est la leçon d’un essai réel : un modèle à qui
 l’on donnait la position de Vénus mais pas son écart au degré d’exaltation a fait la
@@ -315,6 +247,15 @@ aucun autre.
 
 C’est aussi la bonne division du travail, historiquement : le calculateur dressait la figure,
 et le jugement était un texte rédigé.
+
+Le site calcule aussi les **joies** (*gaudia planetarum*). Chaque planète a une maison où elle
+se plaît, et les livres disent qu’elle s’y *réjouit*, sans métaphore — Mercure en première, la
+Lune en troisième, Vénus en cinquième, Mars en sixième, le Soleil en neuvième, Jupiter en
+onzième, Saturne en douzième. Ce n’est pas une dignité : la joie ne pèse rien dans l’almuten,
+et une planète en sa joie peut être pérégrine ou brûlée. Elle dit seulement que l’astre est
+chez lui dans la matière du lieu. Pour un maléfique, cela ne veut pas dire qu’il ne nuit pas,
+mais que sa nuisance est à sa place et se contient : Saturne en douzième est un geôlier dans
+une prison, il y est utile, et personne ne l’invite à souper.
 
 ## Les trois genres, et ce qu’ils répondent
 
