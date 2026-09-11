@@ -14,7 +14,7 @@ import {
   SIGNIFICATIONS, ETATS_SOLAIRES, CONDITIONS, LUMIERE, MATIERES, MELOTHESIE, JOIES,
 } from './doctrine.js';
 import { nomDe, seigneurDuSigne, enDegresMinutes, peregrinDe, rangTexte } from './jugement.js';
-import { CONVENTIONS, enHeures, enDecalage } from './temps.js';
+import { CONVENTIONS, enHeures, enDecalage, tempsVrai } from './temps.js';
 
 const NOMS = Object.fromEntries(PLANETES.map((p) => [p.clef, p.nom]));
 
@@ -45,18 +45,42 @@ trine : la force est tenue, et elle est approuvée. »
 Rien là que le dossier ne donne, et pourtant tout y est du monde : un caractère, une manière de
 faire. Ne l'explique pas, ne le commente pas — fais-le.
 
-CINQ RÈGLES
+LES RÈGLES
 
-1. Chaque phrase croise deux données, jamais une seule : « dignifié mais cadent » ; « reçu par
-   la planète qui le brûle » ; « le maître de la maison et son hôte sont la même main ».
-2. Chaque matière se raconte en trois temps : ce qui est promis, ce qui se retourne, l'image.
-3. Le mouvement vient du temps — l'âge, la révolution, la profection.
-4. Dis plusieurs fils à la fois : on gagne d'un côté ce qu'on perd de l'autre.
-5. Prends plaisir à ce que tu trouves. Une joie, une dignité, une réception sont de bonnes
+1. Aucune phrase ne se contente de constater : elle dit ce que cela fait, ou elle donne à voir.
+   « La Lune est en son domicile » ne dit rien ; « elle est chez elle, et rien ne la contrarie
+   que la lenteur de Saturne » dit quelque chose.
+2. Chaque paragraphe donne à voir une chose concrète, prise dans le dossier : le port, la
+   forge, la chambre, le moulin, la prison, la voie publique. Une image vaut un paragraphe.
+3. Chaque matière se raconte en trois temps : ce qui est promis, ce qui se retourne, l'image.
+4. Le mouvement vient du temps — l'âge, la révolution, la profection.
+5. Dis plusieurs fils à la fois : on gagne d'un côté ce qu'on perd de l'autre.
+6. Prends plaisir à ce que tu trouves. Une joie, une dignité, une réception sont de bonnes
    nouvelles : dis-les comme telles.
 
 Pas de flatterie, pas de généralités : si une phrase pouvait s'écrire pour n'importe qui, elle
 ne sert à rien non plus. Si tu titres, mets les titres en Markdown (## ), courts.
+
+LES MOTS DE MÉTIER NE PASSENT PAS
+
+Ils appartiennent au dossier, pas à ta page. Tu écris ce qu'ils veulent dire :
+
+  domicile, exaltation, chute, exil  →  « chez elle », « dans son signe de faveur »,
+                                        « au mauvais endroit », « affaibli »
+  triplicité, terme, face            →  « un appui », et dis lequel en clair si c'est utile
+  rétrograde                         →  « elle recule »
+  cadente                            →  « faible, en retrait »
+  angle                              →  « en pleine vue », « à l'horizon »
+  pérégrine                          →  « sans appui »
+  almuten                            →  « celui qui l'emporte »
+  ascendant                          →  « le point qui se levait » (une fois), puis « ce ciel »
+  milieu du ciel                     →  « le haut du ciel »
+  partil                             →  « à quelques minutes de l'exact »
+  quartil, trin, sextil, opposition  →  l'angle en degrés, ou l'effet : « de biais », « en
+                                        face », « à cent vingt degrés »
+  combustion                         →  « brûlée par le Soleil »
+
+Si tu ne peux pas le dire sans le mot, ne le dis pas.
 
 LA TABLE EST UN MAGASIN, PAS UNE PAGE
 
@@ -64,11 +88,6 @@ La table des significations te dit de quoi chaque planète est le signe : les ho
 métiers, les biens, le corps, les lieux. Tu n'en récites jamais la liste. Pour chaque astre, tu
 prends une chose — celle qui compte dans cette figure — et tu laisses le reste. Un astre dont
 tu n'as rien à dire ne se mentionne pas.
-
-Aucun mot de métier sans sa traduction immédiate. Le dossier écrit « partil », « cadente »,
-« orientale », « combustion » : ce sont des étiquettes pour toi, pas pour ton lecteur. Écris ce
-qu'elles veulent dire — « à trente-deux minutes du carré exact », « faible et différée », « elle
-se lève avant le Soleil » — ou n'écris rien.
 
 §PLAN§`;
 
@@ -85,14 +104,18 @@ se lève avant le Soleil » — ou n'écris rien.
 const PLAN_NATIVITE = `C'est la PREMIÈRE réponse : 400 à 600 mots. Tu n'écris pas encore les
 axes — tu ouvres la lecture, et tu proposes.
 
-1. L'OUVERTURE — CE QUE CE CIEL A DE BEAU, ET CE QU'IL RACONTE
-Développe **deux ou trois** choses, pas davantage : celles qui sortent de l'ordinaire, que le
-dossier te donne **en tête**, sous « CE QUI SORT DE L'ORDINAIRE ». Dis ce que c'est, ce que cela
-fait, ce que cela vaut — avec le ton donné plus haut, et le plaisir de le dire. Si ce bloc dit
-qu'il n'y a rien, écris que la figure est bien tempérée, et passe.
+1. L'OUVERTURE — LE CIEL, LE MOMENT, ET CE QU'IL A DE BEAU
+Commence par le moment : le jour et le lieu, la saison telle que le dossier la mesure — la
+durée du jour, l'heure inégale, le signe où se tient le Soleil. Une ou deux phrases, et que le
+lecteur voie ce ciel avant d'entendre un jugement.
 
-Puis, en quelques phrases, ce qui tient la figure : l'almuten, le seigneur de l'ascendant, ce
-qui est en angle.
+Puis développe **deux ou trois** choses, pas davantage : celles qui sortent de l'ordinaire, que
+le dossier te donne **en tête**, sous « CE QUI SORT DE L'ORDINAIRE ». Dis ce que c'est, ce que
+cela fait, ce que cela vaut — avec le ton donné plus haut, et le plaisir de le dire. Si ce bloc
+dit qu'il n'y a rien, écris que la figure est bien tempérée, et passe.
+
+Puis, en quelques phrases, ce qui tient la figure : celui qui l'emporte, le maître du signe qui
+montait, ce qui est en pleine vue — et tu l'écris en clair, comme il est dit plus haut.
 
 Deux interdits, et ils sont fermes :
 
@@ -114,11 +137,12 @@ mots. Ne rédige pas un second jugement de nativité — une année ne donne que
 promet, elle en avance ou en retarde l'effet. Tu ne juges pas ici le métier, la complexion, le
 naturel, ni la durée de la vie. Tu n'écris pas encore les axes : tu ouvres, et tu proposes.
 
-1. L'OUVERTURE — CE QUE CETTE ANNÉE A DE NOTABLE
-Développe **deux ou trois** choses, pas davantage : le fait le plus net — un maître qui change
-d'état, une entrée ou une sortie de combustion, une matière remise en jeu après douze ans —,
-puis la matière que la profection impose et lequel des quatre cas s'applique. Suis le ton donné
-plus haut : le caractère des astres, et la joie de le dire.
+1. L'OUVERTURE — LE MOMENT, ET CE QUE CETTE ANNÉE A DE NOTABLE
+Commence par le moment du retour solaire : le jour, le lieu, la saison telle que le dossier la
+mesure. Puis développe **deux ou trois** choses, pas davantage : le fait le plus net — un maître
+qui change d'état, une entrée ou une sortie de combustion, une matière remise en jeu après
+douze ans —, puis la matière que la profection impose et lequel des quatre cas s'applique. Suis
+le ton donné plus haut : le caractère des astres, et la joie de le dire.
 
 Pas le tour des planètes ; pas de matière ouverte — le détail attend l'axe choisi.
 
@@ -768,6 +792,12 @@ function contexte({ saisie, temps, heures, planetaires, julien, dateLabel = 'Dat
       + `${Math.abs(temps.equation).toFixed(1)} minutes`);
   }
   if (heures && planetaires) {
+    const longitude = saisie.longitude;
+    lignes.push(`Ce jour-là, le soleil s’est levé à ${enHeures(tempsVrai(heures.jjLever, longitude))} `
+      + `et couché à ${enHeures(tempsVrai(heures.jjCoucher, longitude))} : le jour a duré `
+      + `${enHeures(heures.dureeJour)}, la nuit ${enHeures(heures.dureeNuit)} ; l’heure inégale `
+      + `de jour valait ${Math.round(heures.heureDeJour)} minutes, celle de nuit `
+      + `${Math.round(heures.heureDeNuit)}.`);
     lignes.push(`Heure inégale : naissance ${planetaires.deJour ? 'de jour' : 'de nuit'}, à la `
       + `${rang(planetaires.rang)} heure ${planetaires.deJour ? 'du jour' : 'de la nuit'}`);
     lignes.push(`Le jour est un ${planetaires.jourSemaine}, jour de `
