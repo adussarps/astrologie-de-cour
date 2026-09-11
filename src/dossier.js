@@ -21,14 +21,42 @@ const NOMS = Object.fromEntries(PLANETES.map((p) => [p.clef, p.nom]));
 // ─── Le ton et la consigne ───────────────────────────────────────────────────
 
 const SOCLE_HAUT = `Tu écris pour quelqu'un qui lit aujourd'hui : français simple et direct, sans
-costume d'époque. Tu n'es pas un astrologue de 1380 — tu traduis un calcul médiéval.
+costume d'époque. Tu n'es pas un astrologue de 1380 — tu traduis un calcul médiéval, et tu le
+fais avec plaisir : c'est une belle pièce, et cela doit s'entendre.
 
 Tout ce que tu dis se lit dans le dossier ci-dessous. Tu n'ajoutes aucun nombre, aucune règle,
-aucune donnée qui ne s'y trouve. Une position ne vaut que par ce qu'elle dit du monde réel :
-un métier, un revenu, un corps, une relation, une démarche.
+aucune donnée qui ne s'y trouve. Chaque phrase nomme un astre du dossier et dit ce qu'il
+gouverne dans le monde réel — un métier, un revenu, un corps, une relation, une démarche. Une
+phrase sans astre ne dit rien : supprime-la.
+
+LE TON — le caractère des planètes, et la joie de le dire
+
+Tu ne récites pas une fiche : tu racontes ce que les astres font. Dis le caractère de chaque
+planète et ce qu'elle produit dans une vie, et que le plaisir se voie. Voici le ton, sur un
+ciel qui n'est pas le tien — c'est la nativité d'une ville, non d'un homme : garde le ton, pas
+le sujet.
+
+« Mars est dans sa propre maison, le Scorpion : la ville est à celui qui fait la guerre, et
+c'est de lui qu'elle tient son nom. Mais Saturne l'y rejoint, et Saturne est froid et lent :
+il retient l'élan de Mars, et de ce mélange naît un peuple qui se bat sans se hâter. Vénus y
+ajoute la douceur, Mercure la raison. Et Jupiter, dans sa propre maison, les regarde de son
+trine : la force est tenue, et elle est approuvée. »
+
+Rien là que le dossier ne donne, et pourtant tout y est du monde : un caractère, une manière de
+faire. Ne l'explique pas, ne le commente pas — fais-le.
+
+CINQ RÈGLES
+
+1. Chaque phrase croise deux données, jamais une seule : « dignifié mais cadent » ; « reçu par
+   la planète qui le brûle » ; « le maître de la maison et son hôte sont la même main ».
+2. Chaque matière se raconte en trois temps : ce qui est promis, ce qui se retourne, l'image.
+3. Le mouvement vient du temps — l'âge, la révolution, la profection.
+4. Dis plusieurs fils à la fois : on gagne d'un côté ce qu'on perd de l'autre.
+5. Prends plaisir à ce que tu trouves. Une joie, une dignité, une réception sont de bonnes
+   nouvelles : dis-les comme telles.
 
 Pas de flatterie, pas de généralités : si une phrase pouvait s'écrire pour n'importe qui, elle
-ne sert à rien. Si tu titres, mets les titres en Markdown (## ), courts.
+ne sert à rien non plus. Si tu titres, mets les titres en Markdown (## ), courts.
 
 §PLAN§`;
 
@@ -46,15 +74,22 @@ const PLAN_NATIVITE = `C'est la PREMIÈRE réponse, et elle reste courte : 200 �
 n'écris pas encore la lecture — tu l'ouvres, et tu proposes.
 
 1. L'OUVERTURE — CE QUE CE CIEL A DE BEAU, ET CE QU'IL RACONTE DE LOIN
-Quelques phrases. D'abord ce qui sort de l'ordinaire, que le dossier te donne calculé : dis-le
-simplement, et si c'est une bonne chose, dis-le comme une bonne chose ; si rien n'en sort, dis
-que la figure est bien tempérée. Puis, en deux ou trois phrases, ce qui tient la figure
-(l'almuten, le seigneur de l'ascendant, ce qui est en angle) et ce que cela donne en gros.
-C'est un aperçu, pas la lecture — n'invente aucune rareté.
+Quelques phrases. D'abord ce qui sort de l'ordinaire, que le dossier te donne **en tête**, sous
+« CE QUI SORT DE L'ORDINAIRE » : dis-le simplement, et si c'est une bonne chose, dis-le comme
+une bonne chose ; si ce bloc dit qu'il n'y a rien, dis que la figure est bien tempérée. Puis,
+en deux ou trois phrases, ce qui tient la figure (l'almuten, le seigneur de l'ascendant, ce qui
+est en angle) et ce que cela donne en gros. C'est un aperçu, pas la lecture.
+
+Forme voulue, sur un ciel qui n'est pas le tien — ne le recopie pas :
+« Le Soleil se réjouit en neuvième, et c'est la seule joie de la figure. Mars, lui, tient tout :
+seigneur de l'ascendant et almuten à la fois, une seule main — et Mars est en sa chute. Quatre
+matières sont chargées : le corps, l'avoir, les contrats, le métier. La dignité, non. »
 
 2. LES AXES — TA QUESTION
-Le dossier te donne les matières que cette figure charge vraiment. Nomme-les en une ligne
-chacune, sans les développer, et demande au lecteur laquelle il veut ouvrir. Tu t'arrêtes là.
+Le dossier te donne, en tête, les matières que cette figure charge. Reprends leurs titres tels
+quels, un par ligne, sans les développer, et demande au lecteur laquelle il veut ouvrir. Tu
+n'ajoutes aucun autre format de lecture — ni « maison par maison », ni « le détail technique »,
+ni rien que le bloc ne donne. Tu t'arrêtes là.
 
 Quand il répond, tu ouvres la matière choisie — le socle ci-dessous vaut toujours.`;
 
@@ -65,15 +100,16 @@ la complexion, le naturel, ni la durée de la vie. Tu n'écris pas encore la lec
 l'ouvres, et tu proposes.
 
 1. L'OUVERTURE — CE QUE CETTE ANNÉE A DE NOTABLE
-Quelques phrases. Le dossier te donne ce qui a franchement changé depuis la nativité et l'état
-du maître de l'année. Dis le fait le plus net — un maître qui change d'état, une entrée ou une
-sortie de combustion, une matière remise en jeu après douze ans — puis, en deux ou trois
-phrases, la matière que la profection impose et lequel des quatre cas s'applique. Si rien
-n'est franc, dis-le et passe.
+Quelques phrases. Le dossier te donne, en tête, les matières que cette année charge, et plus
+loin ce qui a franchement changé depuis la nativité. Dis le fait le plus net — un maître qui
+change d'état, une entrée ou une sortie de combustion, une matière remise en jeu après douze
+ans — puis, en deux ou trois phrases, la matière que la profection impose et lequel des quatre
+cas s'applique.
 
 2. LES AXES — TA QUESTION
-Le dossier te donne les matières que cette année charge. Nomme-les en une ligne chacune, sans
-les développer, et demande au lecteur laquelle il veut suivre. Tu t'arrêtes là.
+Reprends les titres des axes tels que le dossier les donne, un par ligne, sans les développer,
+et demande au lecteur laquelle il veut suivre. Tu n'ajoutes aucun autre format de lecture. Tu
+t'arrêtes là.
 
 Quand il répond, tu ouvres la matière choisie — le socle ci-dessous vaut toujours.`;
 
@@ -85,7 +121,8 @@ seigneur.
 Le oui ou le non doit figurer dans ta première phrase comme dans ta dernière, et dans le
 titre de la réponse. Un jugement qui finit en nuances n'a pas été rendu. Tu peux dire à
 quelles conditions, par quelle voie, avec quel retard — la réponse elle-même est l'un des
-deux mots.
+deux mots. Les règles de ton valent ici comme ailleurs, mais le récit ne remplace jamais la
+réponse : le oui ou le non vient d'abord, et le reste s'y plie.
 
 400 à 700 mots. Pas d'ouverture sur ce que la figure a de singulier. Quatre sections :
 
@@ -135,6 +172,9 @@ prononce aucun jugement de mariage : la règle ne peut pas être conduite.
 400 à 600 mots. Termine par une question au lecteur sur ce qu'il veut qu'on creuse.`;
 
 const SOCLE_BAS = `CE QUE TU NE FAIS PAS
+- Tu ne parles jamais de ton travail, du dossier, de la méthode, ni de ce que tu vas faire. Tu
+  ne décris pas la lecture : tu la fais. Aucune phrase ne commence par « Ce que le dossier… »,
+  « Je ne… », « Il s'agit de… », « Ce thème… » — ni ne résume ce que le dossier contient.
 - Aucun portrait par signe solaire. Personne n'est « un Bélier ». Le Soleil est une planète
   parmi sept ; sa place se juge par maison, dignité et regard.
 - « Vous êtes quelqu'un de… » est interdit. Tu décris des dispositions de vie, jamais un
@@ -300,7 +340,11 @@ function etatEnClair(a) {
  *  le plus, et celle qui change le plus de choses. */
 function solaireEnClair(a) {
   if (!a.solaire || a.solaire.classe === 'libre') return '';
-  const mots = { cazimi: 'AU CŒUR DU SOLEIL', combuste: 'BRÛLÉE', rayons: 'sous les rayons' };
+  const mots = {
+    cazimi: 'AU CŒUR DU SOLEIL',
+    combuste: GENRES[a.clef] === 'f' ? 'BRÛLÉE' : 'BRÛLÉ',
+    rayons: 'sous les rayons',
+  };
   return `, ${mots[a.solaire.classe]} (${a.solaire.ecart.toFixed(1)}° du Soleil)`;
 }
 
@@ -397,7 +441,9 @@ function marquesDAxe(figure, a) {
     .filter((t) => /domicile|exaltation|triplicité/.test(t));
   if (grandes.length) m.push(['dignite', grandes.join(' et ')]);
   if ((a.etat?.perdues ?? []).length) m.push(['perte', a.etat.perdues.join(' et ')]);
-  if (a.solaire?.classe === 'combuste') m.push(['combuste', 'brûlé par le Soleil']);
+  if (a.solaire?.classe === 'combuste') {
+    m.push(['combuste', GENRES[a.clef] === 'f' ? 'brûlée par le Soleil' : 'brûlé par le Soleil']);
+  }
   if (a.solaire?.classe === 'cazimi') m.push(['cazimi', 'au cœur du Soleil']);
   if (a.retrograde && !a.noeud) m.push(['retro', 'rétrograde']);
   if (a.joie) m.push(['joie', 'en sa joie']);
@@ -472,7 +518,19 @@ function lesAxesEnClair(figure) {
     + '\n';
 }
 
-function figureEnClair(figure, { ouverture = true } = {}) {
+/** Ce que la première réponse doit dire, mis en tête du dossier : le
+ *  remarquable et les axes chargés. Le modèle écrit à partir de ce qu'il vient
+ *  de lire — et non au milieu de six mille mots de tables. */
+export function ouvertureEnClair(figure) {
+  const trouves = ceQuiSortDeLOrdinaire(figure);
+  const notables = `CE QUI SORT DE L'ORDINAIRE — la matière de la première rubrique\n`
+    + (trouves.length
+      ? trouves.map((x) => `  — ${x}`).join('\n')
+      : '  (rien : cette figure est bien tempérée. Dis-le en une phrase, et n’invente aucune rareté.)');
+  return `\n${notables}\n${lesAxesEnClair(figure)}`;
+}
+
+function figureEnClair(figure) {
   const astres = figure.astres.map((a) =>
     `  ${a.nom.padEnd(16)} ${enSigne(a.longitude).padEnd(22)} maison ${String(a.maison).padStart(2)}`
     + ` (${(a.force ?? '').padEnd(11)})`
@@ -484,15 +542,6 @@ function figureEnClair(figure, { ouverture = true } = {}) {
     + `${perfectionEnClair(a)}`).join('\n');
 
   const pf = figure.perfections ?? {};
-  // Les deux digests — le remarquable et les axes chargés — servent l'ouverture
-  // de la nativité et de la révolution. L'interrogation les écarte : elle doit
-  // répondre d'abord, et sa consigne lui interdit d'ouvrir sur le singulier.
-  const trouves = ouverture ? ceQuiSortDeLOrdinaire(figure) : null;
-  const blocNotables = trouves === null ? '' : `\nCE QUI SORT DE L'ORDINAIRE — la matière `
-    + `de la première rubrique\n${trouves.length
-      ? trouves.map((x) => `  — ${x}`).join('\n')
-      : '  (rien : cette figure est bien tempérée. Dis-le en une phrase, et n’invente aucune rareté.)'}\n`;
-  const blocAxes = ouverture ? lesAxesEnClair(figure) : '';
   const perfections = [
     pf.versExaltation
       ? `  Le corps le mieux placé de la figure : ${pf.versExaltation.nom}, à `
@@ -633,7 +682,7 @@ function figureEnClair(figure, { ouverture = true } = {}) {
 L'ALMUTEN DE L'ASCENDANT — la planète qui gouverne toute la figure
 ${almuten}
   L'emporte : ${nomDe(figure.almuten.vainqueur.planete)}
-${blocNotables}${blocAxes}
+
 LES ASTRES
 ${astres}
 
@@ -674,7 +723,8 @@ function contexte({ saisie, temps, heures, planetaires, julien, dateLabel = 'Dat
     `${dateLabel} : ${saisie.jour}/${saisie.mois}/${saisie.annee}`
     + `${julien ? ' (calendrier JULIEN, comme l\'aurait lu un calculateur du temps)' : ' (calendrier grégorien)'}`,
     `Heure annoncée : ${saisie.heure} h ${String(saisie.minute).padStart(2, '0')}`,
-    `Lieu : latitude ${saisie.latitude}°, longitude ${saisie.longitude}°`,
+    `Lieu : ${saisie.lieu ? `${saisie.lieu} — ` : ''}latitude ${saisie.latitude}°, `
+    + `longitude ${saisie.longitude}°`,
     saisie.sexe
       ? `Sexe du natif : ${saisie.sexe}, donné par le consultant. Il ne sert qu’à une chose, `
         + 'et à une seule : la Part du Mariage se prend de Saturne à Vénus pour un homme et de '
@@ -795,6 +845,8 @@ export function dossierNativite({ saisie, resultat }) {
   return [
     consigne(PLAN_NATIVITE),
     SEPARATEUR('LA COMMANDE') + `Rédige la lecture de cette nativité.`,
+    SEPARATEUR('CE QUE TU DOIS DIRE DANS CETTE PREMIÈRE RÉPONSE')
+      + ouvertureEnClair(resultat.figure),
     SEPARATEUR('LES DONNÉES') + contexte({ ...resultat, saisie, dateLabel: 'Date de naissance' }),
     '',
     figureEnClair(resultat.figure),
@@ -814,6 +866,8 @@ export function dossierAnnee({ saisie, resultat, annee, julien = false }) {
     SEPARATEUR('LA COMMANDE') + `Rédige le jugement de l'année qui court des ${annee.age} ans `
       + `de ce natif à ses ${annee.age + 1} ans — un jugement de révolution, non de nativité.\n\n`
       + `La révolution court du ${enDate(annee.jj, julien)} au ${enDate(annee.finit, julien)}.`,
+    SEPARATEUR('CE QUE TU DOIS DIRE DANS CETTE PREMIÈRE RÉPONSE')
+      + ouvertureEnClair(annee.annuelle),
     SEPARATEUR('LA NATIVITÉ (le fond, qui ne se rejuge pas)')
       + contexte({ ...resultat, saisie, dateLabel: 'Date de naissance' }),
     '',
@@ -906,7 +960,7 @@ export function dossierInterrogation({ saisie, resultat, question, jugement }) {
     SEPARATEUR('LA FIGURE DE L\'INSTANT')
       + contexte({ ...resultat, saisie, dateLabel: 'Date de la question' }),
     '',
-    figureEnClair(resultat.figure, { ouverture: false }),
+    figureEnClair(resultat.figure),
     SEPARATEUR('LA DOCTRINE') + tablesDeDoctrine(),
     SEPARATEUR('LES RÉSERVES') + reserves(),
   ].join('\n');
@@ -1006,7 +1060,7 @@ function echangesEnClair(e) {
 export function dossierSynastrie({ saisieA, saisieB, resultatA, resultatB, synastrie: s }) {
   const personne = (nom, saisie, resultat) =>
     contexte({ ...resultat, saisie, dateLabel: `Date de naissance ${nom}` })
-    + '\n\n' + figureEnClair(resultat.figure, { ouverture: false });
+    + '\n\n' + figureEnClair(resultat.figure);
 
   return [
     consigne(PLAN_SYNASTRIE),

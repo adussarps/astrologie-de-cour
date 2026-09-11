@@ -735,7 +735,7 @@ function rendreQuestion(rangMaison, texteQuestion) {
   const jj = maintenantEnJJ();
   const saisie = {
     ...dateLocales(jj, latitude, longitude),
-    latitude, longitude, convention: null, sexe: $('#sexe').value || null,
+    latitude, longitude, lieu, convention: null, sexe: $('#sexe').value || null,
   };
   const resultat = dresser(saisie, jj);
   const { figure } = resultat;

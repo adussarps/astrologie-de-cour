@@ -386,6 +386,22 @@ Les corrections sont bienvenues, et les reproches aussi. Ce qui manque le plus, 
   La source directe des cinq nativités.
 - **Alcabitius**, *Introductorius ad magisterium iudiciorum astrorum*, éd. Ch. Burnett,
   K. Yamamoto, M. Yano, Warburg Institute, 2004.
+- **Ptolémée**, *Tetrabiblos* — livre IV, 10, « De la division des temps », pour les
+  prorogations par matière : le corps, les biens, l'âme, la dignité, la conduite ne vont pas
+  toujours du même côté, et l'astrologue le dit.
+- **Vettius Valens**, *Anthologies*, trad. Mark T. Riley (1990s, en ligne) — le plus ancien
+  recueil de jugements conservé ; voir le [jugement de richesse](https://www.skyscript.co.uk/wealthvalens.html)
+  publié par David Plant.
+- **L’horoscope de Rome** (fondation de la ville). Sources anciennes : Plutarque, *Vie de
+  Romulus* 12, 3-6 ; Cicéron, *De divinatione* II, 98-99 ; Solin, *Collectanea* I, 18 ;
+  Jean Lydus, *De mensibus* I, 14. Étude : **Stephan Heilen**, « Ancient Scholars on the
+  Horoscope of Rome », *Culture and Cosmos* 11 (2007),
+  [en ligne](http://cultureandcosmos.org/pdfs/11/11_Heilen_Horoscope_of_Rome_Vol11.pdf).
+  Le ciel transmis — Jupiter en Poissons, Saturne, Vénus, Mars et Mercure en Scorpion, le
+  Soleil et la Lune en Balance — ne tombe ni au 4 octobre 754 av. J.-C. (la date que Tarutius
+  avait calculée) ni au 21 avril 753 (la date traditionnelle des Parilia) : notre moteur le
+  place au **30 octobre 754 av. J.-C.** Voir la section « Deux figures » pour la leçon que
+  cela porte.
 - **Jean-Patrice Boudet**, *Entre science et nigromance*, Publications de la Sorbonne, 2006.
 - **R. Horrox**, *The Black Death*, Manchester University Press, 1994, pour le *Compendium de
   epidemia*.
