@@ -20,6 +20,7 @@
     <nav>
       <button class="onglet actif" data-vue="officine">Ma figure</button>
       <button class="onglet" data-vue="nativites">Les nativités</button>
+      <button class="onglet" data-vue="synastrie">Synastrie</button>
       <button class="onglet" data-vue="notice">La notice</button>
     </nav>
   </div>
@@ -169,6 +170,151 @@
   <div id="autres-pieces" class="intro"></div>
 </section>
 
+<!-- ══════════════════════════════ DEUX FIGURES ═════════════════════════════ -->
+<section id="vue-synastrie" class="vue cachee">
+  <div class="intro">
+    <h2>Synastrie</h2>
+    <p>Deux figures face à face. Les livres la font à leur manière — et il faut savoir laquelle,
+    parce qu'ils en donnent deux, pour deux questions différentes.</p>
+    <p><b>La concorde</b> — Ptolémée, <i>Tetrabiblos</i> IV, 7 — vaut pour <b>toute relation</b> :
+    un mariage, une amitié, un frère, un associé, un adversaire. Elle compare les <b>quatre
+    lieux chefs</b> des deux nativités : le Soleil, la Lune, l'ascendant et la part de Fortune.
+    Mêmes signes ou échange de places : sympathie assurée. Signes disjoints ou opposés :
+    inimitié profonde. Trine et sextile : sympathie moindre. Quartile : antipathie moindre.</p>
+    <p><b>Le mariage</b> — <i>Tetrabiblos</i> IV, 5 — est une règle à part, et plus étroite :
+    elle ne regarde que les <b>luminaires</b> des deux figures, et veut savoir qui est l'homme
+    et qui est la femme pour mettre la Lune de l'un au Soleil de l'autre.</p>
+  </div>
+
+  <form id="formulaire-synastrie" class="officine">
+    <div class="duo-naissances">
+      <fieldset class="naissance">
+        <legend>Première personne</legend>
+        <div class="rangee rangee-date">
+          <div class="champ">
+            <label for="jour-a">Jour</label>
+            <input type="number" id="jour-a" min="1" max="31" value="20" required>
+          </div>
+          <div class="champ">
+            <label for="mois-a">Mois</label>
+            <input type="number" id="mois-a" min="1" max="12" value="5" required>
+          </div>
+          <div class="champ">
+            <label for="annee-a">Année</label>
+            <input type="number" id="annee-a" min="-500" max="2400" value="1996" required>
+          </div>
+        </div>
+        <div class="rangee">
+          <div class="champ champ-heure">
+            <label for="heure-a">Heure</label>
+            <div class="paire">
+              <input type="number" id="heure-a" min="0" max="23" placeholder="h">
+              <span>h</span>
+              <input type="number" id="minute-a" min="0" max="59" placeholder="min" value="0">
+            </div>
+          </div>
+          <div class="champ champ-sexe">
+            <label for="sexe-a">C'est</label>
+            <select id="sexe-a">
+              <option value="">sans le dire</option>
+              <option value="homme">un homme</option>
+              <option value="femme">une femme</option>
+            </select>
+          </div>
+        </div>
+        <div class="champ champ-lieu">
+          <label for="lieu-a">Lieu</label>
+          <input id="lieu-a" value="Paris" autocomplete="off" spellcheck="false">
+          <ul id="lieux-a" class="suggestions" hidden></ul>
+          <span class="etat-lieu" id="etat-lieu-a" aria-live="polite"></span>
+        </div>
+        <details class="reglages">
+          <summary>Coordonnées et convention d'heure</summary>
+          <div class="rangee">
+            <div class="champ petit">
+              <label for="latitude-a">Latitude</label>
+              <input type="number" id="latitude-a" step="0.0001" value="48.8566" required>
+            </div>
+            <div class="champ petit">
+              <label for="longitude-a">Longitude</label>
+              <input type="number" id="longitude-a" step="0.0001" value="2.3522" required>
+            </div>
+            <div class="champ champ-convention">
+              <label for="convention-a">L'heure est donnée en</label>
+              <select id="convention-a"></select>
+            </div>
+          </div>
+        </details>
+      </fieldset>
+
+      <fieldset class="naissance">
+        <legend>Seconde personne</legend>
+        <div class="rangee rangee-date">
+          <div class="champ">
+            <label for="jour-b">Jour</label>
+            <input type="number" id="jour-b" min="1" max="31" value="14" required>
+          </div>
+          <div class="champ">
+            <label for="mois-b">Mois</label>
+            <input type="number" id="mois-b" min="1" max="12" value="9" required>
+          </div>
+          <div class="champ">
+            <label for="annee-b">Année</label>
+            <input type="number" id="annee-b" min="-500" max="2400" value="1998" required>
+          </div>
+        </div>
+        <div class="rangee">
+          <div class="champ champ-heure">
+            <label for="heure-b">Heure</label>
+            <div class="paire">
+              <input type="number" id="heure-b" min="0" max="23" placeholder="h">
+              <span>h</span>
+              <input type="number" id="minute-b" min="0" max="59" placeholder="min" value="0">
+            </div>
+          </div>
+          <div class="champ champ-sexe">
+            <label for="sexe-b">C'est</label>
+            <select id="sexe-b">
+              <option value="">sans le dire</option>
+              <option value="homme">un homme</option>
+              <option value="femme">une femme</option>
+            </select>
+          </div>
+        </div>
+        <div class="champ champ-lieu">
+          <label for="lieu-b">Lieu</label>
+          <input id="lieu-b" value="Paris" autocomplete="off" spellcheck="false">
+          <ul id="lieux-b" class="suggestions" hidden></ul>
+          <span class="etat-lieu" id="etat-lieu-b" aria-live="polite"></span>
+        </div>
+        <details class="reglages">
+          <summary>Coordonnées et convention d'heure</summary>
+          <div class="rangee">
+            <div class="champ petit">
+              <label for="latitude-b">Latitude</label>
+              <input type="number" id="latitude-b" step="0.0001" value="48.8566" required>
+            </div>
+            <div class="champ petit">
+              <label for="longitude-b">Longitude</label>
+              <input type="number" id="longitude-b" step="0.0001" value="2.3522" required>
+            </div>
+            <div class="champ champ-convention">
+              <label for="convention-b">L'heure est donnée en</label>
+              <select id="convention-b"></select>
+            </div>
+          </div>
+        </details>
+      </fieldset>
+    </div>
+
+    <div class="boutons">
+      <button type="submit" class="principal">Comparer les deux figures</button>
+    </div>
+  </form>
+
+  <div id="resultat-synastrie"></div>
+</section>
+
 <!-- ══════════════════════════════ LA NOTICE ═══════════════════════════════ -->
 <section id="vue-notice" class="vue cachee">
 
@@ -246,6 +392,10 @@
     car un regard qui se défait dit que la chose est déjà passée, et c’est là l’erreur que Sahl
     reproche aux ignorants —, ou bien si une planète plus rapide qu’eux porte la lumière du
     premier au second.</p>
+    <p>À côté de ces trois-là, une <b>comparaison</b> : deux nativités mises face à face.
+    Ptolémée en donne deux règles distinctes — la <i>concorde</i> (IV, 7), qui vaut pour toute
+    relation et compare les quatre lieux chefs des deux figures, et le <i>mariage</i> (IV, 5),
+    qui ne regarde que les luminaires. Voyez l’onglet <b>Synastrie</b>.</p>
     <div class="avertissement-genre" id="avertissement-oresme"></div>
   </details>
 
@@ -330,6 +480,11 @@
     <p>Le dossier destiné à un modèle de langue est fabriqué dans votre navigateur et n’est
     envoyé nulle part : le site n’appelle aucun fournisseur et n’en recommande aucun. C’est
     vous qui le collez, où vous voulez.</p>
+    <p>Votre ciel peut être <b>gardé dans votre navigateur</b> pour être comparé à un autre, et
+    <b>transmis par un lien</b>. Les données voyagent alors dans le <i>fragment</i> de l’adresse
+    — la partie après le dièse, que le navigateur n’envoie jamais au serveur, par construction.
+    À vous seul de décider à qui vous donnez ce lien : il contient votre date, votre heure et
+    votre lieu de naissance.</p>
     <p><a href="https://github.com/adussarps/astrologie-de-cour" target="_blank" rel="noopener">Le
     dépôt, sur GitHub</a> — la contribution la plus utile serait de reconstruire le calcul
     alphonsin depuis les données de DISHAS, pour afficher côte à côte le ciel réel et le ciel

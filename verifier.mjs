@@ -577,6 +577,77 @@ console.log('\n── Les axes que la figure charge, et qu’on propose au lecte
     + `de ${moins} à ${plus} selon la figure.`);
 }
 
+console.log('\n── La synastrie : deux figures face à face (Ptolémée, IV, 5 et IV, 7)');
+{
+  // Ptolémée juge le mariage sur « les luminaires des deux génitures ». Ces
+  // contrôles tiennent les lois du module : la comparaison ne dépend pas de
+  // l'ordre, et un aspect croisé n'a pas de sens de mouvement — entre deux
+  // ciels figés à des dates différentes, il n'y en a pas.
+  const { synastrie, aspectsCroises, echangesEntreFigures, concorde, rapportEntreLieux } =
+    await import('./src/synastrie.js');
+  const figureDe = (clef) => {
+    const n = NATIVITES.find((x) => x.clef === clef);
+    const { jj } = versTempsUniversel({ ...n, convention: 'vraie' });
+    return juger({
+      positions: positions(jj), maisons: maisons(jj, n.latitude, n.longitude),
+      sexe: n.sexe ?? null,
+    });
+  };
+  const louis = figureDe('louis-orleans');
+  const charles = figureDe('charles-vi');
+  const s = synastrie(louis, charles);
+
+  const cles = (liste) => liste
+    .map((r) => `${[r.de, r.a].sort().join('+')}/${r.nom}/${r.ecart.toFixed(6)}`).sort();
+  const aller = cles(aspectsCroises(louis, charles));
+  const retour = cles(aspectsCroises(charles, louis));
+  ok('les aspects croisés ne dépendent pas de l’ordre des figures',
+    aller.length === retour.length && aller.every((x, i) => x === retour[i]),
+    `${aller.length} contre ${retour.length}`);
+
+  ok('aucun aspect croisé ne dit qu’il s’applique ou se sépare',
+    s.aspects.every((r) => !('applique' in r) && !('mouvement' in r)), 'un sens est présent');
+
+  ok('les quatre croisements des luminaires sont rendus', 4, s.luminaires.paires.length);
+  ok('le verdict est l’un des trois',
+    ['durable', 'rupture', 'partage'].includes(s.luminaires.verdict), s.luminaires.verdict);
+
+  const eAB = echangesEntreFigures(louis, charles);
+  const eBA = echangesEntreFigures(charles, louis);
+  ok('la réception croisée se répond, rôles échangés',
+    eAB.aRecuParB.length === eBA.bRecuParA.length
+      && eAB.aRecuParB.every((x) => eBA.bRecuParA
+        .some((y) => y.hote === x.hote && y.recue === x.recue && y.par === x.par)),
+    'les deux relevés diffèrent');
+
+  // La concorde (IV, 7) porte sur les quatre lieux chefs, et la comparaison ne
+  // doit pas dépendre de l'ordre : c'est une distance entre deux signes.
+  const c = s.concorde;
+  const cBA = concorde(charles, louis);
+  const lieu = (f, clef) => (clef === 'ascendant' ? f.ascendant
+    : clef === 'fortune' ? f.parts.find((p) => p.clef === 'fortune').longitude
+      : f.astres.find((a) => a.clef === clef).longitude);
+
+  ok('les quatre lieux chefs sont rendus', 4, c.lieux.length);
+  ok('le verdict de concorde est l’un des cinq',
+    ['sympathie-assuree', 'inimities', 'sympathie-moindre', 'antipathie-moindre', 'partagee']
+      .includes(c.verdict), c.verdict);
+  ok('la concorde est la même dans les deux sens',
+    c.verdict === cBA.verdict && c.lieux.every((l, i) => l.rapport === cBA.lieux[i].rapport),
+    'les deux sens diffèrent');
+  ok('le rapport de signe ne dépend pas de l’ordre',
+    ['soleil', 'lune', 'ascendant', 'fortune'].every((clef) =>
+      rapportEntreLieux(lieu(louis, clef), lieu(charles, clef))
+        === rapportEntreLieux(lieu(charles, clef), lieu(louis, clef))),
+    'un rapport change avec l’ordre');
+
+  console.log(`     Louis d’Orléans × Charles VI : concorde ${c.verdict} ; luminaires `
+    + `${s.luminaires.verdict} (${s.luminaires.compte.harmonieuses} harmonieux, `
+    + `${s.luminaires.compte.inharmonieuses} durs, ${s.luminaires.compte.aversions} en `
+    + `aversion) ; ${s.aspects.length} aspects croisés ; ${s.echanges.mutuels.length} `
+    + `échange(s) mutuel(s).`);
+}
+
 console.log('\n── L’interrogation : les voies d’aboutissement');
 {
   // On juge les douze espèces de questions sur une même figure. Ce qu'on

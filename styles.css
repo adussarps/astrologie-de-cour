@@ -825,3 +825,55 @@ footer p { max-width: 72ch; margin: 0; }
   .maison-lue .corps { padding-left: calc(1.8em + 14px); }
   table.releve { font-size: .84rem; }
 }
+
+/* ── Deux figures : la comparaison ───────────────────────────────────────── */
+
+.duo-naissances {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
+}
+.naissance { border: 1px solid var(--trait); padding: 14px 16px 18px; margin: 0; }
+.naissance legend {
+  font-variant: small-caps; letter-spacing: .05em;
+  color: var(--rubrique); padding: 0 8px;
+}
+.duo-carres {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 26px; margin-top: 28px;
+}
+.synastrie-texte { margin-top: 34px; }
+.synastrie-bloc { margin: 0 0 30px; padding-top: 18px; border-top: 1px solid var(--trait); }
+.synastrie-bloc:first-child { border-top: none; padding-top: 0; }
+.verdict-synastrie { font-size: 1.16rem; font-weight: 600; margin: 0 0 12px; }
+.synastrie-bloc.accord .verdict-synastrie { color: #3f6b34; }
+.synastrie-bloc.desaccord .verdict-synastrie { color: var(--rubrique); }
+.croix { color: var(--encre-pale); font-size: .9em; }
+ul.receptions { list-style: none; padding: 0; margin: 0 0 10px; font-size: .94rem; }
+ul.receptions li { padding: 5px 0 5px 18px; position: relative; }
+ul.receptions li::before { content: '·'; position: absolute; left: 2px; color: var(--rubrique); }
+ul.receptions li.mutuel::before { content: '✦'; }
+
+@media (max-width: 640px) {
+  .duo-naissances, .duo-carres { grid-template-columns: 1fr; }
+}
+
+/* Un repli de comparaison : la table est là, mais ne prend pas la page. */
+.repli { margin: 10px 0; }
+.repli > summary { cursor: pointer; color: var(--rubrique); font-size: .95rem; }
+.repli[open] > summary { margin-bottom: 10px; }
+
+/* ── Après sa figure : comparer, envoyer ─────────────────────────────────── */
+
+.actions-compat {
+  margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--trait);
+  display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline;
+}
+.actions-compat .lien { font-size: .95rem; }
+.actions-compat-note {
+  flex-basis: 100%; margin: 4px 0 0; font-size: .82rem; color: var(--encre-pale);
+}
+.actions-compat-note.dit { color: #3f6b34; }
+.accueil-synastrie {
+  padding: 14px 16px; margin: 0 0 22px; font-size: 1.02rem;
+  border-left: 3px solid var(--or); background: rgba(154, 123, 51, .07);
+}

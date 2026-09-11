@@ -23,7 +23,8 @@ import { figureDeLAnnee, SOURCES as SOURCES_ANNEE } from './annee.js';
 import {
   DEMANDES, jugerInterrogation, SOURCES as SOURCES_QUESTION,
 } from './interrogation.js';
-import { dossierNativite, dossierAnnee, dossierInterrogation } from './dossier.js';
+import { dossierNativite, dossierAnnee, dossierInterrogation, dossierSynastrie } from './dossier.js';
+import { synastrie as calculerSynastrie, SOURCES as SOURCES_SYNASTRIE } from './synastrie.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
@@ -321,6 +322,7 @@ function rendreFigure(saisie, cartouche, { titreCarre = '', dossier = null } = {
           ${titreCarre}
           ${troisLignes(figure)}
           ${dossier ? actions(dossier, dossierNativite({ saisie, resultat })) : ''}
+          ${dossier ? actionsCompatibilite() : ''}
         </div>
       </div>
       <details class="detail">
@@ -384,14 +386,83 @@ function rendreSansHeure(saisie) {
 
 // ─── L'officine ──────────────────────────────────────────────────────────────
 
-function lireFormulaire() {
+/** Lit une naissance. Sans suffixe, c'est l'officine ; « -a » et « -b » sont
+ *  les deux personnes de la comparaison. */
+function lireFormulaire(suffixe = '') {
+  const v = (id) => $(`#${id}${suffixe}`).value;
   return {
-    annee: +$('#annee').value, mois: +$('#mois').value, jour: +$('#jour').value,
-    heure: +$('#heure').value, minute: +$('#minute').value || 0,
-    latitude: +$('#latitude').value, longitude: +$('#longitude').value,
-    convention: $('#convention').value,
-    sexe: $('#sexe').value || null,
+    annee: +v('annee'), mois: +v('mois'), jour: +v('jour'),
+    heure: +v('heure'), minute: +v('minute') || 0,
+    latitude: +v('latitude'), longitude: +v('longitude'),
+    convention: v('convention'),
+    sexe: v('sexe') || null,
+    lieu: v('lieu').trim(),
   };
+}
+
+// ─── Le ciel principal, gardé d'une vue à l'autre ────────────────────────────
+//
+// Le ciel saisi dans l'officine est le ciel principal : il préremplit la
+// première personne de la comparaison, et il peut s'envoyer. Rien ne part vers
+// un serveur : le ciel voyage dans le *fragment* de l'URL — la partie après le
+// dièse, que le navigateur ne transmet jamais — et il est retenu dans le
+// navigateur, sur la machine, jamais ailleurs.
+
+const CLE_CIEL = 'gaudia.ciel';
+let naissancePrincipale = null;
+
+/** Un ciel en une chaîne : les nombres bruts, le lieu encodé. */
+function encoderCiel(saisie) {
+  return [
+    saisie.annee, saisie.mois, saisie.jour, saisie.heure, saisie.minute,
+    saisie.latitude, saisie.longitude, saisie.convention ?? '', saisie.sexe ?? '', saisie.lieu ?? '',
+  ].map((x) => encodeURIComponent(String(x))).join('~');
+}
+
+function decoderCiel(texte) {
+  const c = String(texte).split('~').map(decodeURIComponent);
+  if (c.length < 9 || c.slice(0, 7).some((x) => x === '')) return null;
+  const [annee, mois, jour, heure, minute, latitude, longitude] = c.slice(0, 7).map(Number);
+  if (![annee, mois, jour, latitude, longitude].every(Number.isFinite)) return null;
+  return {
+    annee, mois, jour, heure, minute, latitude, longitude,
+    convention: c[7] || undefined, sexe: c[8] || null, lieu: c[9] ?? '',
+  };
+}
+
+/** Retenir le ciel principal — en mémoire, et dans le navigateur. */
+function retenirCiel(saisie) {
+  naissancePrincipale = saisie;
+  try { localStorage.setItem(CLE_CIEL, encoderCiel(saisie)); } catch { /* navigation privée */ }
+}
+
+function cielRetenu() {
+  if (naissancePrincipale) return naissancePrincipale;
+  try {
+    const texte = localStorage.getItem(CLE_CIEL);
+    if (texte) naissancePrincipale = decoderCiel(texte);
+  } catch { /* ignoré */ }
+  return naissancePrincipale;
+}
+
+/** Remplir une naissance du formulaire — l'officine ou l'une des deux colonnes. */
+function ecrireNaissance(suffixe, saisie) {
+  const poser = (id, valeur) => {
+    const champ = $(`#${id}${suffixe}`);
+    if (champ && valeur !== undefined && valeur !== null) champ.value = valeur;
+  };
+  poser('annee', saisie.annee); poser('mois', saisie.mois); poser('jour', saisie.jour);
+  poser('heure', saisie.heure); poser('minute', String(saisie.minute ?? 0).padStart(2, '0'));
+  poser('latitude', saisie.latitude); poser('longitude', saisie.longitude);
+  poser('lieu', saisie.lieu);
+  poser('sexe', saisie.sexe ?? '');
+  if (saisie.convention) poser('convention', saisie.convention);
+}
+
+/** Le ciel porté par l'adresse, s'il y en a un. */
+function cielDeLAdresse() {
+  const fragment = globalThis.location?.hash?.replace(/^#/, '') ?? '';
+  return fragment.startsWith('ciel=') ? decoderCiel(fragment.slice(5)) : null;
 }
 
 /** La convention proposée dépend de la date : l'heure légale n'existe pas
@@ -842,6 +913,11 @@ function initOfficine() {
   noterCalendrier();
   noterConvention();
 
+  // Le ciel principal est gardé d'une visite à l'autre : on le remet dans
+  // l'officine, faute de quoi le lecteur le ressaisirait à chaque fois.
+  const retenu = cielRetenu();
+  if (retenu) { ecrireNaissance('', retenu); noterCalendrier(); noterConvention(); }
+
   $('#formulaire').addEventListener('submit', (e) => {
     e.preventDefault();
     const saisie = lireFormulaire();
@@ -857,6 +933,7 @@ function initOfficine() {
         $('#lieu').value || '—',
       ],
     }, { dossier: 'nativite' });
+    retenirCiel(saisie);
     $('#resultat').innerHTML = markup;
     ouvrirLaSuite(saisie);
     montrer('#resultat');
@@ -1054,17 +1131,287 @@ function initMethode() {
     <h3>${html(r.titre)}</h3><p>${html(r.texte)}</p></div>`).join('');
 }
 
+// ─── Synastrie : la concorde, et le mariage ──────────────────────────────────
+
+const LIBELLE_RAPPORT = {
+  'meme-signe': 'même signe',
+  disjoints: 'signes disjoints',
+  opposition: 'opposition',
+  sympathie: 'trine ou sextile',
+  antipathie: 'quartile',
+};
+
+const VERDICT_CONCORDE = {
+  'sympathie-assuree': ['accord', 'Sympathie assurée et indissoluble'],
+  inimities: ['desaccord', 'Inimitiés profondes et durables'],
+  'sympathie-moindre': ['accord', 'Sympathie moindre'],
+  'antipathie-moindre': ['desaccord', 'Antipathie moindre'],
+  partagee: ['', 'Rapports partagés'],
+};
+
+const VERDICT_MARIAGE = {
+  durable: ['accord', 'Les mariages durent'],
+  rupture: ['desaccord', 'Divorces et aliénations'],
+  partage: ['', 'Ni l’un ni l’autre'],
+};
+
+function blocConcorde(s) {
+  const c = s.concorde;
+  const [classe, titre] = VERDICT_CONCORDE[c.verdict] ?? ['', '—'];
+  const lignes = c.lieux.map((l) => `<tr>
+    <td>${html(l.nom)}</td>
+    <td>${l.rapport ? html(LIBELLE_RAPPORT[l.rapport]) : '—'}</td>
+    <td class="deg">${l.ecart != null ? html(enDegresMinutes(l.ecart)) : '—'}</td>
+  </tr>`).join('');
+  return `<section class="synastrie-bloc ${classe}">
+    <h3>La concorde — <i>Tetrabiblos</i> IV, 7</h3>
+    <p class="verdict-synastrie">${html(titre)}${c.genres.length
+    ? ` — amitié ${html(c.genres.join(', '))}` : ''}.</p>
+    <table class="releve">
+      <thead><tr><th>Lieu chef</th><th>Rapport</th><th>Écart</th></tr></thead>
+      <tbody>${lignes}</tbody>
+    </table>
+    ${c.echanges.length ? `<p class="cote">Échange de places :
+      ${c.echanges.map((e) => `${html(e.a)} / ${html(e.b)}`).join(', ')} — le texte le met
+      au rang du même signe.</p>` : ''}
+    <p class="cote">Les deux ascendants sont à ${html(enDegresMinutes(c.ecartDesAscendants))}
+    l’un de l’autre${c.ascendantsSerres
+    ? ' : c’est le cas que Ptolémée dit le plus fort, à quelque dix-sept degrés.' : '.'}</p>
+    <span class="renvoi">${html(SOURCES_SYNASTRIE.concorde)}</span>
+  </section>`;
+}
+
+function blocMariage(s) {
+  const l = s.luminaires;
+  const [classe, titre] = VERDICT_MARIAGE[l.verdict] ?? ['', '—'];
+  const lignes = l.paires.map((p) => `<tr${p.nature === 'harmonieuse' ? ' class="dignifie"' : ''}>
+    <td>${html(nomDe(p.de))} <span class="croix">×</span> ${html(nomDe(p.a))}</td>
+    <td>${p.nom ? html(`${p.glyphe} ${p.nom}`) : 'aucun'}</td>
+    <td class="deg">${p.ecart != null ? html(enDegresMinutes(p.ecart)) : '—'}</td>
+    <td>${html(p.signe ?? '—')}</td>
+  </tr>`).join('');
+  const privilegie = l.privilegie
+    ? `<p class="cote">Le croisement que Ptolémée met au-dessus des autres — la Lune du mari
+      au Soleil de la femme : ${l.privilegie.nom
+    ? `${html(l.privilegie.glyphe)} ${html(l.privilegie.nom)}, à
+       ${html(enDegresMinutes(l.privilegie.ecart))}` : 'aucun aspect'}.</p>`
+    : `<p class="cote">Les sexes n’étant pas donnés, le croisement privilégié — Lune du mari
+      au Soleil de la femme — n’est pas désigné.</p>`;
+  return `<section class="synastrie-bloc ${classe}">
+    <h3>Le mariage — <i>Tetrabiblos</i> IV, 5</h3>
+    <p class="verdict-synastrie">${html(titre)} — ${l.compte.harmonieuses} croisement(s)
+    harmonieux, ${l.compte.inharmonieuses} dur(s), ${l.compte.aversions} en aversion.</p>
+    <table class="releve">
+      <thead><tr><th>Luminaires</th><th>Par degré</th><th>Écart</th><th>Par signe</th></tr></thead>
+      <tbody>${lignes}</tbody>
+    </table>
+    ${privilegie}
+    <span class="renvoi">${html(SOURCES_SYNASTRIE.mariage)}</span>
+  </section>`;
+}
+
+function tableauAspectsCroises(aspects) {
+  if (!aspects.length) {
+    return `<section class="synastrie-bloc"><h3>Les aspects croisés</h3>
+      <p>Aucune planète de l’une ne regarde une planète de l’autre dans les orbes.</p></section>`;
+  }
+  const montre = aspects.slice(0, 24);
+  const lignes = montre.map((r) => `<tr${r.partil ? ' class="dignifie"' : ''}>
+    <td>${html(nomDe(r.de))} <span class="croix">×</span> ${html(nomDe(r.a))}</td>
+    <td>${html(`${r.glyphe} ${r.nom}`)}</td>
+    <td class="deg">${html(enDegresMinutes(r.ecart))}</td>
+    <td>${r.partil ? 'partil' : ''}</td>
+  </tr>`).join('');
+  return `<section class="synastrie-bloc">
+    <h3>Les aspects croisés</h3>
+    <p class="preambule">Deux ciels figés à des dates différentes ne s’appliquent ni ne se
+    séparent : on donne l’aspect et son écart, jamais un mouvement.</p>
+    <details class="repli">
+      <summary>${aspects.length} aspect(s) croisé(s) dans les orbes</summary>
+      <table class="releve">
+        <thead><tr><th>Couple</th><th>Aspect</th><th>Écart</th><th></th></tr></thead>
+        <tbody>${lignes}</tbody>
+      </table>
+      ${aspects.length > montre.length
+    ? `<p class="cote">${aspects.length - montre.length} autres, plus lâches, ne sont pas
+      montrés.</p>` : ''}
+    </details>
+    <span class="renvoi">${html(SOURCES_SYNASTRIE.aspects)}</span>
+  </section>`;
+}
+
+function tableauEchanges(e) {
+  const lignes = [];
+  for (const x of e.aRecuParB) {
+    lignes.push(`<li><b>${html(nomDe(x.recue))}</b> (I) est reçue par
+      <b>${html(nomDe(x.hote))}</b> (II), par ${html(x.par)}.</li>`);
+  }
+  for (const x of e.bRecuParA) {
+    lignes.push(`<li><b>${html(nomDe(x.recue))}</b> (II) est reçue par
+      <b>${html(nomDe(x.hote))}</b> (I), par ${html(x.par)}.</li>`);
+  }
+  const mutuels = e.mutuels.map((m) =>
+    `<li class="mutuel"><b>Échange mutuel</b> : ${html(nomDe(m.a))} et ${html(nomDe(m.b))}
+     se logent l’une l’autre.</li>`).join('');
+  const total = lignes.length + e.mutuels.length;
+  return `<section class="synastrie-bloc">
+    <h3>Les réceptions entre les deux figures</h3>
+    ${total
+    ? `<details class="repli">
+        <summary>${total} réception(s)${e.mutuels.length
+      ? `, dont ${e.mutuels.length} échange(s) mutuel(s)` : ''}</summary>
+        <ul class="receptions">${lignes.join('')}${mutuels}</ul>
+      </details>`
+    : '<p>Aucune planète de l’une ne se tient dans un lieu de l’autre.</p>'}
+    <span class="renvoi">${html(SOURCES_SYNASTRIE.reception)}</span>
+  </section>`;
+}
+
+function rendreSynastrie(saisieA, saisieB) {
+  const resultatA = dresser(saisieA);
+  const resultatB = dresser(saisieB);
+  const s = calculerSynastrie(resultatA.figure, resultatB.figure);
+  const cartouche = (saisie, rang) => ({
+    titre: `Figura ${rang}`,
+    lignes: [`${saisie.jour}/${saisie.mois}/${saisie.annee}`,
+      `${String(saisie.heure).padStart(2, '0')} h ${String(saisie.minute).padStart(2, '0')}`],
+  });
+  return `
+    <div class="duo-carres">
+      ${hoteDuCarre(resultatA.figure, cartouche(saisieA, 'I'), AU_REPOS)}
+      ${hoteDuCarre(resultatB.figure, cartouche(saisieB, 'II'), AU_REPOS)}
+    </div>
+    <div class="synastrie-texte">
+      ${blocConcorde(s)}
+      ${blocMariage(s)}
+      ${tableauAspectsCroises(s.aspects)}
+      ${tableauEchanges(s.echanges)}
+      ${actions('synastrie', dossierSynastrie({
+    saisieA, saisieB, resultatA, resultatB, synastrie: s,
+  }))}
+    </div>`;
+}
+
+function initSynastrie() {
+  for (const suffixe of ['-a', '-b']) {
+    const select = $(`#convention${suffixe}`);
+    select.innerHTML = Object.values(CONVENTIONS)
+      .map((c) => `<option value="${c.clef}">${html(c.nom)}</option>`).join('');
+    const reglerConvention = () => {
+      select.value = conventionParDefaut(+$(`#annee${suffixe}`).value);
+    };
+    reglerConvention();
+    $(`#annee${suffixe}`).addEventListener('input', reglerConvention);
+    installerRechercheDeLieu({
+      champ: $(`#lieu${suffixe}`),
+      liste: $(`#lieux${suffixe}`),
+      etat: $(`#etat-lieu${suffixe}`),
+      surChoix: (lieu) => {
+        $(`#latitude${suffixe}`).value = lieu.latitude.toFixed(4);
+        $(`#longitude${suffixe}`).value = lieu.longitude.toFixed(4);
+      },
+    });
+  }
+
+  // Le ciel principal, déjà saisi, devient la première personne.
+  const retenu = cielRetenu();
+  if (retenu) ecrireNaissance('-a', retenu);
+
+  $('#formulaire-synastrie').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if ($('#heure-a').value === '' || $('#heure-b').value === '') {
+      $('#resultat-synastrie').innerHTML = `<div class="refus">
+        <h2>Sans les deux heures, pas de comparaison</h2>
+        <p>Les deux ascendants sont les lieux chefs de la concorde : sans eux la règle de
+        Ptolémée ne peut pas être conduite. Il faut l’heure des deux naissances — voyez
+        « Je ne sais pas l’heure » dans <i>Ma figure</i> pour comprendre pourquoi.</p></div>`;
+      return;
+    }
+    const saisieA = lireFormulaire('-a');
+    const saisieB = lireFormulaire('-b');
+    retenirCiel(saisieA);
+    $('#resultat-synastrie').innerHTML = rendreSynastrie(saisieA, saisieB);
+    montrer('#resultat-synastrie');
+  });
+}
+
 // ─── Navigation ──────────────────────────────────────────────────────────────
+
+/** Passer d'une vue à l'autre — ce que fait un onglet, et ce que font les
+ *  renvois d'une vue à l'autre (« vérifier ma compatibilité »). */
+function basculerVers(vue) {
+  $$('.onglet').forEach((o) => o.classList.toggle('actif', o.dataset.vue === vue));
+  $$('.vue').forEach((v) => v.classList.toggle('cachee', v.id !== `vue-${vue}`));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (vue === 'nativites' && !$('#nativite-detail').innerHTML) {
+    $('#galerie button')?.click();
+  }
+}
 
 function initNavigation() {
   $$('.onglet').forEach((onglet) => onglet.addEventListener('click', () => {
-    $$('.onglet').forEach((o) => o.classList.toggle('actif', o === onglet));
-    $$('.vue').forEach((v) => v.classList.toggle('cachee', v.id !== `vue-${onglet.dataset.vue}`));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (onglet.dataset.vue === 'nativites' && !$('#nativite-detail').innerHTML) {
-      $('#galerie button').click();
-    }
+    basculerVers(onglet.dataset.vue);
   }));
+}
+
+// ─── Le ciel principal : le garder, le comparer, l'envoyer ───────────────────
+
+/** Après sa propre figure : passer à la comparaison, ou envoyer son ciel. */
+function actionsCompatibilite() {
+  return `<div class="actions-compat">
+    <button type="button" class="lien" data-vers="synastrie">Vérifier ma compatibilité avec
+    quelqu’un</button>
+    <button type="button" class="lien copier-ciel">Envoyer mon ciel à quelqu’un</button>
+    <p class="actions-compat-note" aria-live="polite">Le lien porte votre ciel dans son
+    adresse, après le dièse : il n’est envoyé à aucun serveur, et vous seul décidez à qui le
+    transmettre.</p>
+  </div>`;
+}
+
+function initCompatibilite() {
+  document.addEventListener('click', (e) => {
+    if (e.target.closest?.('[data-vers="synastrie"]')) {
+      const retenu = cielRetenu();
+      if (retenu) ecrireNaissance('-a', retenu);
+      basculerVers('synastrie');
+      montrer('#formulaire-synastrie');
+      return;
+    }
+
+    const bouton = e.target.closest?.('.copier-ciel');
+    if (!bouton) return;
+    const retenu = cielRetenu();
+    if (!retenu) return;
+    const lien = `${location.origin}${location.pathname}#ciel=${encoderCiel(retenu)}`;
+    const note = bouton.parentElement.querySelector('.actions-compat-note');
+    const dire = (m) => { if (note) { note.textContent = m; note.classList.add('dit'); } };
+    const fait = 'Lien copié. Envoyez-le : votre correspondant y saisira sa propre naissance, '
+      + 'et rien ne passe par un serveur.';
+
+    // Même contrainte que la copie du dossier : l'appel doit partir dans le tour
+    // du clic, et le presse-papier n'est pas garanti.
+    Promise.resolve(navigator.clipboard?.writeText(lien))
+      .then(() => dire(fait))
+      .catch(() => {
+        if (copierALAncienne(lien)) dire(fait);
+        else dire(`Copie refusée par le navigateur. Le lien est : ${lien}`);
+      });
+  });
+}
+
+/** Un ciel reçu par l'adresse : on l'installe comme première personne. */
+function initPartage() {
+  const recu = cielDeLAdresse();
+  if (!recu) return;
+  retenirCiel(recu);
+  ecrireNaissance('-a', recu);
+  basculerVers('synastrie');
+  const zone = $('#resultat-synastrie');
+  if (zone) {
+    zone.innerHTML = `<p class="accueil-synastrie">Un ciel vous a été transmis : c’est la
+    <b>première personne</b>, déjà chargée à gauche. Saisissez votre propre naissance à droite,
+    puis comparez.</p>`;
+  }
 }
 
 initCopie();
@@ -1074,3 +1421,9 @@ initOfficine();
 initQuestions();
 initNativites();
 initMethode();
+initSynastrie();
+initCompatibilite();
+initPartage();
+// Un lien collé dans un onglet déjà ouvert ne recharge pas la page : le
+// changement de fragment doit suffire à installer le ciel reçu.
+globalThis.addEventListener?.('hashchange', initPartage);

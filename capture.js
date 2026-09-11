@@ -71,6 +71,12 @@ const script = {
              document.querySelector('#formulaire-question').requestSubmit(); 'ok'`,
   sources: `document.querySelector('[data-vue=notice]').click();
             document.querySelectorAll('#vue-notice .pan')[4].open = true; 'ok'`,
+  synastrie: `document.querySelector('[data-vue=synastrie]').click();
+              document.querySelector('#heure-a').value = 14;
+              document.querySelector('#minute-a').value = 30;
+              document.querySelector('#heure-b').value = 8;
+              document.querySelector('#minute-b').value = 15;
+              document.querySelector('#formulaire-synastrie').requestSubmit(); 'ok'`,
 }[CIBLE];
 
 const r = await envoyer('Runtime.evaluate', { expression: script, returnByValue: true });

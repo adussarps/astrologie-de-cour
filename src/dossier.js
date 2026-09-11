@@ -110,6 +110,30 @@ deux mots.
    circonstances changent. N'ouvre sur aucune matière absente du dossier, et n'annonce aucun
    événement.`;
 
+const PLAN_SYNASTRIE = `Ceci est une comparaison de DEUX nativités. La doctrine n'est pas celle
+d'une figure seule, et il faut la suivre : deux chapitres différents du Tetrabiblos s'en
+occupent, et ils ne répondent pas à la même question.
+
+1. LA CONCORDE — Ptolémée, IV, 7. Elle vaut pour toute relation : un mariage, une amitié, un
+frère, un associé, un adversaire. Elle compare les quatre lieux chefs des deux figures — le
+Soleil, la Lune, l'ascendant, la part de Fortune. Mêmes signes ou échange de places :
+sympathie assurée. Signes disjoints ou opposés : inimitié profonde. Trine et sextile :
+sympathie moindre. Quartile : antipathie moindre. Le dossier te donne le rapport de chacun et
+le verdict. Ouvre là-dessus : dis la sympathie ou l'inimitié, et par quels lieux elle tient.
+Si les lieux se répondent par les luminaires, l'amitié est de choix ; par les parts de
+Fortune, de besoin ; par les ascendants, de plaisir ou de peine.
+
+2. CE QUI LA PORTE. Les aspects croisés entre les deux figures — jamais un mouvement, les
+deux ciels sont figés — et les réceptions : une planète reçue dans le signe d'une planète de
+l'autre. Nomme ce qui pèse vraiment, pas l'inventaire.
+
+3. LE MARIAGE, SI C'EN EST UN. Si les sexes sont donnés, le dossier te donne aussi le
+croisement des luminaires de Ptolémée, IV, 5 — la Lune de l'un au Soleil de l'autre — et le
+témoignage des bénéfiques et des maléfiques. Dis-le. Si les sexes ne sont pas donnés, ne
+prononce aucun jugement de mariage : la règle ne peut pas être conduite.
+
+400 à 600 mots. Termine par une question au lecteur sur ce qu'il veut qu'on creuse.`;
+
 const SOCLE_BAS = `CE QUE TU NE FAIS PAS
 - Aucun portrait par signe solaire. Personne n'est « un Bélier ». Le Soleil est une planète
   parmi sept ; sa place se juge par maison, dignité et regard.
@@ -883,6 +907,120 @@ export function dossierInterrogation({ saisie, resultat, question, jugement }) {
       + contexte({ ...resultat, saisie, dateLabel: 'Date de la question' }),
     '',
     figureEnClair(resultat.figure, { ouverture: false }),
+    SEPARATEUR('LA DOCTRINE') + tablesDeDoctrine(),
+    SEPARATEUR('LES RÉSERVES') + reserves(),
+  ].join('\n');
+}
+
+// ─── Le dossier d'une comparaison de deux figures ────────────────────────────
+
+const NOM_RAPPORT = {
+  'meme-signe': 'même signe',
+  disjoints: 'signes disjoints',
+  opposition: 'signes opposés',
+  sympathie: 'trine ou sextile',
+  antipathie: 'quartile',
+};
+
+const NOM_VERDICT_CONCORDE = {
+  'sympathie-assuree': 'SYMPATHIE ASSURÉE ET INDISSOLUBLE',
+  inimities: 'INIMITIÉS PROFONDES ET DURABLES',
+  'sympathie-moindre': 'sympathie moindre',
+  'antipathie-moindre': 'antipathie moindre',
+  partagee: 'rapports partagés',
+};
+
+const NOM_VERDICT_MARIAGE = {
+  durable: 'mariages durables',
+  rupture: 'divorces et aliénations',
+  partage: 'ni l’un ni l’autre',
+};
+
+function concordeEnClair(c) {
+  const lignes = c.lieux.map((l) => `  ${l.nom.padEnd(20)} `
+    + `${l.rapport ? NOM_RAPPORT[l.rapport] : '—'}`
+    + `${l.ecart != null ? `   (écart ${enDegresMinutes(l.ecart)})` : ''}`).join('\n');
+  return `  VERDICT : ${NOM_VERDICT_CONCORDE[c.verdict]}\n`
+    + `  Compte : ${c.compte['meme-signe']} même(s) signe(s), ${c.compte.sympathie} trine(s) `
+    + `ou sextile(s), ${c.compte.antipathie} quartile(s), ${c.compte.disjoints} disjoint(s), `
+    + `${c.compte.opposition} opposition(s).\n`
+    + `  Les quatre lieux chefs des deux figures, l'un sous l'autre :\n${lignes}\n`
+    + (c.genres.length
+      ? `  Les lieux qui se répondent donnent une amitié ${c.genres.join(', ')}.\n` : '')
+    + (c.echanges.length
+      ? `  Échange de places : ${c.echanges.map((e) => `${e.a}/${e.b}`).join(', ')} — le texte `
+        + `le met au rang du même signe.\n` : '')
+    + `  Ascendants à ${enDegresMinutes(c.ecartDesAscendants)} l'un de l'autre`
+    + `${c.ascendantsSerres ? ' — le cas que le texte dit le plus fort (environ 17°).' : '.'}\n`
+    + `  Source : Ptolémée, Tetrabiblos, IV, 7 (trad. Robbins).`;
+}
+
+function mariageEnClair(l) {
+  const lignes = l.paires.map((p) => `  ${`${p.de} × ${p.a}`.padEnd(20)} `
+    + `${p.nom ? `${p.nom} (${p.ecart != null ? enDegresMinutes(p.ecart) : '—'})` : 'aucun aspect'}`
+    + `  — par signe : ${p.signe ?? 'aucun'}`).join('\n');
+  const privilegie = l.privilegie
+    ? `  Le croisement privilégié (Lune du mari au Soleil de la femme) : `
+      + `${l.privilegie.nom
+        ? `${l.privilegie.nom}, ${enDegresMinutes(l.privilegie.ecart)}` : 'aucun aspect'}`
+      + ` — ${l.privilegie.nature}.\n`
+    : '  Les sexes n’étant pas donnés, le croisement privilégié n’est pas désigné.\n';
+  return `  VERDICT : ${NOM_VERDICT_MARIAGE[l.verdict]}\n`
+    + `  (${l.compte.harmonieuses} harmonieux, ${l.compte.inharmonieuses} durs, `
+    + `${l.compte.aversions} en aversion, ${l.compte.conjonctions} conjonction(s))\n`
+    + `${lignes}\n${privilegie}`
+    + `  Source : Ptolémée, Tetrabiblos, IV, 5 (trad. Robbins).`;
+}
+
+function temoignagesEnClair(t) {
+  const ligne = (x) => `  ${x.nom} de ${x.figure} ${x.aspect} ${nomDe(x.sur)} de ${x.surFigure}, `
+    + `à ${enDegresMinutes(x.ecart)}`;
+  return `  Bénéfiques :\n${t.benefiques.length ? t.benefiques.map(ligne).join('\n')
+    : '  (aucun)'}\n`
+    + `  Maléfiques :\n${t.malefiques.length ? t.malefiques.map(ligne).join('\n')
+      : '  (aucun)'}\n`
+    + `  Source : les bénéfiques gardent le mariage agréable et profitable, les maléfiques le `
+    + `rendent querelleur (Ptolémée, IV, 5).`;
+}
+
+function aspectsCroisesEnClair(aspects) {
+  if (!aspects.length) return '  (aucun aspect entre les deux figures dans les orbes)';
+  return aspects.map((r) => `  ${`${nomDe(r.de)} ${r.glyphe} ${nomDe(r.a)}`.padEnd(26)} `
+    + `${r.nom}, à ${enDegresMinutes(r.ecart)}${r.partil ? ' — PARTIL' : ''}`).join('\n');
+}
+
+function echangesEnClair(e) {
+  const lignes = [];
+  for (const x of e.aRecuParB) {
+    lignes.push(`  ${nomDe(x.recue)} (I) est reçue par ${nomDe(x.hote)} (II), par ${x.par}`);
+  }
+  for (const x of e.bRecuParA) {
+    lignes.push(`  ${nomDe(x.recue)} (II) est reçue par ${nomDe(x.hote)} (I), par ${x.par}`);
+  }
+  for (const m of e.mutuels) {
+    lignes.push(`  ÉCHANGE MUTUEL : ${nomDe(m.a)} et ${nomDe(m.b)} se logent l’une l’autre`);
+  }
+  return lignes.length ? lignes.join('\n') : '  (aucune)';
+}
+
+export function dossierSynastrie({ saisieA, saisieB, resultatA, resultatB, synastrie: s }) {
+  const personne = (nom, saisie, resultat) =>
+    contexte({ ...resultat, saisie, dateLabel: `Date de naissance ${nom}` })
+    + '\n\n' + figureEnClair(resultat.figure, { ouverture: false });
+
+  return [
+    consigne(PLAN_SYNASTRIE),
+    SEPARATEUR('LA COMMANDE') + `Compare ces deux nativités. La concorde d'abord — elle vaut `
+      + `pour toute relation — puis, si les sexes sont donnés, ce que Ptolémée dit du mariage.`,
+    SEPARATEUR('PREMIÈRE FIGURE (I)') + personne('I', saisieA, resultatA),
+    SEPARATEUR('SECONDE FIGURE (II)') + personne('II', saisieB, resultatB),
+    SEPARATEUR('LA CONCORDE — Ptolémée, IV, 7') + concordeEnClair(s.concorde),
+    SEPARATEUR('LE MARIAGE — Ptolémée, IV, 5') + mariageEnClair(s.luminaires),
+    SEPARATEUR('CE QUE LES BÉNÉFIQUES ET LES MALÉFIQUES REGARDENT')
+      + temoignagesEnClair(s.temoignages),
+    SEPARATEUR('LES ASPECTS CROISÉS — sans mouvement, les deux ciels sont figés')
+      + aspectsCroisesEnClair(s.aspects),
+    SEPARATEUR('LES RÉCEPTIONS ENTRE LES DEUX FIGURES') + echangesEnClair(s.echanges),
     SEPARATEUR('LA DOCTRINE') + tablesDeDoctrine(),
     SEPARATEUR('LES RÉSERVES') + reserves(),
   ].join('\n');

@@ -263,6 +263,36 @@ une question au ciel revient à tenir la réponse pour déjà écrite. C’est c
 attaque dans son *Livre de divinacions* — Oresme, traducteur de Charles V, dont le traité de
 la sphère ouvre le manuscrit même où sont reliées les cinq nativités royales.
 
+## La synastrie : la concorde, et le mariage
+
+Deux figures face à face. Les livres la font à leur manière — mais en deux temps, et pour
+deux questions différentes. Le site donne les deux, et ne les confond pas.
+
+**La concorde** — Ptolémée, *Tetrabiblos* IV, 7 — vaut pour **toute relation** : un mariage,
+une amitié, un frère, un associé, un adversaire. Elle compare les **quatre lieux chefs** des
+deux nativités : le Soleil, la Lune, l’ascendant et la part de Fortune. Mêmes signes ou échange
+de places : sympathie assurée et indissoluble. Signes disjoints ou opposés : inimitiés
+profondes. Signes qui se regardent : le trine et le sextile rendent les sympathies moindres, le
+quartile les antipathies moindres — et le texte dit le cas le plus fort lorsque les deux
+ascendants sont à quelque dix-sept degrés l’un de l’autre. Le site nomme au passage les trois
+genres que Ptolémée distingue : par les luminaires l’amitié est **de choix**, par les parts de
+Fortune **de besoin**, par les ascendants **de plaisir ou de peine**.
+
+**Le mariage** — *Tetrabiblos* IV, 5 — est une règle à part, plus étroite : elle ne regarde que
+les **luminaires**. Les mariages durent quand les luminaires des deux figures sont en aspect
+harmonieux — trine ou sextile —, et plus encore quand la **Lune de l’un** est en cet aspect
+avec le **Soleil de l’autre**. Les oppositions et les quartiles annoncent les ruptures ; les
+bénéfiques qui regardent ces luminaires gardent le mariage agréable, les maléfiques le rendent
+querelleur. Le site demande donc qui est l’homme et qui est la femme — sans quoi il ne
+prononce aucun jugement de mariage et le dit.
+
+Ce que la comparaison **ne fait pas**, et qu’il faut savoir : elle ne dit **jamais** si un
+aspect s’applique ou se sépare. Entre deux ciels figés à des dates différentes, la Lune de l’un
+ne marche vers rien dans l’autre : un aspect croisé est un aspect, sans mouvement. Et les
+**superpositions de maisons** — les planètes de l’un dans les maisons de l’autre — sont un
+usage du XXᵉ siècle, absent de Ptolémée : le site ne les calcule pas tant qu’il ne peut pas les
+citer.
+
 ## Le lieu, et quelle heure
 
 Une figure sans longitude n’est pas une figure, et une heure sans sa convention n’est pas une
@@ -317,6 +347,7 @@ src/temps.js       les conventions de temps — heure légale, heure vraie, équ
 src/lieux.js       la recherche de lieu : liste du corpus hors ligne, puis Photon
 src/annee.js       la révolution de l'année, la profection, le maître de l'année
 src/interrogation.js  les questions, les considérations de Bonatti, la perfection
+src/synastrie.js   deux figures comparées — la concorde (IV, 7) et le mariage (IV, 5)
 src/dossier.js     le dossier à coller dans un modèle de langue
 src/texte.js       l'échappement du HTML, en un seul endroit
 src/app.js         l'interface : la figure, les trois lignes, le repli du détail
@@ -368,3 +399,8 @@ originales sont sous [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/dee
 
 Rien de ce que vous entrez ne quitte votre navigateur : il n’y a pas de serveur, pas de
 mesure d’audience, pas de dépendance chargée à l’exécution hormis une fonte.
+
+Le **ciel principal** — celui qu’on dresse dans *Ma figure* — est gardé dans le navigateur
+(`localStorage`) et préremplit la première personne de la comparaison. Le bouton *Envoyer mon
+ciel* copie un lien qui le porte dans le **fragment** de l’adresse : la partie après le dièse
+n’est jamais transmise au serveur, et c’est vous qui décidez à qui vous donnez ce lien.
