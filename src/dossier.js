@@ -70,20 +70,20 @@ ne sert à rien non plus. Si tu titres, mets les titres en Markdown (## ), court
 // ignore la nativité : elle répond par oui ou par non à une seule question,
 // sur la figure de l'instant où on l'a posée.
 
-const PLAN_NATIVITE = `C'est la PREMIÈRE réponse, et elle reste courte : 200 à 350 mots. Tu
-n'écris pas encore la lecture — tu l'ouvres, et tu proposes.
+const PLAN_NATIVITE = `C'est la PREMIÈRE réponse : 800 à 1000 mots. Tu n'écris pas encore les
+axes — tu ouvres la lecture, et tu proposes.
 
-1. L'OUVERTURE — CE QUE CE CIEL A DE BEAU, ET CE QU'IL RACONTE DE LOIN
-Quelques phrases. D'abord ce qui sort de l'ordinaire, que le dossier te donne **en tête**, sous
-« CE QUI SORT DE L'ORDINAIRE » : dis-le simplement, et si c'est une bonne chose, dis-le comme
-une bonne chose ; si ce bloc dit qu'il n'y a rien, dis que la figure est bien tempérée. Puis,
-en deux ou trois phrases, ce qui tient la figure (l'almuten, le seigneur de l'ascendant, ce qui
-est en angle) et ce que cela donne en gros. C'est un aperçu, pas la lecture.
+1. L'OUVERTURE — CE QUE CE CIEL A DE BEAU, ET CE QU'IL RACONTE
+Un vrai passage, non quelques phrases : c'est là que se voit le métier. Suis le ton donné plus
+haut — dis le caractère des astres et ce qu'ils font d'une vie, et que le plaisir s'entende.
 
-Forme voulue, sur un ciel qui n'est pas le tien — ne le recopie pas :
-« Le Soleil se réjouit en neuvième, et c'est la seule joie de la figure. Mars, lui, tient tout :
-seigneur de l'ascendant et almuten à la fois, une seule main — et Mars est en sa chute. Quatre
-matières sont chargées : le corps, l'avoir, les contrats, le métier. La dignité, non. »
+D'abord ce qui sort de l'ordinaire, que le dossier te donne **en tête**, sous « CE QUI SORT DE
+L'ORDINAIRE » : développe-le — ce que c'est, ce que cela fait, ce que cela vaut. Si ce bloc dit
+qu'il n'y a rien, écris que la figure est bien tempérée, et passe.
+
+Puis la figure elle-même : ce qui la tient — l'almuten, le seigneur de l'ascendant, ce qui est
+en angle —, ce que ces astres sont, ce qui est promis et ce qui se retourne. Croise les
+données, dis plusieurs fils à la fois.
 
 2. LES AXES — TA QUESTION
 Le dossier te donne, en tête, les matières que cette figure charge. Reprends leurs titres tels
@@ -93,18 +93,17 @@ ni rien que le bloc ne donne. Tu t'arrêtes là.
 
 Quand il répond, tu ouvres la matière choisie — le socle ci-dessous vaut toujours.`;
 
-const PLAN_REVOLUTION = `Ceci est une RÉVOLUTION D'ANNÉE. C'est la PREMIÈRE réponse, et elle reste
-courte : 200 à 350 mots. Ne rédige pas un second jugement de nativité — une année ne donne que
-ce que la nativité promet, elle en avance ou en retarde l'effet. Tu ne juges pas ici le métier,
-la complexion, le naturel, ni la durée de la vie. Tu n'écris pas encore la lecture : tu
-l'ouvres, et tu proposes.
+const PLAN_REVOLUTION = `Ceci est une RÉVOLUTION D'ANNÉE. C'est la PREMIÈRE réponse : 600 à 800
+mots. Ne rédige pas un second jugement de nativité — une année ne donne que ce que la nativité
+promet, elle en avance ou en retarde l'effet. Tu ne juges pas ici le métier, la complexion, le
+naturel, ni la durée de la vie. Tu n'écris pas encore les axes : tu ouvres, et tu proposes.
 
 1. L'OUVERTURE — CE QUE CETTE ANNÉE A DE NOTABLE
-Quelques phrases. Le dossier te donne, en tête, les matières que cette année charge, et plus
-loin ce qui a franchement changé depuis la nativité. Dis le fait le plus net — un maître qui
-change d'état, une entrée ou une sortie de combustion, une matière remise en jeu après douze
-ans — puis, en deux ou trois phrases, la matière que la profection impose et lequel des quatre
-cas s'applique.
+Un vrai passage. Le dossier te donne, en tête, les matières que cette année charge, et plus loin
+ce qui a franchement changé depuis la nativité. Dis le fait le plus net — un maître qui change
+d'état, une entrée ou une sortie de combustion, une matière remise en jeu après douze ans —,
+puis la matière que la profection impose et lequel des quatre cas s'applique. Suis le ton donné
+plus haut : le caractère des astres, et la joie de le dire.
 
 2. LES AXES — TA QUESTION
 Reprends les titres des axes tels que le dossier les donne, un par ligne, sans les développer,
