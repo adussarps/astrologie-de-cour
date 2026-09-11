@@ -9,19 +9,25 @@ globalThis.Astronomy = Astronomy;
 import tzlookup from 'tz-lookup';
 globalThis.tzlookup = tzlookup;
 
-const { jourJulien, positions, maisons, heuresInegales, heuresPlanetaires, enSigne, ecartAngulaire,
-  syzygiePrecedente } = await import('./src/ciel.js');
-const { laDureeDeVie } = await import('./src/vie.js');
+const { jourJulien, positions, maisons, heuresInegales, heuresPlanetaires, enSigne,
+  ecartAngulaire, dateGregorienne, dateCivile } = await import('./src/ciel.js');
 const { juger, proximiteExaltation, enDegresMinutes, regardEntre } =
   await import('./src/jugement.js');
-const { EXALTATIONS, JOIES, enSaJoie } = await import('./src/doctrine.js');
+const { EXALTATIONS, JOIES, ORBES, enSaJoie } = await import('./src/doctrine.js');
 const { jugerInterrogation } = await import('./src/interrogation.js');
 const { NATIVITES, CONJONCTION_1345 } = await import('./src/corpus.js');
 const { versTempsUniversel, equationDuTemps, fuseauDe, decalageLegal, conventionParDefaut } =
   await import('./src/temps.js');
 const { figureDeLAnnee, profection, dansLAnnee, laForce } = await import('./src/annee.js');
+const { lesAxesCharges } = await import('./src/dossier.js');
 
 let echecs = 0;
+
+/** Un contrôle qui compte : un ✓ manqué doit faire échouer la suite. */
+const ok = (quoi, vrai, obtenu = '') => {
+  if (!vrai) echecs++;
+  console.log(`   ${vrai ? '✓' : '✗'} ${quoi.padEnd(52)} ${vrai ? '' : `obtenu ${obtenu}`}`);
+};
 
 // ─── Le temps : quelle heure veut dire quoi ──────────────────────────────────
 console.log('── Les conventions de temps');
@@ -181,93 +187,6 @@ console.log('\n── Les degrés de perfection');
   console.log('       calculé de tête, et annoncé 0° 18′. C’est pour cela qu’on le calcule ici.');
 }
 
-console.log('\n── La syzygie qui précède la naissance');
-{
-  // Deux lois suffisent, et elles se vérifient sans éphéméride de contrôle :
-  // la syzygie tombe avant la naissance et pas plus de trente jours avant
-  // (le mois synodique en fait 29,53), et les deux luminaires y sont soit au
-  // même degré, soit dos à dos. Le piège que cela attrape est réel : chercher
-  // la phase dans une seule fenêtre de quarante jours rend parfois
-  // l'avant-dernière syzygie, ce qui décale le hyleg d'al-Qabīṣī d'un mois.
-  const ok = (quoi, vrai, obtenu) => console.log(
-    `   ${vrai ? '✓' : '✗'} ${quoi.padEnd(58)} ${vrai ? '' : `obtenu ${obtenu}`}`);
-
-  let avant = true; let recente = true; let alignee = true; let pire = 0;
-  for (let annee = 1300; annee <= 2000; annee += 37) {
-    for (const [mois, jour] of [[1, 8], [4, 19], [7, 3], [10, 27]]) {
-      const jj = jourJulien({ annee, mois, jour, heure: 9, julien: annee < 1582 });
-      const s = syzygiePrecedente(jj);
-      if (!s) { avant = false; continue; }
-      const age = jj - s.jj;
-      if (!(age > 0)) avant = false;
-      if (!(age < 29.6)) { recente = false; pire = Math.max(pire, age); }
-      const ecart = ecartAngulaire(s.soleil, s.lune);
-      const attendu = s.conjonction ? 0 : 180;
-      if (Math.abs(ecart - attendu) > 0.05) alignee = false;
-    }
-  }
-  ok('la syzygie tombe toujours avant la naissance', avant, 'une syzygie postérieure');
-  ok('et jamais plus d’un mois synodique avant', recente, `${pire.toFixed(1)} jours`);
-  ok('les luminaires y sont conjoints ou opposés à 3′ près', alignee, 'désalignement');
-
-  const s = syzygiePrecedente(jourJulien({ annee: 1996, mois: 5, jour: 20, heure: 12.5 }));
-  console.log(`     20/5/1996 : ${s.nom} trois jours plus tôt, à ${enSigne(s.longitude)}.`);
-}
-
-console.log('\n── Le hyleg : deux auteurs, deux marches, et l’écart qu’on ne chiffre pas');
-{
-  // Ce bloc ne contrôle aucune durée de vie — il n'y en a pas. Il contrôle que
-  // les deux marches sont bien deux, c'est-à-dire qu'on n'a pas écrit deux fois
-  // la même règle sous deux noms. Une divergence attestée vaut donc ici comme
-  // un résultat positif : c'est elle qu'on publie.
-  const ok = (quoi, vrai, obtenu) => console.log(
-    `   ${vrai ? '✓' : '✗'} ${quoi.padEnd(58)} ${vrai ? '' : `obtenu ${obtenu}`}`);
-
-  const louis = NATIVITES.find((n) => /Louis/.test(n.nom));
-  const { jj } = versTempsUniversel({
-    annee: louis.annee, mois: louis.mois, jour: louis.jour,
-    heure: louis.heure, minute: louis.minute, julien: true,
-    latitude: louis.latitude, longitude: louis.longitude, convention: 'vraie',
-  });
-  const f = juger({ positions: positions(jj), maisons: maisons(jj, louis.latitude, louis.longitude) });
-  const v = laDureeDeVie(f, syzygiePrecedente(jj));
-
-  const [ptol, alca] = v.marches;
-  // Aucun luminaire n'est en lieu prorogatif : Ptolémée passe donc à la planète
-  // qui domine le Soleil, la syzygie et l'ascendant, et c'est Mercure. Chez
-  // al-Qabīṣī rien ne convient — luminaires mal logés, syzygie et Fortune
-  // cadentes — et le hyleg échoit au degré de l'ascendant, en dernier recours.
-  ok('Ptolémée, faute de luminaire bien logé, prend le dominateur : Mercure',
-    ptol.clef === 'mercure', ptol.clef);
-  ok('al-Qabīṣī, faute de tout, échoit au degré de l’ascendant',
-    alca.clef === 'ascendant', alca.clef);
-  ok('les deux ne partent donc pas du même point', !v.accord.memePoint, 'accord');
-  ok('ni ne nomment le même donneur d’années', !v.accord.memeDonneur, 'accord');
-  ok('trois planètes différentes sont nommées pour donner les années',
-    v.donneurs.length === 3, `${v.donneurs.length} : ${v.donneurs.join(', ')}`);
-
-  // La loi qui compte : tout hyleg élu doit avoir un alcocoden nommé, ou être
-  // déclaré incomplet. Un hyleg dont l'alcocoden serait « undefined » passerait
-  // inaperçu à l'écran et ferait dire n'importe quoi au modèle.
-  let complet = true;
-  for (let annee = 1320; annee <= 2000; annee += 23) {
-    const q = jourJulien({ annee, mois: 6, jour: 11, heure: 15, julien: annee < 1582 });
-    const g = juger({ positions: positions(q), maisons: maisons(q, 48.8566, 2.3522) });
-    const w = laDureeDeVie(g, syzygiePrecedente(q));
-    for (const m of w.marches) {
-      if (!Number.isFinite(m.longitude)) { complet = false; break; }
-      for (const a of m.alcocodens) if (!a.elu && !a.incomplet) complet = false;
-    }
-  }
-  ok('tout hyleg a un alcocoden nommé, ou est déclaré incomplet', complet, 'un trou');
-
-  console.log(`     Louis d’Orléans : Ptolémée part de ${ptol.nom} ; al-Qabīṣī, ${alca.nom}.`);
-  console.log(`     Donneurs d’années nommés : ${v.donneurs.join(', ')} — `
-    + `${v.donneurs.length} planètes pour un seul ciel.`);
-  console.log('       Il a été assassiné à trente-cinq ans, et aucune de ces marches');
-  console.log('       ne l’annonçait. C’est pour cela qu’aucun nombre n’est rendu.');
-}
-
 console.log('\n── La part du Mariage se renverse sur le sexe, et non sur la secte');
 {
   // Les trois autres parts s'inversent entre le jour et la nuit ; celle-ci
@@ -284,9 +203,6 @@ console.log('\n── La part du Mariage se renverse sur le sexe, et non sur la 
   const laPart = (sexe) => juger({ positions: positions(jj), maisons: mai, sexe })
     .parts.find((p) => p.clef === 'mariage');
 
-  const ok = (quoi, vrai, obtenu) => console.log(
-    `   ${vrai ? '✓' : '✗'} ${quoi.padEnd(58)} ${vrai ? '' : `obtenu ${obtenu}`}`);
-
   const h = laPart('homme'); const f = laPart('femme'); const rien = laPart(null);
   const miroir = ((h.longitude + f.longitude) % 360 + 360) % 360;
   const deuxAsc = (2 * mai.ascendant % 360 + 360) % 360;
@@ -299,12 +215,12 @@ console.log('\n── La part du Mariage se renverse sur le sexe, et non sur la 
       && Math.abs(rien.variantes.find((v) => v.sexe === 'homme').longitude - h.longitude) < 1e-9,
     JSON.stringify(rien.variantes?.map((v) => v.sexe)));
   ok('les trois autres parts ne dépendent pas du sexe',
-    ['fortune', 'ame', 'dignite'].every((clef) => {
+    ['fortune', 'esprit', 'regne'].every((clef) => {
       const a = juger({ positions: positions(jj), maisons: mai, sexe: 'homme' })
         .parts.find((p) => p.clef === clef);
       const b = juger({ positions: positions(jj), maisons: mai, sexe: 'femme' })
         .parts.find((p) => p.clef === clef);
-      return !a || !b || Math.abs(a.longitude - b.longitude) < 1e-9;
+      return a && b && Math.abs(a.longitude - b.longitude) < 1e-9;
     }), 'aucune ne bouge');
   console.log(`     Mariage : ${enSigne(h.longitude)} si homme, ${enSigne(f.longitude)} si femme.`);
 }
@@ -315,9 +231,6 @@ console.log('\n── Les joies : sept planètes, sept maisons, et aucune dignit
   // Le risque, en l'ajoutant, est précisément qu'elle s'y glisse — que le
   // tableau la range parmi les dignités tenues, et qu'elle finisse par gonfler
   // l'almuten. Ces contrôles-là gardent la porte.
-  const ok = (quoi, vrai, obtenu) => console.log(
-    `   ${vrai ? '✓' : '✗'} ${quoi.padEnd(58)} ${vrai ? '' : `obtenu ${obtenu}`}`);
-
   const maisonsJoie = Object.keys(JOIES.table).map(Number);
   const planetesJoie = Object.values(JOIES.table);
   ok('sept planètes, chacune en une maison, sans doublon',
@@ -398,6 +311,43 @@ console.log('\n── L’écart angulaire : une distance, donc symétrique et b
   if (!accord) echecs++;
   console.log(`   ${accord ? '✓' : '✗'} l’état solaire s’accorde à la table des regards  `
     + `(Vénus ${venus.solaire.ecart.toFixed(1)}° du Soleil, ${venus.solaire.classe})`);
+}
+
+console.log('\n── L’orbe d’un aspect : la moyenne des deux orbes, non leur somme');
+{
+  // Le module portait un commentaire qui appelait « moitié de son rayon » la
+  // valeur du tableau. La vérification faite sur le texte d'al-Bīrūnī tranche
+  // dans l'autre sens : la valeur est l'orbe entier de la planète, et deux
+  // planètes se voient quand leur écart à l'aspect exact n'excède pas la
+  // moyenne des deux orbes, c'est-à-dire la somme de leurs moitiés d'orbe
+  // (§490). Une moyenne et une somme ne se distinguent sur aucune figure prise
+  // seule : il faut donc fixer la règle ici, sur des couples construits.
+  const moitie = (clef) => ORBES.table[clef] / 2;
+  const orbeDe = (a, b) => moitie(a) + moitie(b);
+
+  const attendus = { soleil: 15, lune: 12, mercure: 7, venus: 7, mars: 8, jupiter: 9, saturne: 9 };
+  const controles = [
+    ['les sept orbes sont ceux d’al-Bīrūnī (§436)', true,
+      Object.entries(attendus).every(([c, v]) => ORBES.table[c] === v)],
+    ['Soleil–Lune : 13°30′ (7,5 + 6), et non 27°', 13.5, orbeDe('soleil', 'lune')],
+    ['Jupiter–Mars : 8°30′ (4,5 + 4), et non 17°', 8.5, orbeDe('jupiter', 'mars')],
+    ['Mercure–Vénus : 7° (3,5 + 3,5)', 7, orbeDe('mercure', 'venus')],
+  ];
+  for (const [quoi, attendu, obtenu] of controles) {
+    if (attendu !== obtenu) echecs++;
+    console.log(`   ${attendu === obtenu ? '✓' : '✗'} ${quoi.padEnd(52)} `
+      + `${attendu === obtenu ? '' : `attendu ${attendu}, obtenu ${obtenu}`}`);
+  }
+
+  // Et la règle au point exact : 13,4° est dans l'orbe, 13,6° n'y est plus, et
+  // 20° — ce que donnerait la somme des deux orbes — pas davantage.
+  const poste = (clef, longitude) => ({ clef, longitude, vitesse: 0 });
+  const conjonction = (ecart) => regardEntre(poste('soleil', 0), poste('lune', ecart));
+  ok('à 13,4° de la conjonction, le regard existe', conjonction(13.4)?.nom === 'conjonction',
+    conjonction(13.4)?.nom ?? 'aucun');
+  ok('à 13,6°, il n’existe plus', conjonction(13.6) === null, conjonction(13.6)?.nom ?? 'aucun');
+  ok('à 20°, la somme des orbes ne le sauve pas', conjonction(20) === null,
+    conjonction(20)?.nom ?? 'aucun');
 }
 
 console.log('\n── Le regard : un seul moteur, et il voit la Lune venir');
@@ -563,6 +513,68 @@ console.log('\n── La profection mensuelle');
     if (!ok) echecs++;
     console.log(`   ${ok ? '✓' : '✗'} ${quoi.padEnd(46)} ${ok ? '' : `attendu ${attendu}, obtenu ${obtenu}`}`);
   }
+}
+
+console.log('\n── Le calendrier d’affichage : julien avant 1582, grégorien après');
+{
+  // Le site affichait la fenêtre de révolution et les douze mois en grégorien
+  // proleptique, même pour une naissance médiévale — dix jours d’écart au
+  // XIVᵉ siècle, alors que tout le site lit ces dates dans le julien. La même
+  // date doit se relire dans le calendrier où elle a été saisie.
+  const jj = jourJulien({ annee: 1407, mois: 11, jour: 23, heure: 12, julien: true });
+  const j = dateCivile(jj, true);
+  const g = dateGregorienne(jj);
+  const moderne = jourJulien({ annee: 1996, mois: 5, jour: 20, heure: 12, julien: false });
+  const m = dateCivile(moderne, false);
+
+  ok('le 23 novembre 1407 (julien) se relit au 23 novembre',
+    j.annee === 1407 && j.mois === 11 && j.jour === 23, `${j.jour}/${j.mois}/${j.annee}`);
+  ok('le grégorien proleptique en avance bien de dix jours',
+    g.annee === 1407 && g.mois === 12 && g.jour === 2, `${g.jour}/${g.mois}/${g.annee}`);
+  ok('une date moderne n’est pas décalée',
+    m.annee === 1996 && m.mois === 5 && m.jour === 20, `${m.jour}/${m.mois}/${m.annee}`);
+}
+
+console.log('\n── Les axes que la figure charge, et qu’on propose au lecteur');
+{
+  // L’ouverture de la lecture ne doit plus laisser le modèle choisir : le
+  // dossier classe les matières et propose les mieux marquées, quatre au plus.
+  // Une matière proposée sans raison serait une invention déguisée.
+  const attendus = new Set(['metier', 'avoir', 'corps', 'contrats', 'dignite']);
+  let plus = 0; let moins = 5; let total = 0; let figures = 0;
+  let sansRaison = 0; let horsListe = 0; let malTrie = 0;
+  for (let k = 0; k < 120; k++) {
+    const jj = jourJulien({
+      annee: 1320 + Math.floor(k / 8) * 41, mois: (k % 12) + 1, jour: 3 + (k % 24),
+      heure: k % 24, julien: true,
+    });
+    const f = juger({ positions: positions(jj), maisons: maisons(jj, 48.8566, 2.3522) });
+    const axes = lesAxesCharges(f);
+    const charges = axes.filter((a) => a.charge);
+    plus = Math.max(plus, charges.length);
+    moins = Math.min(moins, charges.length);
+    total += charges.length;
+    figures++;
+    for (const a of charges) {
+      if (!a.raisons.length) sansRaison++;
+      if (!attendus.has(a.clef)) horsListe++;
+    }
+    for (let i = 1; i < axes.length; i++) if (axes[i - 1].score < axes[i].score) malTrie++;
+  }
+  const controles = [
+    ['jamais plus de quatre matières proposées', true, plus <= 4],
+    ['chaque matière proposée a une raison', 0, sansRaison],
+    ['les matières sont celles de la doctrine', 0, horsListe],
+    ['le classement décroît', 0, malTrie],
+    ['au moins deux matières par figure', true, moins >= 2],
+  ];
+  for (const [quoi, attendu, obtenu] of controles) {
+    if (attendu !== obtenu) echecs++;
+    console.log(`   ${attendu === obtenu ? '✓' : '✗'} ${quoi.padEnd(52)} `
+      + `${attendu === obtenu ? '' : `attendu ${attendu}, obtenu ${obtenu}`}`);
+  }
+  console.log(`     ${(total / figures).toFixed(1)} matière(s) proposée(s) en moyenne, `
+    + `de ${moins} à ${plus} selon la figure.`);
 }
 
 console.log('\n── L’interrogation : les voies d’aboutissement');

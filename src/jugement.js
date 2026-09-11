@@ -2,8 +2,7 @@
 //
 // Tout ce qui suit est mécanique et incontesté — les dignités, l'almuten, les
 // parts, les regards. Ce qui ne l'est pas n'est pas calculé ici : le caractère
-// pas du tout, la durée de vie autrement — vie.js en calcule le désaccord des
-// auteurs, mais aucun nombre. Voir RESERVES dans doctrine.js.
+// pas du tout, la durée de vie pas davantage. Voir RESERVES dans doctrine.js.
 
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, POIDS,
@@ -122,6 +121,10 @@ const PAS = 0.04;
 
 export function regardEntre(a, b) {
   const ecartMaintenant = ecartDe(a.longitude, b.longitude);
+  // La limite est la moyenne des deux orbes — soit la somme des deux moitiés
+  // d'orbe. Al-Bīrūnī rapporte cette règle au §490 de son Tafhīm ; Lilly la
+  // tient pour acquise. Ce n'est pas la somme des orbes : elle donnerait au
+  // couple Soleil-Lune 27°, au-delà de toutes les limites qu'al-Bīrūnī énumère.
   const orbe = ((ORBES.table[a.clef] ?? 6) + (ORBES.table[b.clef] ?? 6)) / 2;
   for (const aspect of ASPECTS.table) {
     const ecart = Math.abs(ecartMaintenant - aspect.angle);
@@ -705,11 +708,16 @@ export function enPhrases(figure) {
   });
 
   const a = figure.almuten;
+  const suivants = a.classement.slice(1, 3)
+    .map((x) => `${nom(x.planete)} (${x.score})`).join(' et ');
   p.push({
     titre: 'L’almuten de l’ascendant',
     texte: `Sur ce degré, ${nom(a.vainqueur.planete)} l’emporte avec ${a.vainqueur.score} forces `
       + `(${a.vainqueur.dignites.join(', ')}). `
-      + `Viennent ensuite ${a.classement.slice(1, 3).map((x) => `${nom(x.planete)} (${x.score})`).join(' et ')}. `
+      + (suivants
+        ? `Viennent ensuite ${suivants}. `
+        : `Aucune autre planète ne lui dispute ce degré : elle y tient toutes les dignités `
+          + `à la fois, ce qui est rare. `)
       + `C’est cette planète, non le signe, qui gouverne la figure.`,
     source: 'Dignités : Alcabitius, dist. I. Pondération : tradition latine (Bonatti)',
   });
@@ -740,7 +748,7 @@ export function enPhrases(figure) {
       titre: 'Les regards serrés',
       texte: serres.map((r) => `${nom(r.de)} ${r.aspect.glyphe} ${nom(r.a)} `
         + `(${r.aspect.nom}, ${r.ecart.toFixed(1)}°${r.partil ? ', par degré partil' : ''})`).join(' ; ') + '.',
-      source: 'Alcabitius, dist. III — les aspects ; orbes d’après al-Bīrūnī',
+      source: 'Alcabitius, dist. III — les aspects ; orbes d’après al-Bīrūnī, Tafhīm §436 et §490',
     });
   }
 

@@ -7,7 +7,7 @@
 // ici, les règles lui sont fournies ici avec leur source, et ce qu'il n'a pas
 // le droit de dire lui est dit ici. Il n'apporte que la prose.
 
-import { SIGNES, PLANETES, GENRES, enSigne, signeDe, mod360, dateGregorienne } from './ciel.js';
+import { SIGNES, PLANETES, GENRES, enSigne, signeDe, mod360, dateCivile } from './ciel.js';
 import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, POIDS,
   MAISONS, ASPECTS, ORBES, PARTS, RESERVES, NATURES_SIGNES, FORCE_DES_LIEUX,
@@ -20,27 +20,15 @@ const NOMS = Object.fromEntries(PLANETES.map((p) => [p.clef, p.nom]));
 
 // ─── Le ton et la consigne ───────────────────────────────────────────────────
 
-const SOCLE_HAUT = `Tu rédiges une lecture de la figure calculée ci-dessous. Écris en français
-d'aujourd'hui : clair, mesuré, sans costume d'époque. Tu n'es pas un astrologien de 1380 ; tu
-traduis un calcul médiéval pour quelqu'un qui lit maintenant.
+const SOCLE_HAUT = `Tu écris pour quelqu'un qui lit aujourd'hui : français simple et direct, sans
+costume d'époque. Tu n'es pas un astrologue de 1380 — tu traduis un calcul médiéval.
 
-La figure, les dignités, les regards, les règles et leurs sources sont déjà calculés. Tu
-n'apportes que la prose. Si une donnée n'est pas ci-dessous, tu ne l'as pas.
+Tout ce que tu dis se lit dans le dossier ci-dessous. Tu n'ajoutes aucun nombre, aucune règle,
+aucune donnée qui ne s'y trouve. Une position ne vaut que par ce qu'elle dit du monde réel :
+un métier, un revenu, un corps, une relation, une démarche.
 
-Une position n'est pas une lecture. Tu n'écris une longitude, une dignité ou un regard que si
-tu les traduis aussitôt en une chose du monde — un métier, un bien, un corps, un lieu, une
-conduite. La table des SIGNIFICATIONS sert à cela. Forme voulue, sur un exemple qui n'est pas
-le tien : « Mercure est brûlé par le Soleil, à ⟨tant⟩ degrés de lui : la planète de la plume
-et du compte n'agit plus pour son propre compte. Ce qui s'écrit de cette main sortira sous
-une autre signature. » Le ⟨tant⟩ n'est pas un nombre : chaque chiffre de ton texte doit se
-lire dans le dossier, et nulle part ailleurs.
-
-Les titres sont en Markdown (## ). Ils concluent : la matière, un tiret, ce que tu retiens,
-cinq à dix mots. « Le métier » n'apprend rien ; « Le métier — le travail porte le nom d'un
-autre » apprend tout. Cet exemple n'est pas le tien — ne le recopie pas.
-
-Prose suivie, pas de listes à puces. Si une phrase pourrait convenir à n'importe quelle autre
-figure, raye-la.
+Pas de flatterie, pas de généralités : si une phrase pouvait s'écrire pour n'importe qui, elle
+ne sert à rien. Si tu titres, mets les titres en Markdown (## ), courts.
 
 §PLAN§`;
 
@@ -54,60 +42,40 @@ figure, raye-la.
 // ignore la nativité : elle répond par oui ou par non à une seule question,
 // sur la figure de l'instant où on l'a posée.
 
-const PLAN_NATIVITE = `DEUX PARTIES, DANS CET ORDRE — 700 à 900 mots en tout
+const PLAN_NATIVITE = `C'est la PREMIÈRE réponse, et elle reste courte : 200 à 350 mots. Tu
+n'écris pas encore la lecture — tu l'ouvres, et tu proposes.
 
-1. LE CIEL
-Une seule voix, 400 à 600 mots. La date de naissance est ci-dessous ; elle a déjà produit
-cette figure. Ne la relis pas à part : pas de type solaire (« né un 12 mars, donc… »), pas
-d'horoscope du jour. Tu expliques ce ciel-ci, pas le calendrier.
+1. L'OUVERTURE — CE QUE CE CIEL A DE BEAU, ET CE QU'IL RACONTE DE LOIN
+Quelques phrases. D'abord ce qui sort de l'ordinaire, que le dossier te donne calculé : dis-le
+simplement, et si c'est une bonne chose, dis-le comme une bonne chose ; si rien n'en sort, dis
+que la figure est bien tempérée. Puis, en deux ou trois phrases, ce qui tient la figure
+(l'almuten, le seigneur de l'ascendant, ce qui est en angle) et ce que cela donne en gros.
+C'est un aperçu, pas la lecture — n'invente aucune rareté.
 
-Dis, dans cet ordre :
-- ce qui tient la figure : l'almuten, le seigneur de l'ascendant, ce qui est en angle, et
-  un accident notable s'il y en a vraiment (combustion, joie, réception, aspect partil,
-  proximité d'un degré d'exaltation ou de chute). Une ou deux choses, pas un inventaire.
-  La plupart des figures n'ont rien d'extraordinaire : si c'est le cas, dis-le et passe
-  aux faits. N'invente aucune rareté.
-- ce que cela donne concrètement : de quoi l'on vit, ce que l'on tient et de qui, le corps,
-  les alliés et les adversaires. Tu peux nommer un mot technique (ascendant, almuten,
-  pérégrin) si tu l'expliques à sa première occurrence.
-- deux ou trois gestes : ce qu'il faut pousser, ce qu'il ne faut pas forcer, ce qu'il faut
-  surveiller (un membre, une démarche, une matière à laisser dormir).
+2. LES AXES — TA QUESTION
+Le dossier te donne les matières que cette figure charge vraiment. Nomme-les en une ligne
+chacune, sans les développer, et demande au lecteur laquelle il veut ouvrir. Tu t'arrêtes là.
 
-Nomme le plus fort et le plus faible, chacun dans sa phrase, sans les coller par un « mais ».
-Le métier se juge ici, une seule fois, d'après LE MÉTIER déjà calculé (Ptolémée : la planète
-qui se lève juste avant le Soleil, et le seigneur du milieu du ciel ; Mercure, Vénus ou Mars
-seulement). Si la règle ne désigne personne, le métier est sans distinction : écris-le, ne
-force pas.
+Quand il répond, tu ouvres la matière choisie — le socle ci-dessous vaut toujours.`;
 
-2. TROIS OU QUATRE AXES
-Seulement les matières que CETTE figure charge vraiment. Un titre qui conclut, un court
-paragraphe chacun. Les portes habituelles : le métier (10e), l'avoir (2e et part de Fortune),
-le corps (Lune, ascendant, 6e), les contrats et adversaires (7e). Ce sont des dispositions
-de vie — comment on gagne, de qui on dépend, où le corps lâche — jamais des traits de
-caractère. N'écris pas les douze maisons. Ce qui est banal reste hors de ton texte.`;
+const PLAN_REVOLUTION = `Ceci est une RÉVOLUTION D'ANNÉE. C'est la PREMIÈRE réponse, et elle reste
+courte : 200 à 350 mots. Ne rédige pas un second jugement de nativité — une année ne donne que
+ce que la nativité promet, elle en avance ou en retarde l'effet. Tu ne juges pas ici le métier,
+la complexion, le naturel, ni la durée de la vie. Tu n'écris pas encore la lecture : tu
+l'ouvres, et tu proposes.
 
-const PLAN_REVOLUTION = `Ceci est une RÉVOLUTION D'ANNÉE. Ne rédige pas un second jugement de
-nativité. Une année ne donne que ce que la nativité promet : elle en avance ou en retarde
-l'effet, elle ne le crée pas. Tu ne juges pas ici le métier, la complexion, le naturel, ni
-la durée de la vie.
+1. L'OUVERTURE — CE QUE CETTE ANNÉE A DE NOTABLE
+Quelques phrases. Le dossier te donne ce qui a franchement changé depuis la nativité et l'état
+du maître de l'année. Dis le fait le plus net — un maître qui change d'état, une entrée ou une
+sortie de combustion, une matière remise en jeu après douze ans — puis, en deux ou trois
+phrases, la matière que la profection impose et lequel des quatre cas s'applique. Si rien
+n'est franc, dis-le et passe.
 
-DEUX PARTIES, DANS CET ORDRE — 700 à 900 mots en tout
+2. LES AXES — TA QUESTION
+Le dossier te donne les matières que cette année charge. Nomme-les en une ligne chacune, sans
+les développer, et demande au lecteur laquelle il veut suivre. Tu t'arrêtes là.
 
-1. CETTE ANNÉE
-Une seule voix, 400 à 600 mots. Ouvre sur l'année, pas sur l'homme : la matière imposée par
-la maison profectée (dis-la en une phrase nette), le maître de l'année lu deux fois — au
-natal, ce qu'il peut promettre ; à la révolution, ce qu'il en fera. Le dossier te donne
-lequel des quatre cas s'applique (fort/fort, fort/faible, faible/fort, faible/faible) :
-développe-le, ne le recopie pas. Rappelle que la profection revient tous les douze ans, et
-nomme les âges déjà connus. Deux ou trois gestes : quelle matière pousser, laquelle laisser
-dormir, quel mois est le plus chargé.
-
-2. TROIS OU QUATRE AXES
-Seulement ce que CETTE année charge : le maître (peut-il donner, oui ou non), deux ou trois
-changements francs depuis la nativité (lieu, dignité, combustion — pas le bruit), et les
-mois dont le seigneur est le maître lui-même ou une planète mal disposée. Le calendrier
-entier est ci-dessous : n'en fais pas l'inventaire. Les dates des mois sont calculées ; elles
-disent quelle matière est en jeu, non ce qui arrivera.`;
+Quand il répond, tu ouvres la matière choisie — le socle ci-dessous vaut toujours.`;
 
 const PLAN_INTERROGATION = `Ceci est une INTERROGATION. On te pose une question ; tu réponds.
 La figure est celle de l'instant — la nativité n'y entre pour rien, n'en parle pas. Le
@@ -136,7 +104,11 @@ deux mots.
 3. QUAND. Si une échéance est calculée, donne les degrés, l'unité et la source, et dis que
    les auteurs ne s'accordent pas sur l'échelle. Sinon n'en invente aucune.
 
-4. LA CONDUITE. Une phrase : ce qu'il faut faire demain matin.`;
+4. LA CONDUITE, ET LA PORTE RESTE OUVERTE. Une phrase nette : ce qu'il faut faire demain
+   matin. Puis, en une phrase, dis au consultant ce qu'il peut demander ensuite — ce qui
+   reste à préciser dans cette figure, ou le fait qu'une interrogation se repose quand les
+   circonstances changent. N'ouvre sur aucune matière absente du dossier, et n'annonce aucun
+   événement.`;
 
 const SOCLE_BAS = `CE QUE TU NE FAIS PAS
 - Aucun portrait par signe solaire. Personne n'est « un Bélier ». Le Soleil est une planète
@@ -147,8 +119,8 @@ const SOCLE_BAS = `CE QUE TU NE FAIS PAS
   potentiel, énergie, vibration, intuition, karma, destinée intérieure, « être soi-même ».
 - Aucun nombre calculé, arrondi ou déduit par soustraction. Tous sont ci-dessous. Si un
   écart n'y figure pas, tu ne l'as pas.
-- Aucun âge, aucune durée de vie, même déguisée (« longue vie »). S'il y a une section
-  DURÉE DE VIE, elle te donne un désaccord d'auteurs : rapporte-le, n'en tire pas un chiffre.
+- Aucun âge, aucune durée de vie, même déguisée (« longue vie »). Le site ne la calcule
+  pas et ne t'en fournit aucun élément : n'en invente aucun, sous aucune forme.
 - Aucun événement daté de ton autorité. Un calendrier ou une échéance déjà calculés se
   rapportent comme le produit d'une règle, avec sa source.
 - N'invente aucune règle, aucune table, aucun degré. Deux témoignages qui se contredisent :
@@ -322,7 +294,161 @@ function perfectionEnClair(a) {
     : `   ← à ${enDegresMinutes(p.exaltation)} de son DEGRÉ D’EXALTATION (${cible})`;
 }
 
-function figureEnClair(figure) {
+/** Ce qui, dans cette figure, sort de l'ordinaire — calculé ici, jamais laissé
+ *  à l'appréciation du modèle. C'est la matière de la première rubrique : la
+ *  tradition tient ces accidents pour remarquables, et l'ouverture doit s'y
+ *  appuyer. Quand la liste est vide, la figure est bien tempérée, et cela se dit
+ *  en une phrase — sans inventer de rareté. */
+function ceQuiSortDeLOrdinaire(figure) {
+  const trouves = [];
+  const astres = figure.astres.filter((a) => !a.noeud);
+
+  for (const a of astres) {
+    if (a.joie) trouves.push(`${a.nom} est EN SA JOIE, en la ${a.maison}e maison.`);
+    if (a.solaire?.classe === 'cazimi') {
+      trouves.push(`${a.nom} est AU CŒUR DU SOLEIL, à ${enDegresMinutes(a.solaire.ecart)} `
+        + `du centre : la seule proximité qui renforce.`);
+    }
+  }
+
+  for (const r of figure.regards ?? []) {
+    if (r.partil) {
+      trouves.push(`Aspect PARTIL : ${nomDe(r.de)} ${r.aspect.nom} ${nomDe(r.a)}, `
+        + `à ${enDegresMinutes(r.ecart)} de l’exactitude.`);
+    }
+  }
+
+  for (const m of figure.receptions?.mutuelles ?? []) {
+    trouves.push(`RÉCEPTION MUTUELLE entre ${nomDe(m.a)} et ${nomDe(m.b)}`
+      + (m.regard
+        ? `, qui se regardent par ${m.regard.aspect.nom}.`
+        : `, SANS AUCUN REGARD entre eux : le lien le plus fort de la doctrine, `
+          + `et il ne se voit jamais.`));
+  }
+
+  for (const r of figure.receptions?.simples ?? []) {
+    if (!r.regard) continue;
+    const recue = figure.astres.find((a) => a.clef === r.recue);
+    if (['mars', 'saturne'].includes(r.recue) && recue?.etat?.tenues.length) {
+      trouves.push(`${nomDe(r.recue)} est reçu par ${nomDe(r.hote)} (${r.par}) tout en tenant `
+        + `${recue.etat.tenues.join(' et ')} : un maléfique logé et tenu.`);
+    }
+  }
+
+  const a = figure.almuten;
+  if (a?.vainqueur?.planete === figure.seigneurAscendant) {
+    trouves.push(`L’ALMUTEN de la figure est aussi le seigneur de l’ascendant `
+      + `(${nomDe(a.vainqueur.planete)}) : tout se rassemble en une seule main.`);
+  }
+
+  const pf = figure.perfections ?? {};
+  for (const c of [pf.versExaltation, pf.versChute]) {
+    if (c?.notable) {
+      trouves.push(`${c.nom} est à ${enDegresMinutes(c.ecart)} de son degré `
+        + `${c.versLaChute ? 'de chute' : 'd’exaltation'}.`);
+    }
+  }
+
+  return trouves;
+}
+
+// ─── Les axes que la figure charge vraiment ──────────────────────────────────
+//
+// C'est le seul endroit où la lecture choisit : le dossier doit donc choisir à
+// sa place. Une matière est « chargée » quand son significateur sort de
+// l'ordinaire — force (angle, grande dignité, joie, cœur du Soleil), malheur
+// (combustion, rétrogradation, exil, chute), ou marque extérieure (almuten,
+// aspect partil, hôtes dans la maison). Le banal ne se propose pas.
+
+const POIDS_AXE = {
+  angle: 2, dignite: 3, perte: 3, combuste: 2, cazimi: 4,
+  retro: 2, joie: 2, almuten: 3, partil: 1,
+};
+
+function marquesDAxe(figure, a) {
+  if (!a) return [];
+  const m = [];
+  if (a.force === 'angle') m.push(['angle', 'en angle']);
+  const grandes = (a.etat?.tenues ?? [])
+    .filter((t) => /domicile|exaltation|triplicité/.test(t));
+  if (grandes.length) m.push(['dignite', grandes.join(' et ')]);
+  if ((a.etat?.perdues ?? []).length) m.push(['perte', a.etat.perdues.join(' et ')]);
+  if (a.solaire?.classe === 'combuste') m.push(['combuste', 'brûlé par le Soleil']);
+  if (a.solaire?.classe === 'cazimi') m.push(['cazimi', 'au cœur du Soleil']);
+  if (a.retrograde && !a.noeud) m.push(['retro', 'rétrograde']);
+  if (a.joie) m.push(['joie', 'en sa joie']);
+  if (figure.almuten?.vainqueur?.planete === a.clef) m.push(['almuten', 'almuten de la figure']);
+  const partil = (figure.regards ?? [])
+    .find((r) => r.partil && (r.de === a.clef || r.a === a.clef));
+  if (partil) {
+    m.push(['partil', `aspect partil avec ${nomDe(partil.de === a.clef ? partil.a : partil.de)}`]);
+  }
+  return m;
+}
+
+/** Les cinq matières candidates, évaluées et classées. Les mieux marquées —
+ *  quatre au plus — sont proposées au lecteur ; les autres sont laissées. */
+export function lesAxesCharges(figure) {
+  const astre = (clef) => figure.astres.find((a) => a.clef === clef);
+  const maison = (n) => figure.maisonsHabitees[n - 1];
+  const seigneur = (n) => astre(maison(n).seigneur);
+  const fortune = figure.parts.find((p) => p.clef === 'fortune');
+  const seigneurFortune = fortune && Number.isFinite(fortune.longitude)
+    ? astre(seigneurDuSigne(fortune.longitude)) : null;
+
+  const candidats = [
+    { clef: 'metier', titre: 'Le métier', source: 'Tetrabiblos, IV, 4',
+      sigs: [figure.metier?.seigneurMC, astre(figure.metier?.retenus?.[0])] },
+    { clef: 'avoir', titre: 'L’avoir', source: 'Tetrabiblos, IV, 2',
+      sigs: [seigneur(2), seigneurFortune] },
+    { clef: 'corps', titre: 'Le corps', source: 'Tetrabiblos, III, 12',
+      sigs: [figure.seigneurAscendantPlace, astre('lune'), seigneur(6)] },
+    { clef: 'contrats', titre: 'Les contrats et les adversaires', source: 'Alcabitius, dist. I',
+      sigs: [seigneur(7)] },
+    { clef: 'dignite', titre: 'La dignité', source: 'Tetrabiblos, IV, 3',
+      sigs: [astre('soleil'), astre('lune')] },
+  ];
+
+  const evalues = candidats.map((c) => {
+    let score = 0;
+    const raisons = [];
+    const vus = new Set();
+    for (const a of c.sigs) {
+      if (!a || vus.has(a.clef)) continue;
+      vus.add(a.clef);
+      const m = marquesDAxe(figure, a);
+      if (!m.length) continue;
+      score += m.reduce((s, [clef]) => s + (POIDS_AXE[clef] ?? 1), 0);
+      raisons.push(`${a.nom} ${m.map(([, dit]) => dit).join(', ')}`);
+    }
+    const hotes = c.clef === 'contrats' ? maison(7).hotes.length : 0;
+    if (hotes) {
+      score += Math.min(2, hotes);
+      raisons.push(`${hotes} hôte${hotes > 1 ? 's' : ''} en septième`);
+    }
+    return { clef: c.clef, titre: c.titre, source: c.source, score, raisons };
+  }).sort((a, b) => b.score - a.score);
+
+  const retenus = new Set(evalues.filter((e) => e.score > 0).slice(0, 4).map((e) => e.clef));
+  return evalues.map((e) => ({ ...e, charge: retenus.has(e.clef) }));
+}
+
+function lesAxesEnClair(figure) {
+  const axes = lesAxesCharges(figure);
+  const charges = axes.filter((a) => a.charge);
+  if (!charges.length) {
+    return `\nLES AXES QUE CETTE FIGURE CHARGE — aucun\n  (cette figure est bien tempérée en `
+      + `toutes ses matières : dis-le, et propose au lecteur les quatre portes habituelles — `
+      + `le métier, l’avoir, le corps, les contrats.)\n`;
+  }
+  const banals = axes.filter((a) => !a.charge).map((a) => a.titre);
+  return `\nLES AXES QUE CETTE FIGURE CHARGE — propose-les, ne les développe pas\n`
+    + charges.map((a) => `  — ${a.titre} (${a.source}) : ${a.raisons.join(' ; ')}`).join('\n')
+    + (banals.length ? `\n  (banal, ne le propose pas : ${banals.join(', ')}.)` : '')
+    + '\n';
+}
+
+function figureEnClair(figure, { ouverture = true } = {}) {
   const astres = figure.astres.map((a) =>
     `  ${a.nom.padEnd(16)} ${enSigne(a.longitude).padEnd(22)} maison ${String(a.maison).padStart(2)}`
     + ` (${(a.force ?? '').padEnd(11)})`
@@ -334,6 +460,15 @@ function figureEnClair(figure) {
     + `${perfectionEnClair(a)}`).join('\n');
 
   const pf = figure.perfections ?? {};
+  // Les deux digests — le remarquable et les axes chargés — servent l'ouverture
+  // de la nativité et de la révolution. L'interrogation les écarte : elle doit
+  // répondre d'abord, et sa consigne lui interdit d'ouvrir sur le singulier.
+  const trouves = ouverture ? ceQuiSortDeLOrdinaire(figure) : null;
+  const blocNotables = trouves === null ? '' : `\nCE QUI SORT DE L'ORDINAIRE — la matière `
+    + `de la première rubrique\n${trouves.length
+      ? trouves.map((x) => `  — ${x}`).join('\n')
+      : '  (rien : cette figure est bien tempérée. Dis-le en une phrase, et n’invente aucune rareté.)'}\n`;
+  const blocAxes = ouverture ? lesAxesEnClair(figure) : '';
   const perfections = [
     pf.versExaltation
       ? `  Le corps le mieux placé de la figure : ${pf.versExaltation.nom}, à `
@@ -474,7 +609,7 @@ function figureEnClair(figure) {
 L'ALMUTEN DE L'ASCENDANT — la planète qui gouverne toute la figure
 ${almuten}
   L'emporte : ${nomDe(figure.almuten.vainqueur.planete)}
-
+${blocNotables}${blocAxes}
 LES ASTRES
 ${astres}
 
@@ -529,8 +664,12 @@ function contexte({ saisie, temps, heures, planetaires, julien, dateLabel = 'Dat
         + 'sans supposer ni le sexe ni l’état matrimonial.',
   ];
   if (temps) {
-    lignes.push(`Convention de temps appliquée : ${c?.nom ?? temps.convention}`
-      + `${temps.zone ? ` (fuseau ${temps.zone}, ${enDecalage(temps.decalage)})` : ''}`);
+    lignes.push(temps.convention
+      ? `Convention de temps appliquée : ${c?.nom ?? temps.convention}`
+        + `${temps.zone && temps.decalage != null
+          ? ` (fuseau ${temps.zone}, ${enDecalage(temps.decalage)})` : ''}`
+      : 'Instant connu exactement — aucune convention d’heure à interpréter'
+        + `${temps.zone ? ` (fuseau ${temps.zone})` : ''}`);
     lignes.push(`Au soleil du lieu : ${enHeures(temps.vrai)} vrai, ${enHeures(temps.moyen)} moyen ; `
       + `${enHeures(temps.universel)} au méridien de Greenwich`);
     lignes.push(`Équation du temps ce jour-là : ${temps.equation >= 0 ? '+' : '−'}`
@@ -553,9 +692,9 @@ const SEPARATEUR = (t) => `\n\n${'═'.repeat(78)}\n${t}\n${'═'.repeat(78)}\n`
 const MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août',
   'septembre', 'octobre', 'novembre', 'décembre'];
 
-function enDate(jj) {
+function enDate(jj, julien = false) {
   if (jj === null || jj === undefined) return '(inconnu)';
-  const d = dateGregorienne(jj);
+  const d = dateCivile(jj, julien);
   return `${d.jour} ${MOIS_FR[d.mois - 1]} ${d.annee}`;
 }
 
@@ -575,11 +714,11 @@ function comptesEnClair(etiquette, f) {
 /** Les douze mois de l'année révolue, avec leur matière et leur seigneur.
  *  C'est le seul calendrier que la technique produise honnêtement : il dit
  *  quelle matière est en jeu à quel moment, non ce qui arrivera. */
-function calendrier(annee) {
+function calendrier(annee, julien) {
   const lignes = annee.mois.map((m) => {
     const s = m.seigneur;
     const marque = m.clef === annee.maitre.clef ? '  ←  le maître de l’année lui-même' : '';
-    return `  ${String(m.rang).padStart(2)}. ${enDate(m.debut).padEnd(20)} `
+    return `  ${String(m.rang).padStart(2)}. ${enDate(m.debut, julien).padEnd(20)} `
       + `${(rang(m.maison.rang) + ' — ' + m.maison.titre).padEnd(26)} `
       + `seigneur ${s.nom} (${s.force}, ${etatEnClair(s)})${marque}`;
   });
@@ -628,55 +767,6 @@ function lesChangements(annee) {
 }
 
 /** Le dossier d'une nativité. */
-/** La durée de vie, remise au modèle comme un désaccord et non comme un blanc.
- *
- *  L'ancienne consigne se contentait d'interdire le chiffre. Une interdiction
- *  sans preuve invite à la contourner ; on remet donc la marche entière des deux
- *  auteurs, pour que le refus soit lisible comme un résultat. */
-function dureeDeVieEnClair(vie) {
-  if (!vie?.marches?.length) return '';
-
-  const marche = (m) => {
-    // Trois états, et non deux : un candidat peut être en lieu convenable sans
-    // être celui qu'on retient. Ptolémée le dit en propres termes lorsque les
-    // deux luminaires conviennent.
-    const etat = (e) => (e.elu ? '→ ÉLU     ' : e.retenu ? '  éligible' : '  écarté  ');
-    const etapes = m.marches.map((e) =>
-      `    ${etat(e)} ${(e.nom ?? '').padEnd(30)} ${e.pourquoi}`
-      + (e.detail ? `\n${' '.repeat(15)}${e.detail}` : '')).join('\n');
-
-    const donneurs = m.alcocodens.map((a) =>
-      `    selon ${a.auteur.padEnd(36)} ${a.elu
-        ? `${a.elu.nom} (par ${a.elu.dignite}) — ${a.elu.atteinte.glose}`
-        : 'AUCUN : pas un des seigneurs du degré ne l’atteint, donc le hyleg est incomplet'}`)
-      .join('\n');
-
-    return `  ${m.auteur} — ${m.source}\n${etapes}\n`
-      + `    HYLEG : ${m.nom}${m.position ? ` à ${m.position}` : ''} — ${m.raison}\n`
-      + (m.ecartInterne ? `    (Ptolémée se contredit ici : ${m.ecartInterne})\n` : '')
-      + `    L'ALCOCODEN, selon l'ordre de commandement qu'on suit :\n${donneurs}`;
-  };
-
-  const verdict = vie.accord.memePoint && vie.accord.memeDonneur
-    ? 'Sur cette figure, les deux marches tombent d’accord. C’est le cas le moins fréquent, '
-      + 'et il ne rend pourtant pas le nombre calculable : il resterait à choisir entre les '
-      + 'années majeures, moyennes et mineures du donneur, puis à ajouter et retrancher selon '
-      + 'les regards. Dis l’accord, il vaut d’être dit — et n’en tire pas un âge.'
-    : 'Les deux marches divergent sur cette figure. C’est le fait à rapporter, et il se rapporte '
-      + 'tel quel : deux autorités qu’on enseignait ensemble ne partent pas du même point et ne '
-      + 'nomment pas le même donneur d’années. Nomme les deux points, nomme les donneurs, et '
-      + 'conclus que le nombre aurait dit quel livre était ouvert, non l’âge du natif.';
-
-  return `${SEPARATEUR('LA DURÉE DE VIE — un désaccord, pas un blanc')}Cette section ne te donne `
-    + 'aucun âge, et tu n’en dois produire aucun. Elle te donne mieux : la marche complète de deux '
-    + 'auteurs sur cette figure, pour que tu puisses montrer d’où vient le silence.\n\n'
-    + (vie.syzygie ? `  La syzygie qui a précédé la naissance : ${vie.syzygie.nom}, `
-      + `à ${enSigne(vie.syzygie.longitude)}. Elle entre dans les deux marches, différemment.\n\n` : '')
-    + `${vie.marches.map(marche).join('\n\n')}\n\n`
-    + `  CE QU'IL FAUT EN DIRE\n  ${verdict}\n\n`
-    + `  ET POURQUOI ON S'ARRÊTE LÀ\n  ${vie.pasDeNombre}\n`;
-}
-
 export function dossierNativite({ saisie, resultat }) {
   return [
     consigne(PLAN_NATIVITE),
@@ -684,14 +774,13 @@ export function dossierNativite({ saisie, resultat }) {
     SEPARATEUR('LES DONNÉES') + contexte({ ...resultat, saisie, dateLabel: 'Date de naissance' }),
     '',
     figureEnClair(resultat.figure),
-    dureeDeVieEnClair(resultat.vie),
     SEPARATEUR('LA DOCTRINE') + tablesDeDoctrine(),
     SEPARATEUR('LES RÉSERVES') + reserves(),
   ].join('\n');
 }
 
 /** Le dossier d'une révolution d'année. */
-export function dossierAnnee({ saisie, resultat, annee }) {
+export function dossierAnnee({ saisie, resultat, annee, julien = false }) {
   const m = annee.maitre;
   const retours = Array.from({ length: 8 }, (_, i) => annee.age - 12 * (i + 1))
     .filter((x) => x >= 0);
@@ -700,7 +789,7 @@ export function dossierAnnee({ saisie, resultat, annee }) {
     consigne(PLAN_REVOLUTION),
     SEPARATEUR('LA COMMANDE') + `Rédige le jugement de l'année qui court des ${annee.age} ans `
       + `de ce natif à ses ${annee.age + 1} ans — un jugement de révolution, non de nativité.\n\n`
-      + `La révolution court du ${enDate(annee.jj)} au ${enDate(annee.finit)}.`,
+      + `La révolution court du ${enDate(annee.jj, julien)} au ${enDate(annee.finit, julien)}.`,
     SEPARATEUR('LA NATIVITÉ (le fond, qui ne se rejuge pas)')
       + contexte({ ...resultat, saisie, dateLabel: 'Date de naissance' }),
     '',
@@ -793,7 +882,7 @@ export function dossierInterrogation({ saisie, resultat, question, jugement }) {
     SEPARATEUR('LA FIGURE DE L\'INSTANT')
       + contexte({ ...resultat, saisie, dateLabel: 'Date de la question' }),
     '',
-    figureEnClair(resultat.figure),
+    figureEnClair(resultat.figure, { ouverture: false }),
     SEPARATEUR('LA DOCTRINE') + tablesDeDoctrine(),
     SEPARATEUR('LES RÉSERVES') + reserves(),
   ].join('\n');

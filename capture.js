@@ -4,8 +4,9 @@
 
 const BASE = process.env.BASE ?? 'http://localhost:8765';
 const CIBLE = process.argv[2] ?? 'officine';
+const DEVTOOLS = process.env.DEVTOOLS ?? 'http://127.0.0.1:9222';
 
-const point = await (await fetch('http://127.0.0.1:9222/json/new?' + BASE,
+const point = await (await fetch(`${DEVTOOLS}/json/new?` + BASE,
   { method: 'PUT' })).json();
 const ws = new WebSocket(point.webSocketDebuggerUrl);
 let id = 0;
@@ -61,12 +62,15 @@ const script = {
            document.querySelectorAll('#vue-notice .pan')[0].open = true; 'ok'`,
   annee: `document.querySelector('#heure').value = 14;
           document.querySelector('#minute').value = 30;
-          document.querySelector('[data-vue=questions]').click();
+          document.querySelector('#formulaire').requestSubmit();
           document.querySelector('#formulaire-annee').requestSubmit(); 'ok'`,
-  question: `document.querySelector('[data-vue=questions]').click();
+  question: `document.querySelector('#heure').value = 14;
+             document.querySelector('#minute').value = 30;
+             document.querySelector('#formulaire').requestSubmit();
              document.querySelector('#demande').value = '0';
              document.querySelector('#formulaire-question').requestSubmit(); 'ok'`,
-  sources: `document.querySelector('[data-vue=sources]').click(); 'ok'`,
+  sources: `document.querySelector('[data-vue=notice]').click();
+            document.querySelectorAll('#vue-notice .pan')[4].open = true; 'ok'`,
 }[CIBLE];
 
 const r = await envoyer('Runtime.evaluate', { expression: script, returnByValue: true });

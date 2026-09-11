@@ -88,54 +88,16 @@ chiffre qui fait autorité, pas le ciel.**
 - **Pas de signe solaire, pas de caractère.** Personne, en 1380, n’est *un Bélier* : la notion
   est une invention du XXᵉ siècle. L’astrologie savante travaille sur l’ascendant, les maisons
   et les seigneurs planétaires.
-- **Pas de durée de vie chiffrée** — mais le désaccord, lui, est calculé. Voir la section
-  ci-dessous : c’est le seul endroit du site où la doctrine est mise en contradiction avec
-  elle-même, sur pièces.
+- **Pas de durée de vie.** Le site ne rend aucun âge. Ptolémée et al-Qabīṣī ne désignent pas
+  de la même façon le point d’où l’on fait partir la vie — le *hyleg* —, ni la planète qui
+  donne les années, et le nombre dépendrait ensuite de l’état de cette planète et des regards
+  qui ajoutent et retranchent. Un chiffre aurait dit quel livre était ouvert, non l’âge du
+  natif.
 - **Pas encore la seconde colonne.** Le site calcule le **ciel réel**. Un astrologien de 1380
   calculait avec les **Tables alphonsines**, et les deux divergent. Reconstruire le calcul
   alphonsin depuis les données de [DISHAS](https://dishas.obspm.fr/) et afficher les deux
   colonnes côte à côte avec l’écart en degrés : c’est le vrai travail, et il reste à faire.
   **C’est la contribution la plus utile que quelqu’un puisse apporter à ce dépôt.**
-
-## La durée de vie : un désaccord calculé, plutôt qu’un refus poli
-
-Le site ne rend aucun âge. Ce n’était longtemps qu’une réserve écrite dans un coin — « la
-doctrine n’est pas fixée » — et une réserve qu’on affirme sans la prouver vaut peu. Elle est
-maintenant démontrée sur chaque figure.
-
-Deux autorités qu’on lisait **ensemble** dans les universités latines du XIVᵉ siècle marchent
-côte à côte sur votre nativité :
-
-- **Ptolémée**, *Tetrabiblos*, III, 10-11 (trad. Robbins). Le prorogateur doit se tenir dans
-  l’un de **cinq lieux** seulement — la dixième, la première (de 5° au-dessus de l’horizon à
-  25° au-dessous), la onzième, la septième, la neuvième — et dans cet ordre d’autorité. On
-  prend le luminaire de la secte s’il y est ; sinon l’autre ; sinon la planète qui domine le
-  Soleil, la syzygie et l’ascendant par au moins trois des cinq modes ; sinon l’ascendant.
-- **Al-Qabīṣī** (Alcabitius), *Introduction à l’astrologie*, IV, 4-5 (trad. Burnett, Yamamoto
-  et Yano). Il **n’a pas** les cinq lieux. Il donne à chaque luminaire sa propre liste de
-  maisons, où le genre du signe entre : le Soleil de jour peut donner la vie depuis la huitième
-  — que Ptolémée exclut absolument — pourvu que le signe soit masculin. Et il ajoute une
-  condition que Ptolémée ignore : un candidat ne vaut que si l’un de ses cinq seigneurs
-  l’atteint. Faute de quoi une figure peut n’avoir aucun hyleg valable.
-
-Puis vient l’**alcocoden**, le donneur d’années : le seigneur du degré du hyleg qui l’atteigne,
-pris dans l’ordre de commandement. Et l’ordre est la seconde fourche — al-Qabīṣī rapporte que
-« certains astrologues » mettent le domicile en tête, puis note que **Dorothée a mis le terme
-avant le domicile**. Deux ordres, souvent deux planètes.
-
-**Le résultat, sur la nativité de Louis d’Orléans :** aucun luminaire n’est bien logé, Ptolémée
-passe donc au dominateur et tombe sur **Mercure** ; chez al-Qabīṣī rien ne convient — luminaires
-mal placés, syzygie et part de Fortune cadentes — et le hyleg échoit en dernier recours au
-**degré de l’ascendant**. Trois planètes différentes sont alors nommées pour donner les années.
-Il fut assassiné à trente-cinq ans, et aucune de ces marches ne l’annonçait.
-
-**On s’arrête avant le nombre, et le point d’arrêt est motivé.** Les années majeures, moyennes
-et mineures de chaque planète sont dans les livres, et l’on saurait les additionner. Mais le
-choix entre les trois dépend de l’état de l’alcocoden, puis l’on ajoute et l’on retranche selon
-les regards des bénéfiques et des maléfiques — et c’est là que la règle cesse d’être une règle
-pour devenir la main de l’astrologien. Le désaccord sur le point de départ suffit à faire voir
-ce qu’il faut voir : un chiffre n’aurait pas dit l’âge du natif, il aurait dit quel livre était
-ouvert sur la table.
 
 ## La seule donnée que le ciel ne porte pas : le sexe
 
@@ -183,11 +145,11 @@ regards, et les nomme sous la figure avec leur écart exact.
 | Positions planétaires | `astronomy-engine` confronté à Swiss Ephemeris en 1331, 1345 et 1991 | écart maximal **48″**, la plupart sous 20″ |
 | Maisons d’Alcabitius | confrontées à Swiss Ephemeris (`hsys 'B'`) sur trois époques et trois latitudes | **écart nul** |
 | Heures inégales et planétaires | confrontées aux cinq légendes latines du manuscrit Oxford, St John’s College 164 | **4 sur 5 exacts**, le cinquième documenté |
-| Écart angulaire | symétrie et bornes vérifiées sur 22 000 couples | **exact** |
-| Ascendants | comparés aux éphémérides publiées pour trois naissances cotées AA (Trump, Cendrars, Macron) | **1′ ou moins** |
-| Syzygie précédente | sur 76 dates de 1300 à 2000 : antériorité, âge sous un mois synodique, alignement des luminaires | **exacte à 3′** |
+| Écart angulaire | symétrie et bornes vérifiées sur quelque 25 000 couples | **exact** |
+| Orbes des aspects | moyenne des deux orbes (al-Bīrūnī, *Tafhīm* §436 et §490), soit la somme des moitiés d’orbe | **conforme à la source** |
+| Ascendants | comparés aux éphémérides publiées pour trois naissances cotées AA (Trump, Cendrars, Macron) | **14′ au plus** (0′, 1′ et 14′) |
 | Part du Mariage | symétrie des deux formes autour de l’ascendant ; invariance des trois autres parts | **exact** |
-| Hyleg | les deux marches conduites sur le corpus ; tout hyleg élu a un alcocoden nommé ou est déclaré incomplet | **aucun trou** |
+| Calendrier d’affichage | une date julienne se relit en julien, une grégorienne sans décalage | **exact** |
 | Joies | sept planètes en sept maisons distinctes ; la joie suit le lieu, n’échoit à aucun nœud, et n’entre dans aucune dignité tenue | **exact** |
 
 Les deux premiers contrôles ont été faits avec `pyswisseph` pendant le développement et ne se
@@ -200,7 +162,7 @@ C’est le chemin principal du site, et il est délibéré : le jugement déterm
 mais dur à lire, et un modèle de langue le rend en prose sans avoir rien à inventer.
 
 Chaque figure — nativité, révolution d’année, interrogation — porte donc un bouton
-**Interpréter avec un LLM**, qui copie un dossier de six à huit mille mots ; il ne reste qu’à
+**Interpréter avec un LLM**, qui copie un dossier de cinq à huit mille mots ; il ne reste qu’à
 le coller dans le modèle de son choix. Le site ne nomme aucun fournisseur, n’en ouvre aucun et
 n’en recommande aucun : le dossier ne tiendrait dans aucune URL, il porte sa consigne avec lui,
 et il vaut pour n’importe quel modèle assez grand pour le lire.
@@ -214,18 +176,28 @@ et laissé libre il produirait de l’horoscope de magazine sous un vernis ancie
 donc tout, et rien d’autre : la figure calculée ici, les tables de doctrine avec leur source,
 et la liste explicite de ce qu’il n’a pas le droit de dire — pas de portrait de caractère
 fondé sur le signe solaire, pas d’âge de la mort, pas d’événement daté, aucune règle
-inventée. Il n’apporte que la prose. Là où il devrait se taire faute de doctrine fixée, on
-ne se contente pas de le lui interdire : on lui remet la marche complète des deux auteurs
-sur la figure, pour qu’il rende l’écart au lieu d’un blanc — une interdiction sans preuve
-invite à la contourner.
+inventée. Il n’apporte que la prose, et une interdiction qu’on n’étaye pas invite à la
+contourner : chaque écart qu’il pourrait être tenté de calculer de tête lui est donc remis
+déjà calculé.
 
-**La lecture a deux parties.** D’abord le ciel, en une seule voix, quatre à six cents mots :
-ce qui tient la figure, ce que cela donne concrètement, deux ou trois gestes. Ensuite trois
-ou quatre axes seulement — les matières que *cette* figure charge vraiment (le métier, l’avoir,
-le corps, les contrats), jamais les douze maisons, jamais un portrait. Les titres concluent
-plutôt qu’ils n’annoncent : « Le métier — le travail porte le nom d’un autre ». « Vous êtes
-quelqu’un de… » est interdit. La date de naissance est dans le dossier ; elle a déjà produit
-la figure, on ne la relit pas à part comme un signe solaire.
+**La première réponse est courte, et elle ouvre le dialogue.** Elle dit d’abord ce que *cette*
+figure a de beau ou d’exceptionnel — calculé dans le dossier : un corps au cœur du Soleil, une
+réception mutuelle que nul regard n’accompagne, une planète en sa joie, un aspect partil — et si
+c’est une bonne chose, elle le dit comme une bonne chose, sans le tempérer. La plupart des
+figures sont bien tempérées, et c’est la règle : le modèle l’écrit alors en une phrase, et non
+invente une rareté. Puis, en deux ou trois phrases, ce qui tient la figure et ce qu’elle donne
+de loin — un aperçu, pas la lecture.
+
+**Puis elle propose les axes, et s’arrête.** Les matières que la figure charge vraiment sont
+calculées, elles aussi : le dossier les classe — le métier, l’avoir, le corps, les contrats, la
+dignité — d’après l’état et le lieu de leur significateur (angle, dignité, combustion,
+rétrogradation, exil, aspect partil, almuten), et propose les mieux marquées, quatre au plus. Le
+modèle les nomme en une ligne chacune et demande laquelle ouvrir. **Aucune consigne de style ne
+pèse sur les axes** : ils ne sont pas rédigés, ils sont proposés. C’est la consultation telle
+qu’elle se passait — un dialogue, non un verdict rendu une fois pour toutes.
+
+**Le lecteur choisit, la lecture continue.** Le modèle ouvre alors la matière demandée, sous le
+socle commun : aucune matière hors du dossier, aucune figure nouvelle, aucun événement annoncé.
 
 **Trois consignes, pas une.** Les trois genres ne se jugent pas de la même façon, et les
 confondre est l’erreur que les traités reprochent le plus. Le socle est commun — traduire
@@ -233,9 +205,9 @@ une position en chose du monde, les interdits — mais le plan change :
 
 | Genre | Plan | Ce qu’il refuse de juger |
 |---|---|---|
-| Nativité | le ciel, puis trois ou quatre axes | l’âge de la mort — il reçoit à la place la marche des deux auteurs, et doit en rendre l’écart ; l’événement daté |
-| Révolution | cette année (matière profectée, maître lu deux fois), puis ce que l’année charge | le métier, la complexion, le naturel — ils se décident à la naissance et n’en bougent plus |
-| Interrogation | peut-on juger, la voie, l’échéance, une conduite | tout ce qui touche à la nativité, dont il ne doit pas parler |
+| Nativité | l’ouverture sur le remarquable et sur ce que le ciel raconte de loin, puis les axes chargés proposés au lecteur | l’âge de la mort ; l’événement daté |
+| Révolution | l’ouverture sur ce que l’année a de notable, puis les axes chargés proposés au lecteur | le métier, la complexion, le naturel — ils se décident à la naissance et n’en bougent plus |
+| Interrogation | peut-on juger, la voie, l’échéance, une conduite, puis ce qu’on peut demander ensuite | tout ce qui touche à la nativité, dont il ne doit pas parler |
 
 **Aucun nombre n’est laissé à calculer.** C’est la leçon d’un essai réel : un modèle à qui
 l’on donnait la position de Vénus mais pas son écart au degré d’exaltation a fait la
@@ -346,7 +318,10 @@ src/lieux.js       la recherche de lieu : liste du corpus hors ligne, puis Photo
 src/annee.js       la révolution de l'année, la profection, le maître de l'année
 src/interrogation.js  les questions, les considérations de Bonatti, la perfection
 src/dossier.js     le dossier à coller dans un modèle de langue
+src/texte.js       l'échappement du HTML, en un seul endroit
 src/app.js         l'interface : la figure, les trois lignes, le repli du détail
+capture.js         capture d'écran des vues, via Chrome en mode DevTools
+verifier.mjs       les contrôles ; fumee.mjs charge l'application hors navigateur
 vendor/            astronomy-engine (MIT) et tz-lookup (CC0), figés
 ```
 

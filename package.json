@@ -5,11 +5,20 @@
   "type": "module",
   "license": "MIT",
   "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adussarps/astrologie-de-cour.git"
+  },
+  "homepage": "https://adussarps.github.io/astrologie-de-cour/",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "servir": "python3 -m http.server 8765",
-    "syntaxe": "for f in src/*.js *.mjs; do node --check \"$f\" || exit 1; done && echo 'Syntaxe : tous les fichiers passent.'",
+    "syntaxe": "for f in src/*.js *.mjs capture.js; do node --check \"$f\" || exit 1; done && echo 'Syntaxe : tous les fichiers passent.'",
     "test": "npm run --silent syntaxe && node verifier.mjs",
-    "fumee": "node fumee.mjs"
+    "fumee": "node fumee.mjs",
+    "capture": "node capture.js"
   },
   "devDependencies": {
     "astronomy-engine": "^2.1.19",

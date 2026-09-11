@@ -1,0 +1,20 @@
+name: Contrôles
+
+# Le site n'a pas de construction : mais ses contrôles, oui. Ils tournent sur
+# chaque poussée, sans quoi une régression ne se verrait qu'à l'écran.
+on:
+  push:
+  pull_request:
+
+jobs:
+  controles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run fumee

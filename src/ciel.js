@@ -71,6 +71,26 @@ export function dateGregorienne(jj) {
   return { annee: mois > 2 ? c - 4716 : c - 4715, mois, jour: Math.floor(jour) };
 }
 
+/** Date civile (calendrier julien) à partir d'un jour julien.
+ *  C'est le calendrier de tout ce qui précède octobre 1582 : une révolution
+ *  d'année ou un mois profecté doit s'afficher dans le calendrier où la
+ *  naissance a été lue, non dans un grégorien proleptique qui avance de dix
+ *  jours au XIVᵉ siècle. */
+export function dateJulienne(jj) {
+  const z = Math.floor(jj + 0.5);
+  const f = jj + 0.5 - z;
+  const b = z + 1524;
+  const c = Math.floor((b - 122.1) / 365.25);
+  const d = Math.floor(365.25 * c);
+  const e = Math.floor((b - d) / 30.6001);
+  const jour = b - d - Math.floor(30.6001 * e) + f;
+  const mois = e < 14 ? e - 1 : e - 13;
+  return { annee: mois > 2 ? c - 4716 : c - 4715, mois, jour: Math.floor(jour) };
+}
+
+/** La date civile dans le calendrier où elle a été lue. */
+export const dateCivile = (jj, julien) => (julien ? dateJulienne(jj) : dateGregorienne(jj));
+
 const tempsDe = (jj) => Astronomy.MakeTime(jj - J2000);
 
 /** Obliquité moyenne de l'écliptique (Laskar), valable sur ±10 000 ans. */
@@ -112,54 +132,6 @@ export function positions(jj) {
   out.teste = { longitude: teste, latitude: 0, retrograde: true, noeud: true };
   out.queue = { longitude: mod360(teste + 180), latitude: 0, retrograde: true, noeud: true };
   return out;
-}
-
-/** La syzygie qui précède la naissance : la dernière nouvelle ou pleine lune.
- *
- *  Elle sert au hyleg. Ptolémée s'en sert pour désigner la planète qui domine
- *  les lieux prorogatifs ; al-Qabīṣī en fait un candidat à part entière, ce que
- *  Ptolémée refuse. C'est l'un des points où les deux se séparent, et il faut
- *  donc la calculer pour montrer la séparation.
- *
- *  On la cherche par phases successives plutôt qu'en une passe : une fenêtre
- *  de quarante jours contient parfois deux conjonctions, et prendre la première
- *  venue donnerait l'avant-dernière syzygie au lieu de la dernière. */
-export function syzygiePrecedente(jj) {
-  const derniere = (cible) => {
-    let trouvee = null;
-    let depart = jj - 40;
-    for (let i = 0; i < 4; i++) {
-      const t = Astronomy.SearchMoonPhase(cible, tempsDe(depart), 40);
-      if (!t) break;
-      const quand = t.ut + J2000;
-      if (quand >= jj) break;
-      trouvee = quand;
-      depart = quand + 1;
-    }
-    return trouvee;
-  };
-
-  const nouvelle = derniere(0);
-  const pleine = derniere(180);
-  if (nouvelle === null && pleine === null) return null;
-
-  const conjonction = (pleine === null) || (nouvelle !== null && nouvelle > pleine);
-  const quand = conjonction ? nouvelle : pleine;
-
-  // Le degré de la syzygie est celui du Soleil à cet instant. Pour une pleine
-  // lune, la doctrine retient celui des deux luminaires qui est au-dessus de
-  // la terre ; ne connaissant pas encore l'horizon ici, on rend les deux et
-  // le choix se fait plus haut, où les maisons sont connues.
-  const p = positions(quand);
-  return {
-    jj: quand,
-    conjonction,
-    genre: conjonction ? 'conjonction' : 'opposition',
-    nom: conjonction ? 'la nouvelle lune' : 'la pleine lune',
-    soleil: p.soleil.longitude,
-    lune: p.lune.longitude,
-    longitude: conjonction ? p.soleil.longitude : p.lune.longitude,
-  };
 }
 
 /** Ascendant, milieu du ciel et les douze maisons d'Alcabitius.
