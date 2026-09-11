@@ -618,6 +618,32 @@ console.log('\n── La langue du dossier : les notes de tête ne parlent pas j
   console.log(`     ${vues} figures passées, ${motsDefendus.length} mots surveillés.`);
 }
 
+console.log('\n── La consigne : une conversation, pas une page');
+{
+  // Le lecteur a demandé une conversation : pas de titres, le tutoiement, un
+  // salut au début, une question à la fin. On ne juge pas ici la prose d'un
+  // modèle : on empêche seulement ces règles de disparaître de la consigne à la
+  // première retouche, comme celle des paires avait disparu avant elles.
+  const { dossierNativite } = await import('./src/dossier.js');
+  const jj = jourJulien({ annee: 1400, mois: 5, jour: 20, heure: 16, minute: 30, julien: true });
+  const figure = juger({ positions: positions(jj), maisons: maisons(jj, 48.8566, 2.3522) });
+  const consigne = dossierNativite({
+    saisie: {
+      annee: 1400, mois: 5, jour: 20, heure: 16, minute: 30,
+      latitude: 48.8566, longitude: 2.3522, lieu: 'Paris',
+    },
+    resultat: { jj, julien: false, figure, temps: null, heures: null, planetaires: null },
+  });
+  const controles = [
+    ['aucun titre n’est demandé', !/markdown|^#{1,6} /m.test(consigne)],
+    ['aucune liste n’est demandée', !/un par ligne/.test(consigne)],
+    ['le salut est donné en exemple', /Bonjour mon ami/.test(consigne)],
+    ['le tutoiement est exigé', /Jamais « vous »/.test(consigne)],
+    ['rendre la parole à la fin est exigé', /rends la parole à la fin/i.test(consigne)],
+  ];
+  for (const [quoi, vrai] of controles) ok(quoi, vrai);
+}
+
 console.log('\n── La synastrie : deux figures face à face (Ptolémée, IV, 5 et IV, 7)');
 {
   // Ptolémée juge le mariage sur « les luminaires des deux génitures ». Ces

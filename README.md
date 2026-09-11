@@ -188,11 +188,17 @@ tapez, et rien d’autre. Surtout, **le modèle ne reçoit aucune latitude doctr
 modèle de langue connaît mille fois mieux le Bélier caractériel du XXᵉ siècle qu’Alcabitius,
 et laissé libre il produirait de l’horoscope de magazine sous un vernis ancien. On lui donne
 donc tout, et rien d’autre : la figure calculée ici, les tables de doctrine avec leur source,
-et la liste explicite de ce qu’il n’a pas le droit de dire — pas de portrait de caractère
-fondé sur le signe solaire, pas d’âge de la mort, pas d’événement daté, aucune règle
+et la liste explicite de ce qu’il n’a pas le droit de dire — ni titre ni liste, pas de portrait
+de caractère fondé sur le signe solaire, pas d’âge de la mort, pas d’événement daté, aucune règle
 inventée. Il n’apporte que la prose, et une interdiction qu’on n’étaye pas invite à la
 contourner : chaque écart qu’il pourrait être tenté de calculer de tête lui est donc remis
 déjà calculé.
+
+**C’est une conversation, pas une fiche.** Le dossier ne demande pas une page : il demande une
+lettre. Le modèle tutoie, salue — « Bonjour mon ami, je viens de voir ton ciel » —, écrit des
+paragraphes sans un seul titre, sans liste et sans tableau, et finit chaque réponse en rendant
+la parole. Les étapes numérotées du dossier sont l’ordre du propos, jamais des rubriques. C’est
+la forme qu’a la consultation dans les traités : on demande, on répond, on demande encore.
 
 **La première réponse est courte, et elle ouvre le dialogue.** Elle dit d’abord ce que *cette*
 figure a de beau ou d’exceptionnel — calculé dans le dossier : un corps au cœur du Soleil, une
