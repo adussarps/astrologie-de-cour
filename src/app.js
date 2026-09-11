@@ -13,7 +13,7 @@ import {
   DOMICILES, EXALTATIONS, TRIPLICITES, TERMES, FACES, MAISONS,
   POIDS, PARTS, RESERVES, JOIES, laGrandeDignite,
 } from './doctrine.js';
-import { NATIVITES, CONJONCTION_1345, AUTRES_PIECES } from './corpus.js';
+import { NATIVITES, CONJONCTION_1345, ROME, AUTRES_PIECES } from './corpus.js';
 import {
   CONVENTIONS, versTempsUniversel, lectureDuTemps, conventionParDefaut,
   fuseauDe, enHeures, enDecalage,
@@ -948,7 +948,7 @@ function initOfficine() {
 
 // ─── Les nativités ───────────────────────────────────────────────────────────
 
-const TOUTES = [...NATIVITES, CONJONCTION_1345];
+const TOUTES = [...NATIVITES, CONJONCTION_1345, ROME];
 
 function ficheNativite(n) {
   const entete = `<h2>${html(n.nom)}</h2>
@@ -975,7 +975,7 @@ function ficheNativite(n) {
   const saisie = { ...n, convention: 'vraie' };
   const { markup, planetaires } = rendreFigure(saisie, {
     titre: n.nom.split(',')[0],
-    lignes: [`${n.jour}/${n.mois}/${n.annee}`,
+    lignes: [n.dateAffichee ?? `${n.jour}/${n.mois}/${n.annee}`,
       `${String(n.heure).padStart(2, '0')} h ${String(n.minute).padStart(2, '0')}`, n.lieu],
   });
 
@@ -1033,7 +1033,7 @@ function initNativites() {
   $('#galerie').innerHTML = TOUTES.map((n) => `<button data-clef="${n.clef}">
       <span class="nom">${html(n.nom.split(',')[0])}</span>
       <span class="sous">${html(n.sousTitre ?? '')}</span>
-      <span class="date">${n.jour}.${n.mois}.${n.annee}${n.heureInconnue ? ' — heure inconnue' : ''}</span>
+      <span class="date">${html(n.dateAffichee ?? `${n.jour}.${n.mois}.${n.annee}`)}${n.heureInconnue ? ' — heure inconnue' : ''}</span>
     </button>`).join('');
 
   $('#galerie').addEventListener('click', (e) => {

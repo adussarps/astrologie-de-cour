@@ -83,6 +83,20 @@ Jupiter et de Saturne au **24 mars**. Les maîtres de Paris n’ont pas regardé
 lu les Tables alphonsines. Une conjonction ne s’observe pas, elle se calcule — **c’est le
 chiffre qui fait autorité, pas le ciel.**
 
+### La nativité d’une ville, et le ciel qu’on lui prête
+
+Rome a un ciel de naissance. Tarutius de Firmum le calcula pour Varron vers 45 av. J.-C., et
+Plutarque donne le résultat : la ville fondée le **4 octobre 754 av. J.-C.**, entre la deuxième
+et la troisième heure. Mais la tradition parvenue par Solin et Jean Lydus lui prête d’autres
+positions — Saturne, Vénus, Mars et Mercure dans le Scorpion, Jupiter dans les Poissons, le
+Soleil dans le Taureau, la Lune dans la Balance — et une autre date, les Parilia du 21 avril.
+Le site dresse le ciel de Tarutius et le confronte : le Soleil et la Lune sont bien en Balance,
+Jupiter en Poissons, Saturne et Vénus en Scorpion — mais **Mars est en Balance et Mercure en
+Vierge**, non dans le Scorpion. Aucun jour ne porte les sept positions à la fois. Le Soleil
+« dans le Taureau » est une correction du transmetteur, et Mars dans sa propre maison était
+justement ce que Tarutius voulait : Rome est *Mavortia moenia*, les murs de Mars. **Quatorze
+siècles avant la conjonction de 1345, la même leçon : le chiffre qui circule n’est pas le ciel.**
+
 ## Ce que le site ne fait pas
 
 - **Pas de signe solaire, pas de caractère.** Personne, en 1380, n’est *un Bélier* : la notion

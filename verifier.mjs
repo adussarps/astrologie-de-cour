@@ -10,7 +10,7 @@ import tzlookup from 'tz-lookup';
 globalThis.tzlookup = tzlookup;
 
 const { jourJulien, positions, maisons, heuresInegales, heuresPlanetaires, enSigne,
-  ecartAngulaire, dateGregorienne, dateCivile } = await import('./src/ciel.js');
+  ecartAngulaire, dateGregorienne, dateCivile, signeDe } = await import('./src/ciel.js');
 const { juger, proximiteExaltation, enDegresMinutes, regardEntre } =
   await import('./src/jugement.js');
 const { EXALTATIONS, JOIES, ORBES, enSaJoie } = await import('./src/doctrine.js');
@@ -678,6 +678,40 @@ console.log('\n── L’interrogation : les voies d’aboutissement');
   if (!ok) echecs++;
   console.log(`   ${ok ? '✓' : '✗'} les douze questions reçoivent oui ou non`);
   console.log(`     voies employées : ${[...voies].map(([v, n]) => `${v} ×${n}`).join(', ')}`);
+}
+
+console.log('\n── La nativité de Rome : le ciel transmis ne tombe pas à sa date');
+{
+  // Solin et Jean Lydus prêtent à Tarutius un ciel où Saturne, Vénus, Mars et
+  // Mercure sont tous quatre dans le Scorpion, Jupiter dans les Poissons, le
+  // Soleil dans le Taureau et la Lune dans la Balance. Le site dresse la date
+  // que Plutarque donne — le 4 octobre 754 av. J.-C. — et les confronte. Ce qui
+  // ne suit pas est l'écart documenté, non une régression : Mars et Mercure ne
+  // sont pas dans le Scorpion, et le Soleil s'y trouve en Balance, non en
+  // Taureau. C'est la leçon de la conjonction de 1345, quatorze siècles plus tôt.
+  const { ROME } = await import('./src/corpus.js');
+  const jj = jourJulien({
+    annee: ROME.annee, mois: ROME.mois, jour: ROME.jour,
+    heure: ROME.heure - ROME.longitude / 15, julien: true,
+  });
+  const p = positions(jj);
+  const en = (clef, signe) => signeDe(p[clef].longitude) === signe;
+  const controles = [
+    ['le Soleil est en Balance', true, en('soleil', 6)],
+    ['la Lune est en Balance', true, en('lune', 6)],
+    ['Jupiter est en Poissons', true, en('jupiter', 11)],
+    ['Saturne est en Scorpion', true, en('saturne', 7)],
+    ['Vénus est en Scorpion', true, en('venus', 7)],
+    ['Mars n’est pas dans le Scorpion', true, !en('mars', 7)],
+    ['Mercure n’est pas dans le Scorpion', true, !en('mercure', 7)],
+  ];
+  for (const [quoi, attendu, obtenu] of controles) {
+    if (attendu !== obtenu) echecs++;
+    console.log(`   ${attendu === obtenu ? '✓' : '✗'} ${quoi.padEnd(52)} `
+      + `${attendu === obtenu ? '' : `obtenu ${obtenu}`}`);
+  }
+  console.log(`     Mars ${enSigne(p.mars.longitude)}, Mercure ${enSigne(p.mercure.longitude)} `
+    + `— la tradition les voulait dans le Scorpion.`);
 }
 
 // La conjonction de 1345, aux deux dates.

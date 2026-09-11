@@ -256,3 +256,79 @@ export const AUTRES_PIECES = [
     lien: 'https://www.persee.fr/doc/bsnaf_0081-1181_1971_num_1969_1_2163',
   },
 ];
+
+/** Une ville, non un homme : la nativité de Rome.
+ *
+ *  Tarutius de Firmum la calcula pour Varron vers le milieu du Ier siècle av.
+ *  J.-C. Plutarque rapporte le résultat — conception lors d'une éclipse, naissance
+ *  au lever du soleil, et fondation de la ville le 9 Pharmouthi, soit le
+ *  4 octobre 754 av. J.-C., entre la deuxième et la troisième heure. Mais la
+ *  tradition parvenue par Solin et Jean Lydus donne une autre date — les Parilia,
+ *  le 21 avril 753 — et d'autres positions. Le site dresse le ciel de Tarutius et
+ *  le confronte à ce que la tradition lui prête : ils ne s'accordent pas. */
+export const ROME = {
+  clef: 'rome',
+  nom: 'La nativité de Rome',
+  sousTitre: 'la ville fondée sous le signe de Mars',
+  lieu: 'Rome',
+  latitude: 41.9028,
+  longitude: 12.4964,
+  annee: -753, mois: 10, jour: 4, heure: 8, minute: 0, julien: true,
+  dateAffichee: '4 octobre 754 av. J.-C.',
+  latin: 'Qui auspicato murorum fundamenta iecit duodeviginti natus annos, XI k. Mai., hora '
+    + 'post secundam ante tertiam, sicut L. Tarruntius prodidit mathematicorum nobilissimus, '
+    + 'Iove in piscibus, Saturno Venere Marte Mercurio in scorpione, Sole in tauro, Luna in '
+    + 'libra constitutis.',
+  traduction: 'Celui qui, après avoir pris les auspices, posa les fondations des murs à '
+    + 'dix-huit ans, le onzième jour avant les calendes de mai — le 21 avril —, entre la '
+    + 'deuxième et la troisième heure, comme l’a transmis Lucius Tarruntius, le plus célèbre '
+    + 'des mathématiciens, Jupiter étant dans les Poissons, Saturne, Vénus, Mars et Mercure '
+    + 'dans le Scorpion, le Soleil dans le Taureau et la Lune dans la Balance. — Solin, '
+    + 'Collectanea I, 18 (v. 300 apr. J.-C.) : c’est le ciel que la tradition attribue à la '
+    + 'fondation, non la date que Tarutius avait calculée.',
+  citation: {
+    texte: 'Il déclara que Rome fut fondée par lui le neuvième jour de Pharmouthi, entre la '
+      + 'deuxième et la troisième heure.',
+    origine: 'Plutarque, Vie de Romulus, 12, 6 (trad. B. Perrin, Loeb)',
+    traduction: 'Le 9 Pharmouthi répond, dans le calendrier julien, au 4 octobre 754 av. J.-C. '
+      + '— sept mois avant les Parilia. Tarutius travaillait à rebours : il cherchait le ciel '
+      + 'qui convînt, non la date que l’on fêtait.',
+  },
+  verification: {
+    texte: 'Le 4 octobre 754 av. J.-C. à huit heures locales, le calcul donne le Soleil et la '
+      + 'Lune en Balance, Jupiter en Poissons, Saturne et Vénus en Scorpion — mais Mars en '
+      + 'Balance, à neuf degrés au-dessus de l’ascendant, et Mercure en Vierge, non dans le '
+      + 'Scorpion où la tradition les place.',
+  },
+  ecart: {
+    titre: 'Le ciel de la tradition n’est pas celui de sa date',
+    texte: 'Solin et Jean Lydus prêtent à Tarutius un ciel où Saturne, Vénus, Mars et Mercure '
+      + 'sont tous quatre dans le Scorpion, Jupiter dans les Poissons, le Soleil dans le Taureau '
+      + 'et la Lune dans la Balance. Or ni Mars ni Mercure n’y sont le 4 octobre : et le Soleil '
+      + '« dans le Taureau » est une correction, puisqu’il se tenait en Balance avec la Lune. '
+      + 'Aucun jour ne porte les sept positions transmises à la fois ; les plus proches sont la '
+      + 'fin d’octobre, quand Mars et Mercure entrent dans le Scorpion alors que la Lune en est '
+      + 'déjà sortie.',
+    hypothese: 'Stephan Heilen a montré pourquoi la date fut déplacée : Tarutius voulait Mars '
+      + 'dans sa propre maison, le Scorpion — Mars est le père de Romulus, et Virgile appelle '
+      + 'Rome Mavortia moenia, les murs de Mars. Le transmetteur, lui, a voulu raccorder ce ciel '
+      + 'aux Parilia du 21 avril et a corrigé le Soleil de la Balance au Taureau, sans voir que '
+      + 'Mercure et Vénus, qui ne s’écartent jamais du Soleil de plus d’un ou deux signes, se '
+      + 'trouvaient alors à cinq signes de lui. Le chiffre qui circule n’est pas le ciel.',
+  },
+  source: {
+    cote: 'Plutarque, Vie de Romulus 12, 3-6 ; Cicéron, De divinatione II, 98-99 ; Solin, '
+      + 'Collectanea I, 18 ; Jean Lydus, De mensibus I, 14',
+    note: 'La ville est ici traitée comme un natif : c’est ce que Tarutius fait pour Varron, '
+      + 'et ce que la tradition a retenu.',
+    edition: 'Stephan Heilen, « Ancient Scholars on the Horoscope of Rome », Culture and Cosmos '
+      + '11 (2007), p. 43-68',
+    lien: 'http://cultureandcosmos.org/pdfs/11/11_Heilen_Horoscope_of_Rome_Vol11.pdf',
+  },
+  apres: 'Tarutius de Firmum calculait, vers 45 av. J.-C., pour Varron, la nativité de Romulus '
+    + 'et celle de la ville. Ni l’une ni l’autre ne nous est parvenue dans son texte : il ne '
+    + 'reste que ce que Plutarque, Solin et Jean Lydus en citent. Ce qui demeure est un ciel '
+    + 'd’une beauté rare — cinq planètes serrées dans le Scorpion, Jupiter en son trône, la Lune '
+    + 'en Balance — et la preuve, déjà, que l’astrologie savante ajuste la date au ciel qu’elle '
+    + 'veut trouver.',
+};

@@ -52,12 +52,12 @@ for (const clef of attendus) {
 }
 
 // Et les deux rendus lourds : une nativité complète, et le refus sans heure.
-const { NATIVITES, CONJONCTION_1345 } = await import('./src/corpus.js');
+const { NATIVITES, CONJONCTION_1345, ROME } = await import('./src/corpus.js');
 const { carre } = await import('./src/figure.js');
 const { juger } = await import('./src/jugement.js');
 const { jourJulien, positions, maisons } = await import('./src/ciel.js');
 
-for (const n of [...NATIVITES, CONJONCTION_1345]) {
+for (const n of [...NATIVITES, CONJONCTION_1345, ROME]) {
   if (n.heureInconnue) continue;
   const jj = jourJulien({
     annee: n.annee, mois: n.mois, jour: n.jour,

@@ -58,6 +58,8 @@ const script = {
          c.dispatchEvent(new Event('input', { bubbles: true })); 'ok'`,
   nativites: `document.querySelector('[data-vue=nativites]').click();
               document.querySelector('#galerie button').click(); 'ok'`,
+  rome: `document.querySelector('[data-vue=nativites]').click();
+         document.querySelector('#galerie button[data-clef=rome]').click(); 'ok'`,
   notice: `document.querySelector('[data-vue=notice]').click();
            document.querySelectorAll('#vue-notice .pan')[0].open = true; 'ok'`,
   annee: `document.querySelector('#heure').value = 14;
