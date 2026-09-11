@@ -213,9 +213,27 @@ qu’elle se passait — un dialogue, non un verdict rendu une fois pour toutes.
 **Le lecteur choisit, la lecture continue.** Le modèle ouvre alors la matière demandée, sous le
 socle commun : aucune matière hors du dossier, aucune figure nouvelle, aucun événement annoncé.
 
-**Trois consignes, pas une.** Les trois genres ne se jugent pas de la même façon, et les
-confondre est l’erreur que les traités reprochent le plus. Le socle est commun — traduire
-une position en chose du monde, les interdits — mais le plan change :
+**Le dossier parle la langue qu’il exige.** Un modèle répète ce qu’il lit : tant que les notes
+mises en tête — « ce qui sort de l’ordinaire », « les axes que cette figure charge » — étaient
+écrites en mots de métier, elles ressortaient en mots de métier dans la page, et la lecture
+redevenait un rapport. Ces notes sont donc en clair (« chez elle, dans sa propre maison », « en
+marche arrière », « à quelques minutes de l’exact »), le dossier ne désigne plus une maison par
+son numéro, la liste des mots qui ne passent pas est explicite, et le relevé technique est
+déclaré pour ce qu’il est : une note prise pour le modèle, jamais une page. Un contrôle de
+`verifier.mjs` tient cette langue sur cent vingt figures — sans quoi elle se perdrait à la
+première retouche.
+
+**Et deux plans pour ce qui suit**, car c’est là que tout se perdait. Laissé libre après
+l’ouverture, le modèle retombait sur le relevé. Quand le lecteur a choisi une matière, il reçoit
+donc un plan de seconde réponse — entrer par le monde et non par le relevé, trois mouvements et
+pas sept, dire ce qui est promis puis ce qui se retourne, et où cela mène — et quand il demande
+un simple détail, un plan court : répondre à la question seule, ne pas recommencer la lecture,
+ne pas s’excuser. Si ce qui manquait était dans la figure, cela s’ajoute ; cela ne s’avoue pas,
+et l’hésitation du modèle ne paraît jamais dans sa page.
+
+**Trois genres, trois plans — et deux pour la suite.** Les trois genres ne se jugent pas de la
+même façon, et les confondre est l’erreur que les traités reprochent le plus. Le socle est
+commun — traduire une position en chose du monde, les interdits — mais le plan change :
 
 | Genre | Plan | Ce qu’il refuse de juger |
 |---|---|---|

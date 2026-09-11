@@ -13,7 +13,8 @@ import {
   MAISONS, ASPECTS, ORBES, PARTS, RESERVES, NATURES_SIGNES, FORCE_DES_LIEUX,
   SIGNIFICATIONS, ETATS_SOLAIRES, CONDITIONS, LUMIERE, MATIERES, MELOTHESIE, JOIES,
 } from './doctrine.js';
-import { nomDe, seigneurDuSigne, enDegresMinutes, peregrinDe, rangTexte } from './jugement.js';
+import { nomDe, seigneurDuSigne, enDegresMinutes, peregrinDe, rangTexte, avecArticle }
+  from './jugement.js';
 import { CONVENTIONS, enHeures, enDecalage, tempsVrai } from './temps.js';
 
 const NOMS = Object.fromEntries(PLANETES.map((p) => [p.clef, p.nom]));
@@ -53,7 +54,7 @@ LES RÈGLES
 2. Chaque paragraphe donne à voir une chose concrète, prise dans le dossier : le port, la
    forge, la chambre, le moulin, la prison, la voie publique. Une image vaut un paragraphe.
 3. Chaque matière se raconte en trois temps : ce qui est promis, ce qui se retourne, l'image.
-4. Le mouvement vient du temps — l'âge, la révolution, la profection.
+4. Le mouvement vient du temps — la révolution, la profection, ce qui avance et ce qui recule.
 5. Dis plusieurs fils à la fois : on gagne d'un côté ce qu'on perd de l'autre.
 6. Prends plaisir à ce que tu trouves. Une joie, une dignité, une réception sont de bonnes
    nouvelles : dis-les comme telles.
@@ -61,35 +62,67 @@ LES RÈGLES
 Pas de flatterie, pas de généralités : si une phrase pouvait s'écrire pour n'importe qui, elle
 ne sert à rien non plus. Si tu titres, mets les titres en Markdown (## ), courts.
 
+LA POÉSIE EST DANS LA CHOSE, PAS DANS LE MOT
+
+Tu n'écris pas joliment : tu montres juste. Une image ne s'ajoute pas au jugement, elle est le
+jugement. « Le juge est dans la cave, et il recule » dit plus que dix adjectifs. Prends l'image
+dans le dossier — le port, la chambre, le papier, la moisson, la lampe, la boue — et pose-la
+sans l'annoncer, sans « comme si », sans comparaison savante.
+
+Chaque réponse laisse au moins une sensation : une lumière, une chaleur, un bruit de la ville,
+l'heure qu'il est. Le lecteur doit voir le ciel qu'on lui lit. Une page sans une seule chose à
+voir est une page ratée, quelle que soit sa justesse.
+
 LES MOTS DE MÉTIER NE PASSENT PAS
 
 Ils appartiennent au dossier, pas à ta page. Tu écris ce qu'ils veulent dire :
 
-  domicile, exaltation, chute, exil  →  « chez elle », « dans son signe de faveur »,
-                                        « au mauvais endroit », « affaibli »
+  domicile, exaltation               →  « chez elle », « dans son signe de faveur »
+  chute, exil                        →  « là où elle tombe », « au mauvais endroit »
   triplicité, terme, face            →  « un appui », et dis lequel en clair si c'est utile
   rétrograde                         →  « elle recule »
   cadente                            →  « faible, en retrait »
+  succédente                         →  « la chose vient, mais après un temps »
   angle                              →  « en pleine vue », « à l'horizon »
   pérégrine                          →  « sans appui »
-  almuten                            →  « celui qui l'emporte »
+  almuten                            →  « celle qui l'emporte »
   ascendant                          →  « le point qui se levait » (une fois), puis « ce ciel »
   milieu du ciel                     →  « le haut du ciel »
   partil                             →  « à quelques minutes de l'exact »
   quartil, trin, sextil, opposition  →  l'angle en degrés, ou l'effet : « de biais », « en
                                         face », « à cent vingt degrés »
-  combustion                         →  « brûlée par le Soleil »
+  combustion                         →  « brûlée par le Soleil », « dans son feu »
+  réception, reçu par                →  « elle est logée chez lui », « il lui donne asile »
+  aversion                           →  « ils ne se voient pas »
+  orientale, occidentale             →  « du côté du levant », « du côté du couchant »
+  conjonction                        →  « ils se joignent », « ils sont ensemble »
+  significateur, seigneur            →  « le témoin », « celle qui gouverne ce lieu »
 
-Si tu ne peux pas le dire sans le mot, ne le dis pas.
+Si tu ne peux pas le dire sans le mot, ne le dis pas. Et le mot ne reparaît pas entre
+parenthèses, ni pour être expliqué : « le lieu qu'on appelle la sixième maison » est encore une
+faute.
 
-LA TABLE EST UN MAGASIN, PAS UNE PAGE
+AUCUN NUMÉRO DE MAISON
+
+Tu ne dis jamais « en huitième », « en sixième », « la maison VII ». Tu nommes la matière : les
+papiers qu'on liquide, le travail qu'on subit, la mort et les dettes. Le numéro est dans le
+dossier pour toi, pour que tu saches où regarder — il n'entre pas dans ta page.
+
+LE DOSSIER EST UN RELEVÉ, PAS UNE PAGE
+
+Les tableaux, la figure, et les blocs mis en tête — « ce qui sort de l'ordinaire », « les axes
+que cette figure charge » — sont des notes prises pour toi. Tu les traduis, tu ne les recopies
+jamais : ni une ligne de la figure, ni un titre d'axe, ni une parenthèse du dossier. Recopier
+un fragment du dossier est une faute, même si le fragment est juste.
 
 La table des significations te dit de quoi chaque planète est le signe : les hommes, les
 métiers, les biens, le corps, les lieux. Tu n'en récites jamais la liste. Pour chaque astre, tu
 prends une chose — celle qui compte dans cette figure — et tu laisses le reste. Un astre dont
 tu n'as rien à dire ne se mentionne pas.
 
-§PLAN§`;
+§PLAN§
+
+§SUITE§`;
 
 // ─── Le plan propre à chaque genre ───────────────────────────────────────────
 //
@@ -106,13 +139,17 @@ axes — tu ouvres la lecture, et tu proposes.
 
 1. L'OUVERTURE — LE CIEL, LE MOMENT, ET CE QU'IL A DE BEAU
 Commence par le moment : le jour et le lieu, la saison telle que le dossier la mesure — la
-durée du jour, l'heure inégale, le signe où se tient le Soleil. Une ou deux phrases, et que le
-lecteur voie ce ciel avant d'entendre un jugement.
+durée du jour, l'heure inégale, l'heure où le soleil s'est levé et celle où il s'est couché,
+le signe où se tient le Soleil. Dis la ville à cette heure-là, et le temps de l'année : ce que
+la rue fait, ce que la lumière fait, ce que ce ciel a de beau. Deux ou trois phrases, et que le
+lecteur voie ce ciel avant d'entendre un jugement — c'est une belle pièce, et cela doit se
+sentir.
 
 Puis développe **deux ou trois** choses, pas davantage : celles qui sortent de l'ordinaire, que
 le dossier te donne **en tête**, sous « CE QUI SORT DE L'ORDINAIRE ». Dis ce que c'est, ce que
-cela fait, ce que cela vaut — avec le ton donné plus haut, et le plaisir de le dire. Si ce bloc
-dit qu'il n'y a rien, écris que la figure est bien tempérée, et passe.
+cela fait, ce que cela vaut — avec le ton donné plus haut, et le plaisir de le dire. Traduis
+ces notes, ne les recopie pas. Si ce bloc dit qu'il n'y a rien, écris que la figure est bien
+tempérée, et passe.
 
 Puis, en quelques phrases, ce qui tient la figure : celui qui l'emporte, le maître du signe qui
 montait, ce qui est en pleine vue — et tu l'écris en clair, comme il est dit plus haut.
@@ -125,12 +162,14 @@ Deux interdits, et ils sont fermes :
   phrase — le détail viendra, et à la demande.
 
 2. LES AXES — TA QUESTION
-Le dossier te donne, en tête, les matières que cette figure charge. Reprends leurs titres tels
-quels, un par ligne, sans les développer, et demande au lecteur laquelle il veut ouvrir. Tu
-n'ajoutes aucun autre format de lecture — ni « maison par maison », ni « le détail technique »,
-ni rien que le bloc ne donne. Tu t'arrêtes là.
+Le bloc « LES AXES QUE CETTE FIGURE CHARGE » est une note pour toi. Tu n'en recopies ni la
+source, ni les raisons, ni ces lignes : tu ne donnes que **le titre**, un par ligne, et tu
+demandes au lecteur laquelle il veut ouvrir. Tu n'ajoutes aucun autre format de lecture — ni
+« maison par maison », ni « le détail technique », ni rien que le bloc ne donne. Tu t'arrêtes
+là.
 
-Quand il répond, tu ouvres la matière choisie — le socle ci-dessous vaut toujours.`;
+Quand il répond, tu ouvres la matière choisie en suivant **le plan de la seconde réponse**,
+donné plus bas. Le socle vaut toujours, et rien ne s'y relâche.`;
 
 const PLAN_REVOLUTION = `Ceci est une RÉVOLUTION D'ANNÉE. C'est la PREMIÈRE réponse : 400 à 600
 mots. Ne rédige pas un second jugement de nativité — une année ne donne que ce que la nativité
@@ -139,19 +178,21 @@ naturel, ni la durée de la vie. Tu n'écris pas encore les axes : tu ouvres, et
 
 1. L'OUVERTURE — LE MOMENT, ET CE QUE CETTE ANNÉE A DE NOTABLE
 Commence par le moment du retour solaire : le jour, le lieu, la saison telle que le dossier la
-mesure. Puis développe **deux ou trois** choses, pas davantage : le fait le plus net — un maître
-qui change d'état, une entrée ou une sortie de combustion, une matière remise en jeu après
-douze ans —, puis la matière que la profection impose et lequel des quatre cas s'applique. Suis
-le ton donné plus haut : le caractère des astres, et la joie de le dire.
+mesure, la lumière de ce jour-là. Puis développe **deux ou trois** choses, pas davantage : le
+fait le plus net — un maître qui change d'état, une entrée ou une sortie de combustion, une
+matière remise en jeu après douze ans —, puis la matière que la profection impose et lequel des
+quatre cas s'applique. Traduis les notes du dossier, ne les recopie pas. Suis le ton donné plus
+haut : le caractère des astres, et la joie de le dire.
 
 Pas le tour des planètes ; pas de matière ouverte — le détail attend l'axe choisi.
 
 2. LES AXES — TA QUESTION
-Reprends les titres des axes tels que le dossier les donne, un par ligne, sans les développer,
-et demande au lecteur laquelle il veut suivre. Tu n'ajoutes aucun autre format de lecture. Tu
-t'arrêtes là.
+Reprends les titres des axes tels que le dossier les donne, un par ligne, sans les développer
+et sans en recopier ni la source ni les raisons, et demande au lecteur laquelle il veut suivre.
+Tu n'ajoutes aucun autre format de lecture. Tu t'arrêtes là.
 
-Quand il répond, tu ouvres la matière choisie — le socle ci-dessous vaut toujours.`;
+Quand il répond, tu ouvres la matière choisie en suivant **le plan de la seconde réponse**,
+donné plus bas. Le socle vaut toujours.`;
 
 const PLAN_INTERROGATION = `Ceci est une INTERROGATION. On te pose une question ; tu réponds.
 La figure est celle de l'instant — la nativité n'y entre pour rien, n'en parle pas. Le
@@ -211,10 +252,71 @@ prononce aucun jugement de mariage : la règle ne peut pas être conduite.
 
 400 à 600 mots. Termine par une question au lecteur sur ce qu'il veut qu'on creuse.`;
 
+// ─── Le plan de ce qui suit la première réponse ──────────────────────────────
+//
+// C'est la réponse que le lecteur attend le plus, et celle qui n'avait aucun
+// plan : laissé libre après l'ouverture, le modèle retombait sur le relevé
+// technique, et la page redevenait un rapport. Deux cas, et deux seulement :
+// il a choisi une matière, ou il demande un détail. Le premier veut une
+// lecture, le second une réponse courte — et ni l'un ni l'autre ne se
+// récapitule.
+
+const PLAN_AXE = `CE QUI VIENT APRÈS — LE LECTEUR A CHOISI UNE MATIÈRE
+
+C'est la SECONDE réponse, et c'est celle qu'il lira le plus attentivement. 400 à 600 mots.
+C'est ici que le vocabulaire du dossier revient tout seul, et c'est ici qu'il faut le
+surveiller le plus : rien du socle ne se relâche, et la matière choisie n'autorise pas plus de
+technique que l'ouverture.
+
+1. L'ENTRÉE — PAR LE MONDE, PAS PAR LE RELEVÉ
+Une ou deux phrases qui donnent à voir : le lieu où se tient l'astre qui commande la matière,
+ce qu'on y fait, l'heure, la saison, la lumière. Tu prends ce qui commande, et tu laisses le
+reste. Pas d'inventaire, pas de tour d'horizon.
+
+2. CE QUI EST PROMIS, CE QUI SE RETOURNE, CE QU'ON EN FAIT
+Trois mouvements, quatre au plus — pas sept. Chacun part d'un astre du dossier et finit dans le
+monde : un métier, une paie, un papier, une pièce, un visage, une démarche. Dis d'abord ce qui
+est donné, puis ce qui est retenu, repris ou perdu, puis comment cela se conduit. Si deux
+témoins se contredisent, dis-le et tranche en donnant ta raison. On gagne d'un côté ce qu'on
+perd de l'autre : c'est ce balancement qui fait la lecture, pas l'énumération.
+
+3. LE TEMPS
+Ce que la figure dit de la vitesse : ce qui vient tôt, ce qui vient tard, ce qui se reprend,
+ce qui se défait. Aucune date, aucun âge, aucune durée que le dossier ne donne.
+
+4. OÙ CELA MÈNE, ET LA PORTE SUIVANTE
+Deux phrases nettes, sans morale ni conseil général. Puis, si le dossier donne d'autres axes,
+une seule ligne pour demander lequel ouvrir ensuite — le titre, rien de plus.
+
+CE QUI EST FERME ICI
+- Le nom de la matière est dans le dossier ; la matière, elle, est dans la vie. Un métier, des
+  papiers, un corps — jamais « la sixième maison ».
+- Pas de tour des planètes, pas de tableau, pas de récapitulation de ce que tu as déjà écrit.
+- Aucun mot de la liste du socle, même pour l'expliquer, même entre parenthèses.
+- Si une chose ne peut pas se dire sans son mot de métier, elle ne se dit pas.`;
+
+const PLAN_DETAIL = `CE QUI VIENT APRÈS — LE LECTEUR DEMANDE UNE PRÉCISION
+
+Ce n'est plus la première réponse : il a lu, il demande un détail, ou il te dit ce qu'il vit.
+Tu réponds à sa question et à elle seule. 200 à 400 mots, et tu ne recommences jamais la
+lecture : pas de nouveau tour du ciel, pas de tableau, pas de résumé de ce que tu as écrit.
+
+S'il te dit ce qu'il vit et que la figure le dit aussi, tu le lui montres — la figure parlait
+déjà de cela, et voici par où. Si elle ne le dit pas, tu le dis, et tu t'arrêtes là.
+
+Tu n'écris ni ton embarras ni ta correction : rien de « vous avez raison », rien de « j'ai parlé
+trop vite ». Si ta première réponse était trop courte, tu ajoutes ce qui manquait, et cela se
+lit comme une suite, non comme un aveu.
+
+Les mots de métier ne reviennent pas davantage ici qu'ailleurs : ce que tu viens d'expliquer,
+tu l'expliques encore, et plus court.`;
+
 const SOCLE_BAS = `CE QUE TU NE FAIS PAS
 - Tu ne parles jamais de ton travail, du dossier, de la méthode, ni de ce que tu vas faire. Tu
   ne décris pas la lecture : tu la fais. Aucune phrase ne commence par « Ce que le dossier… »,
   « Je ne… », « Il s'agit de… », « Ce thème… » — ni ne résume ce que le dossier contient.
+- Aucun fragment du dossier n'est recopié : ni une ligne de la figure, ni un intitulé d'axe, ni
+  une parenthèse. Aucun numéro de maison. Ce qui vient du relevé se traduit, ou ne se dit pas.
 - Tu n'écris jamais ton hésitation. Rien de « non, plutôt », rien qu'on reprenne : ce que tu
   corriges ne paraît pas. Ce que tu écris est ce que tu penses.
 - Aucun portrait par signe solaire. Personne n'est « un Bélier ». Le Soleil est une planète
@@ -225,8 +327,9 @@ const SOCLE_BAS = `CE QUE TU NE FAIS PAS
   potentiel, énergie, vibration, intuition, karma, destinée intérieure, « être soi-même ».
 - Aucun nombre calculé, arrondi ou déduit par soustraction. Tous sont ci-dessous. Si un
   écart n'y figure pas, tu ne l'as pas.
-- Aucun âge, aucune durée de vie, même déguisée (« longue vie »). Le site ne la calcule
-  pas et ne t'en fournit aucun élément : n'en invente aucun, sous aucune forme.
+- Aucune durée de vie, aucun terme, aucun âge de la vie qui ne soit déjà écrit dans le
+  dossier. Le site ne calcule pas la durée de vie et ne t'en fournit aucun élément :
+  n'en invente aucun, sous aucune forme.
 - Aucun événement daté de ton autorité. Un calendrier ou une échéance déjà calculés se
   rapportent comme le produit d'une règle, avec sa source.
 - N'invente aucune règle, aucune table, aucun degré. Deux témoignages qui se contredisent :
@@ -237,9 +340,11 @@ planète se trouve — pas par le signe de la pointe. En angle elle agit visible
 faiblement. Pérégrine mais reçue n'est pas sans appui. Nomme, pour ce que tu affirmes, la
 règle et le livre qui l'autorisent. Les sources sont ci-dessous ; n'en invente aucune.`;
 
-/** La consigne, assemblée pour un genre. Le socle ne change pas ; seul le plan
- *  change, parce que les trois genres ne répondent pas à la même question. */
-const consigne = (plan) => SOCLE_HAUT.replace('§PLAN§', plan) + '\n\n' + SOCLE_BAS;
+/** La consigne, assemblée pour un genre. Le socle ne change pas ; seuls le plan
+ *  et la suite changent, parce que les genres ne répondent pas à la même
+ *  question et ne se suivent pas de la même façon. */
+const consigne = (plan, suite = PLAN_DETAIL) =>
+  SOCLE_HAUT.replace('§PLAN§', plan).replace('§SUITE§', suite) + '\n\n' + SOCLE_BAS;
 
 // ─── Les tables de doctrine, telles qu'il les recevra ────────────────────────
 
@@ -409,12 +514,26 @@ function perfectionEnClair(a) {
  *  tradition tient ces accidents pour remarquables, et l'ouverture doit s'y
  *  appuyer. Quand la liste est vide, la figure est bien tempérée, et cela se dit
  *  en une phrase — sans inventer de rareté. */
+/** Les aspects, dits par leur angle et non par leur nom : « trin », « quartil »
+ *  et « conjonction » sont des mots du relevé, et le socle les refuse. */
+const ANGLE_EN_CLAIR = {
+  conjonction: 'au même degré',
+  sextil: 'de biais, à soixante degrés',
+  quartil: 'de biais, à quatre-vingt-dix degrés',
+  trin: 'à cent vingt degrés, d’amitié parfaite',
+  opposition: 'en face, à cent quatre-vingts degrés',
+};
+
 function ceQuiSortDeLOrdinaire(figure) {
   const trouves = [];
   const astres = figure.astres.filter((a) => !a.noeud);
 
   for (const a of astres) {
-    if (a.joie) trouves.push(`${a.nom} est EN SA JOIE, en la ${a.maison}e maison.`);
+    if (a.joie) {
+      const lieu = figure.maisonsHabitees[a.maison - 1];
+      trouves.push(`${a.nom} est DANS LE LIEU DE SA JOIE — ${lieu.titre.toLowerCase()}, `
+        + `le lieu qui lui agrée entre tous (${lieu.detail}).`);
+    }
     if (a.solaire?.classe === 'cazimi') {
       trouves.push(`${a.nom} est AU CŒUR DU SOLEIL, à ${enDegresMinutes(a.solaire.ecart)} `
         + `du centre : la seule proximité qui renforce.`);
@@ -423,16 +542,19 @@ function ceQuiSortDeLOrdinaire(figure) {
 
   for (const r of figure.regards ?? []) {
     if (r.partil) {
-      trouves.push(`Aspect PARTIL : ${nomDe(r.de)} ${r.aspect.nom} ${nomDe(r.a)}, `
-        + `à ${enDegresMinutes(r.ecart)} de l’exactitude.`);
+      trouves.push(`${avecArticle(r.de)} et ${avecArticle(r.a)} : l’angle est presque exact — `
+        + `${ANGLE_EN_CLAIR[r.aspect.nom] ?? r.aspect.nom}, à ${enDegresMinutes(r.ecart)} `
+        + `de l’exactitude.`);
     }
   }
 
   for (const m of figure.receptions?.mutuelles ?? []) {
-    trouves.push(`RÉCEPTION MUTUELLE entre ${nomDe(m.a)} et ${nomDe(m.b)}`
+    trouves.push(`${avecArticle(m.a)} et ${avecArticle(m.b)} se logent l’une dans l’autre — `
+      + `chacune dans le signe de l’autre`
       + (m.regard
-        ? `, qui se regardent par ${m.regard.aspect.nom}.`
-        : `, SANS AUCUN REGARD entre eux : le lien le plus fort de la doctrine, `
+        ? `, et elles se regardent — ${ANGLE_EN_CLAIR[m.regard.aspect.nom]
+          ?? m.regard.aspect.nom}.`
+        : `, SANS AUCUN REGARD entre elles : le lien le plus fort de la doctrine, `
           + `et il ne se voit jamais.`));
   }
 
@@ -440,22 +562,28 @@ function ceQuiSortDeLOrdinaire(figure) {
     if (!r.regard) continue;
     const recue = figure.astres.find((a) => a.clef === r.recue);
     if (['mars', 'saturne'].includes(r.recue) && recue?.etat?.tenues.length) {
-      trouves.push(`${nomDe(r.recue)} est reçu par ${nomDe(r.hote)} (${r.par}) tout en tenant `
-        + `${recue.etat.tenues.join(' et ')} : un maléfique logé et tenu.`);
+      trouves.push(`${avecArticle(r.recue)} est logé chez ${avecArticle(r.hote)}, `
+        + `${receptionEnClair(r.par, r.hote)}, tout en tenant `
+        + `${recue.etat.tenues.map((t) => digniteEnClair(t, r.recue)).join(' et ')} : `
+        + `un maléfique logé, et tenu.`);
     }
   }
 
   const a = figure.almuten;
   if (a?.vainqueur?.planete === figure.seigneurAscendant) {
-    trouves.push(`L’ALMUTEN de la figure est aussi le seigneur de l’ascendant `
-      + `(${nomDe(a.vainqueur.planete)}) : tout se rassemble en une seule main.`);
+    trouves.push(`${avecArticle(a.vainqueur.planete)} l’emporte dans toute la figure, et c’est `
+      + `aussi ${GENRES[a.vainqueur.planete] === 'f' ? 'elle' : 'lui'} qui gouverne le point `
+      + `qui se levait : tout se rassemble en une seule main.`);
   }
 
   const pf = figure.perfections ?? {};
   for (const c of [pf.versExaltation, pf.versChute]) {
     if (c?.notable) {
-      trouves.push(`${c.nom} est à ${enDegresMinutes(c.ecart)} de son degré `
-        + `${c.versLaChute ? 'de chute' : 'd’exaltation'}.`);
+      const f = GENRES[c.clef] === 'f';
+      trouves.push(`${avecArticle(c.clef)} est à ${enDegresMinutes(c.ecart)} `
+        + (c.versLaChute
+          ? `du point le plus bas de sa course — c’est là qu’${f ? 'elle' : 'il'} tombe.`
+          : `de son degré de faveur — le point où ${f ? 'elle' : 'il'} est le mieux.`));
     }
   }
 
@@ -475,25 +603,63 @@ const POIDS_AXE = {
   retro: 2, joie: 2, almuten: 3, partil: 1,
 };
 
+/** Les dignités, dites dans la langue que le socle exige. Le modèle répète ce
+ *  qu'il lit : une note technique ressort en note technique, et c'est
+ *  exactement ainsi que le jargon rentrait dans la page. */
+const DIGNITES_EN_CLAIR = {
+  'en son domicile': ['chez lui, dans sa propre maison', 'chez elle, dans sa propre maison'],
+  'en son exaltation': ['dans son signe de faveur', 'dans son signe de faveur'],
+  'en sa triplicité': ['avec l’appui des siens', 'avec l’appui des siens'],
+  'en son terme': ['sur un degré qui est un peu sien', 'sur un degré qui est un peu sien'],
+  'en sa face': ['sur un degré qui est un peu sien', 'sur un degré qui est un peu sien'],
+  'en son exil': ['au mauvais endroit', 'au mauvais endroit'],
+  'en sa chute': ['là où il tombe', 'là où elle tombe'],
+};
+
+const digniteEnClair = (dit, clef) => {
+  // Les dignités tenues s'écrivent « en son domicile » ; le motif d'une
+  // réception s'écrit « domicile », sans article. Une seule porte d'entrée.
+  const paire = DIGNITES_EN_CLAIR[dit.startsWith('en ') ? dit : `en son ${dit}`];
+  if (!paire) return dit;
+  return GENRES[clef] === 'f' ? paire[1] : paire[0];
+};
+
+/** Le motif d'une réception, dans une phrase qui dit déjà qui loge qui : « dans
+ *  le signe qu'elle gouverne » vaut mieux que « par domicile ». */
+function receptionEnClair(par, hote) {
+  const f = GENRES[hote] === 'f';
+  if (par === 'domicile') return `dans le signe qu’${f ? 'elle' : 'il'} gouverne`;
+  if (par === 'exaltation') return 'dans son signe de faveur';
+  return `par ${par}`;
+}
+
 function marquesDAxe(figure, a) {
   if (!a) return [];
+  const f = GENRES[a.clef] === 'f';
   const m = [];
-  if (a.force === 'angle') m.push(['angle', 'en angle']);
+  if (a.force === 'angle') m.push(['angle', 'en pleine vue, à l’horizon']);
   const grandes = (a.etat?.tenues ?? [])
     .filter((t) => /domicile|exaltation|triplicité/.test(t));
-  if (grandes.length) m.push(['dignite', grandes.join(' et ')]);
-  if ((a.etat?.perdues ?? []).length) m.push(['perte', a.etat.perdues.join(' et ')]);
+  if (grandes.length) {
+    m.push(['dignite', grandes.map((t) => digniteEnClair(t, a.clef)).join(' et ')]);
+  }
+  if ((a.etat?.perdues ?? []).length) {
+    m.push(['perte', a.etat.perdues.map((t) => digniteEnClair(t, a.clef)).join(' et ')]);
+  }
   if (a.solaire?.classe === 'combuste') {
-    m.push(['combuste', GENRES[a.clef] === 'f' ? 'brûlée par le Soleil' : 'brûlé par le Soleil']);
+    m.push(['combuste', f ? 'brûlée par le Soleil' : 'brûlé par le Soleil']);
   }
   if (a.solaire?.classe === 'cazimi') m.push(['cazimi', 'au cœur du Soleil']);
-  if (a.retrograde && !a.noeud) m.push(['retro', 'rétrograde']);
-  if (a.joie) m.push(['joie', 'en sa joie']);
-  if (figure.almuten?.vainqueur?.planete === a.clef) m.push(['almuten', 'almuten de la figure']);
+  if (a.retrograde && !a.noeud) m.push(['retro', 'en marche arrière']);
+  if (a.joie) m.push(['joie', 'dans le lieu qui lui agrée']);
+  if (figure.almuten?.vainqueur?.planete === a.clef) {
+    m.push(['almuten', 'celle qui l’emporte dans toute la figure']);
+  }
   const partil = (figure.regards ?? [])
     .find((r) => r.partil && (r.de === a.clef || r.a === a.clef));
   if (partil) {
-    m.push(['partil', `aspect partil avec ${nomDe(partil.de === a.clef ? partil.a : partil.de)}`]);
+    const autre = avecArticle(partil.de === a.clef ? partil.a : partil.de);
+    m.push(['partil', `à quelques minutes de l’exact avec ${autre}`]);
   }
   return m;
 }
@@ -531,12 +697,13 @@ export function lesAxesCharges(figure) {
       const m = marquesDAxe(figure, a);
       if (!m.length) continue;
       score += m.reduce((s, [clef]) => s + (POIDS_AXE[clef] ?? 1), 0);
-      raisons.push(`${a.nom} ${m.map(([, dit]) => dit).join(', ')}`);
+      raisons.push(`${a.nom} · ${m.map(([, dit]) => dit).join(' · ')}`);
     }
     const hotes = c.clef === 'contrats' ? maison(7).hotes.length : 0;
     if (hotes) {
       score += Math.min(2, hotes);
-      raisons.push(`${hotes} hôte${hotes > 1 ? 's' : ''} en septième`);
+      raisons.push(`les contrats · ${hotes} logé${hotes > 1 ? 's' : ''} chez lui `
+        + `— la matière a du monde`);
     }
     return { clef: c.clef, titre: c.titre, source: c.source, score, raisons };
   }).sort((a, b) => b.score - a.score);
@@ -548,14 +715,18 @@ export function lesAxesCharges(figure) {
 function lesAxesEnClair(figure) {
   const axes = lesAxesCharges(figure);
   const charges = axes.filter((a) => a.charge);
+  const entete = `\nLES AXES QUE CETTE FIGURE CHARGE — une note pour toi, pas une page\n`
+    + `  Tu n'en recopies ni la source, ni les raisons, ni ces lignes : tu ne donnes que le\n`
+    + `  titre, un par ligne, et tu demandes au lecteur laquelle il veut ouvrir.\n`;
   if (!charges.length) {
-    return `\nLES AXES QUE CETTE FIGURE CHARGE — aucun\n  (cette figure est bien tempérée en `
-      + `toutes ses matières : dis-le, et propose au lecteur les quatre portes habituelles — `
-      + `le métier, l’avoir, le corps, les contrats.)\n`;
+    return entete + `  Aucun : cette figure est bien tempérée en toutes ses matières. Dis-le en\n`
+      + `  une phrase, et propose au lecteur les quatre portes habituelles — le métier,\n`
+      + `  l’avoir, le corps, les contrats.\n`;
   }
   const banals = axes.filter((a) => !a.charge).map((a) => a.titre);
-  return `\nLES AXES QUE CETTE FIGURE CHARGE — propose-les, ne les développe pas\n`
-    + charges.map((a) => `  — ${a.titre} (${a.source}) : ${a.raisons.join(' ; ')}`).join('\n')
+  return entete
+    + charges.map((a) => `  — ${a.titre} (${a.source})\n`
+      + a.raisons.map((r) => `      ${r}`).join('\n')).join('\n')
     + (banals.length ? `\n  (banal, ne le propose pas : ${banals.join(', ')}.)` : '')
     + '\n';
 }
@@ -565,7 +736,8 @@ function lesAxesEnClair(figure) {
  *  de lire — et non au milieu de six mille mots de tables. */
 export function ouvertureEnClair(figure) {
   const trouves = ceQuiSortDeLOrdinaire(figure);
-  const notables = `CE QUI SORT DE L'ORDINAIRE — la matière de la première rubrique\n`
+  const notables = `CE QUI SORT DE L'ORDINAIRE — la matière de la première rubrique, `
+    + `à traduire et non à recopier\n`
     + (trouves.length
       ? trouves.map((x) => `  — ${x}`).join('\n')
       : '  (rien : cette figure est bien tempérée. Dis-le en une phrase, et n’invente aucune rareté.)');
@@ -795,7 +967,8 @@ function contexte({ saisie, temps, heures, planetaires, julien, dateLabel = 'Dat
     const longitude = saisie.longitude;
     lignes.push(`Ce jour-là, le soleil s’est levé à ${enHeures(tempsVrai(heures.jjLever, longitude))} `
       + `et couché à ${enHeures(tempsVrai(heures.jjCoucher, longitude))} : le jour a duré `
-      + `${enHeures(heures.dureeJour)}, la nuit ${enHeures(heures.dureeNuit)} ; l’heure inégale `
+      + `${enHeures(heures.dureeJour)}, la nuit ${enHeures(heures.dureeNuit)}. `
+      + `Nous sommes ${saison(saisie.mois, saisie.latitude)} ; l’heure inégale `
       + `de jour valait ${Math.round(heures.heureDeJour)} minutes, celle de nuit `
       + `${Math.round(heures.heureDeNuit)}.`);
     lignes.push(`Heure inégale : naissance ${planetaires.deJour ? 'de jour' : 'de nuit'}, à la `
@@ -813,6 +986,21 @@ const SEPARATEUR = (t) => `\n\n${'═'.repeat(78)}\n${t}\n${'═'.repeat(78)}\n`
 
 const MOIS_FR = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août',
   'septembre', 'octobre', 'novembre', 'décembre'];
+
+/** La saison du lieu, par le mois et l'hémisphère. Ce n'est pas une donnée
+ *  d'astrologie : c'est ce que le lecteur voit par sa fenêtre, et le dossier le
+ *  lui donne pour qu'il ne l'invente pas — ni ne dise l'hiver sur un mois de
+ *  mai. */
+const SAISON_NORD = ['hiver', 'hiver', 'printemps', 'printemps', 'printemps', 'été', 'été',
+  'été', 'automne', 'automne', 'automne', 'hiver'];
+const SAISON_SUD = {
+  hiver: 'été', printemps: 'automne', été: 'hiver', automne: 'printemps',
+};
+function saison(mois, latitude) {
+  const nord = SAISON_NORD[mois - 1] ?? '';
+  const mot = latitude >= 0 ? nord : SAISON_SUD[nord];
+  return mot === 'printemps' ? 'au printemps' : `en ${mot}`;
+}
 
 function enDate(jj, julien = false) {
   if (jj === null || jj === undefined) return '(inconnu)';
@@ -891,7 +1079,7 @@ function lesChangements(annee) {
 /** Le dossier d'une nativité. */
 export function dossierNativite({ saisie, resultat }) {
   return [
-    consigne(PLAN_NATIVITE),
+    consigne(PLAN_NATIVITE, PLAN_AXE),
     SEPARATEUR('LA COMMANDE') + `Rédige la lecture de cette nativité.`,
     SEPARATEUR('CE QUE TU DOIS DIRE DANS CETTE PREMIÈRE RÉPONSE')
       + ouvertureEnClair(resultat.figure),
@@ -910,7 +1098,7 @@ export function dossierAnnee({ saisie, resultat, annee, julien = false }) {
     .filter((x) => x >= 0);
 
   return [
-    consigne(PLAN_REVOLUTION),
+    consigne(PLAN_REVOLUTION, PLAN_AXE),
     SEPARATEUR('LA COMMANDE') + `Rédige le jugement de l'année qui court des ${annee.age} ans `
       + `de ce natif à ses ${annee.age + 1} ans — un jugement de révolution, non de nativité.\n\n`
       + `La révolution court du ${enDate(annee.jj, julien)} au ${enDate(annee.finit, julien)}.`,

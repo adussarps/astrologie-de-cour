@@ -577,6 +577,47 @@ console.log('\n── Les axes que la figure charge, et qu’on propose au lecte
     + `de ${moins} à ${plus} selon la figure.`);
 }
 
+console.log('\n── La langue du dossier : les notes de tête ne parlent pas jargon');
+{
+  // Le modèle recopie ce qu'il lit : les notes mises en tête — « ce qui sort de
+  // l'ordinaire », « les axes que cette figure charge » — sont la source de la
+  // première réponse, et c'est par elles que le vocabulaire du relevé rentrait
+  // dans la page. On contrôle donc la langue de la source. La langue de la
+  // réponse, elle, ne se contrôle pas ici : c'est le socle qui la commande.
+  const { ouvertureEnClair } = await import('./src/dossier.js');
+  const motsDefendus = ['domicile', 'exaltation', 'exil', ' chute', 'rétrograde',
+    'pérégrin', 'almuten', 'partil', 'cazimi', 'réception', 'significateur',
+    'orientale', 'occidentale', 'conjonction', 'aversion', 'succédente', 'cadente',
+    'en angle', 'hôte', 'seigneur', 'combustion', 'en sa joie', 'triplicité'];
+  let fautes = 0; let numeros = 0; let vues = 0;
+  const vus = new Map();
+  for (let k = 0; k < 120; k++) {
+    const jj = jourJulien({
+      annee: 1320 + Math.floor(k / 8) * 41, mois: (k % 12) + 1, jour: 3 + (k % 24),
+      heure: k % 24, julien: true,
+    });
+    const f = juger({ positions: positions(jj), maisons: maisons(jj, 48.8566, 2.3522) });
+    const texte = ouvertureEnClair(f).toLowerCase();
+    vues++;
+    for (const mot of motsDefendus) {
+      if (texte.includes(mot)) { fautes++; vus.set(mot, (vus.get(mot) ?? 0) + 1); }
+    }
+    // Le numéro d'une maison ne doit pas entrer dans la page : on cherche
+    // « 8e maison » ou « maison 8 ». Le contrôle se fait ligne à ligne, sinon
+    // l'indentation du relevé fait passer « maison \n Vénus » pour un numéro.
+    // Le motif est écrit deux fois, et c'est voulu : `test` sur une expression
+    // littérale garde son `lastIndex` d'un appel à l'autre.
+    if (texte.split('\n').some((l) => /\b\d+(?:e|re|er)?\s+maison\b|\bmaison\s+\d/.test(l))) {
+      numeros++;
+    }
+  }
+  const pires = [...vus.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3)
+    .map(([m, n]) => `« ${m.trim()} » ×${n}`).join(', ');
+  ok('aucun mot de métier dans les notes de tête', fautes === 0, `${fautes} fois — ${pires}`);
+  ok('aucune maison désignée par son numéro', numeros === 0, numeros);
+  console.log(`     ${vues} figures passées, ${motsDefendus.length} mots surveillés.`);
+}
+
 console.log('\n── La synastrie : deux figures face à face (Ptolémée, IV, 5 et IV, 7)');
 {
   // Ptolémée juge le mariage sur « les luminaires des deux génitures ». Ces
